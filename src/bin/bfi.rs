@@ -13,23 +13,7 @@ fn main() {
 }
 
 fn get_program() -> Vec<u8> {
-    let matches = App::new("bfi")
-        .author("Jesse A. Tov <jesse.tov@gmail.com>")
-        .about("A Brainfuck interpreter")
-        .arg(Arg::with_name("expr")
-            .short("e")
-            .long("expr")
-            .value_name("CODE")
-            .help("BF code to execute")
-            .multiple(true)
-            .takes_value(true)
-            .conflicts_with("INPUT"))
-        .arg(Arg::with_name("INPUT")
-            .help("The source file to interpret")
-            .multiple(true)
-            .conflicts_with("expr")
-            .index(1))
-        .get_matches();
+    let matches = build_clap_app().get_matches();
 
     let mut input = Vec::new();
     if let Some(exprs) = matches.values_of("expr") {
@@ -45,3 +29,23 @@ fn get_program() -> Vec<u8> {
 
     input
 }
+
+fn build_clap_app() -> App<'static, 'static> {
+    App::new("bfi")
+        .author("Jesse A. Tov <jesse.tov@gmail.com>")
+        .about("A Brainfuck interpreter")
+        .arg(Arg::with_name("expr")
+            .short("e")
+            .long("expr")
+            .value_name("CODE")
+            .help("BF code to execute")
+            .multiple(true)
+            .takes_value(true)
+            .conflicts_with("INPUT"))
+        .arg(Arg::with_name("INPUT")
+            .help("The source file to interpret")
+            .multiple(true)
+            .conflicts_with("expr")
+            .index(1))
+}
+
