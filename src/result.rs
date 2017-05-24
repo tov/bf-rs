@@ -2,7 +2,7 @@ use std::fmt;
 
 pub type BfResult<T> = Result<T, Error>;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Error {
     UnmatchedBegin,
     UnmatchedEnd,
@@ -10,7 +10,7 @@ pub enum Error {
     PointerOverflow,
 }
 
-impl fmt::Debug for Error {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::Error::*;
 

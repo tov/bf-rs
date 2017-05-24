@@ -57,13 +57,13 @@ fn main() {
 
 fn parse(options: &Options) -> ast::Program {
     ast::parser::parse_program(&options.program_text)
-        .unwrap_or_else(|e| error_exit(2, format!("Syntax error: {:?}.", e)))
+        .unwrap_or_else(|e| error_exit(2, format!("Syntax error: {}.", e)))
 }
 
 fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
     let state = options.memory_size.map(state::State::with_capacity);
     program.interpret_stdin(state)
-        .unwrap_or_else(|e| error_exit(3, format!("Runtime error: {:?}.", e)))
+        .unwrap_or_else(|e| error_exit(3, format!("Runtime error: {}.", e)))
 }
 
 fn get_options() -> Options {
