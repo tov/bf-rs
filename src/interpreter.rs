@@ -9,7 +9,7 @@ pub trait Interpretable {
     fn interpret_state<R: Read, W: Write>(
         &self, state: State, input: R, output: W) -> BfResult<()>;
 
-    /// Interprets a program. If the given `state` is `None`, uses a new, empty state.
+    /// Interprets a program. If the given `size` is `None`, the default memory size.
     fn interpret<R: Read, W: Write>(
         &self, size: Option<usize>, input: R, output: W) -> BfResult<()>
     {
