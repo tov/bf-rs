@@ -10,7 +10,7 @@ use clap::{Arg, App};
 use bf::ast;
 use bf::rle_ast;
 use bf::flat;
-use bf::interpreter::Interpretable;
+use bf::traits::Interpretable;
 
 const VERSION: &'static str = "0.1.0";
 

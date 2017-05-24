@@ -6,7 +6,7 @@ extern crate bf;
 use bf::ast;
 use bf::rle_ast;
 use bf::flat;
-use bf::interpreter::Interpretable;
+use bf::traits::Interpretable;
 use bf::test_helpers;
 
 use test::Bencher;

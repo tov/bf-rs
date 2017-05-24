@@ -2,7 +2,7 @@ use std::io::{Read, Write};
 
 use state::State;
 use result::BfResult;
-use interpreter::Interpretable;
+use traits::Interpretable;
 use super::*;
 
 impl Interpretable for Program {
