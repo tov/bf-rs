@@ -24,14 +24,12 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
         Instruction::Op((OpCode::Down, count)) => state.down(count as u8),
         Instruction::Op((OpCode::In, count)) => {
             for _ in 0 .. count {
-                let mut byte = [0];
-                let _ = input.read_exact(&mut byte);
-                state.store(byte[0]);
+                state.read(input);
             }
         }
         Instruction::Op((OpCode::Out, count)) => {
             for _ in 0 .. count {
-                let _ = output.write_all(&[state.load()]);
+                state.write(output);
             }
         }
         Instruction::Op((OpCode::Begin, _)) | Instruction::Op((OpCode::End, _)) =>

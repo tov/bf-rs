@@ -22,14 +22,8 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
         Instruction::Op(OpCode::Right) => state.right(1),
         Instruction::Op(OpCode::Up) => state.up(1),
         Instruction::Op(OpCode::Down) => state.down(1),
-        Instruction::Op(OpCode::In) => {
-            let mut byte = [0];
-            let _ = input.read_exact(&mut byte);
-            state.store(byte[0]);
-        }
-        Instruction::Op(OpCode::Out) => {
-            let _ = output.write_all(&[state.load()]);
-        }
+        Instruction::Op(OpCode::In) => state.read(input),
+        Instruction::Op(OpCode::Out) => state.write(output),
         Instruction::Op(OpCode::Begin) | Instruction::Op(OpCode::End) =>
             panic!("Invalid opcode"),
         Instruction::Loop(ref program) => {

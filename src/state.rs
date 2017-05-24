@@ -1,3 +1,5 @@
+use std::io::{Read, Write};
+
 /// The default number of 8-bit memory cells, as used by
 /// [`State::new`](struct.State.html#method.new).
 pub const DEFAULT_CAPACITY: usize = 30_000;
@@ -79,6 +81,20 @@ impl State {
     #[inline]
     pub fn store(&mut self, value: u8) {
         self.memory[self.pointer] = value;
+    }
+
+    /// Reads from a `Read` into the byte at the pointer.
+    #[inline]
+    pub fn read<R: Read>(&mut self, input: &mut R) {
+        let mut byte = [0];
+        let _ = input.read_exact(&mut byte);
+        self.store(byte[0]);
+    }
+
+    /// Writes to a `Write` from the byte at the pointer.
+    #[inline]
+    pub fn write<W: Write>(&self, output: &mut W) {
+        let _ = output.write_all(&[self.load()]);
     }
 }
 
