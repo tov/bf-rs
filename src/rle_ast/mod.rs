@@ -1,7 +1,7 @@
 pub mod compiler;
 pub mod interpreter;
 
-use ::op_code::OpCode;
+use op_code::OpCode;
 
 /// A BF program is a sequence of instructions.
 pub type Program = Box<[Instruction]>;

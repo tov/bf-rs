@@ -34,19 +34,15 @@ fn main() {
     interpret(&*program, &options);
 }
 
-fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
-    let state = options.memory_size.map(state::State::with_capacity);
-    match program.interpret_stdin(state) {
-        Ok(()) => (),
-        Err(e) => error_exit(3, format!("Runtime error: {:?}.", e)),
-    }
+fn parse(options: &Options) -> ast::Program {
+    ast::parser::parse_program(&options.program_text)
+        .unwrap_or_else(|e| error_exit(2, format!("Syntax error: {:?}.", e)))
 }
 
-fn parse(options: &Options) -> ast::Program {
-    match ast::parser::parse_program(&options.program_text) {
-        Ok(program) => program,
-        Err(e) => error_exit(2, format!("Syntax error: {:?}.", e)),
-    }
+fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
+    let state = options.memory_size.map(state::State::with_capacity);
+    program.interpret_stdin(state)
+        .unwrap_or_else(|e| error_exit(3, format!("Runtime error: {:?}.", e)))
 }
 
 fn get_options() -> Options {
@@ -57,26 +53,25 @@ fn get_options() -> Options {
 
     let matches = build_clap_app().get_matches();
 
+    if let Some(size) = matches.value_of("size") {
+        let size = size.parse()
+            .unwrap_or_else(|e| error_exit(1, format!("Could not parse memory size: {}", e)));
+        result.memory_size = Some(size);
+    }
+
     if let Some(exprs) = matches.values_of("expr") {
         for e in exprs {
             result.program_text.extend(e.as_bytes());
         }
     } else if let Some(files) = matches.values_of("INPUT") {
         for f in files {
-            let mut file = File::open(f).unwrap();
-            file.read_to_end(&mut result.program_text).unwrap();
+            let mut file = File::open(f)
+                .unwrap_or_else(|e| error_exit(1, format!("{}: {}", e, f)));
+            file.read_to_end(&mut result.program_text)
+                .unwrap_or_else(|e| error_exit(1, format!("{}: {}", e, f)));
         }
     } else {
         error_exit(1, "No program given.".to_owned());
-    }
-
-    if let Some(size) = matches.value_of("size") {
-        match size.parse() {
-            Ok(size) =>
-                result.memory_size = Some(size),
-            Err(e) =>
-                error_exit(1, format!("Could not parse memory size: {}", e)),
-        }
     }
 
     result
