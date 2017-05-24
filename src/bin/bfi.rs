@@ -8,6 +8,7 @@ use clap::{Arg, App};
 
 use bf::state;
 use bf::ast::{parser, interpreter};
+//use bf::rle_ast::{compiler, interpreter};
 
 fn main() {
     let program = parser::parse_program(&get_program()).unwrap();

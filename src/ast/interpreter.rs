@@ -18,10 +18,10 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
     where R: Read, W: Write
 {
     match *instruction {
-        Instruction::Op(OpCode::Left) => state.left(),
-        Instruction::Op(OpCode::Right) => state.right(),
-        Instruction::Op(OpCode::Up) => state.up(),
-        Instruction::Op(OpCode::Down) => state.down(),
+        Instruction::Op(OpCode::Left) => state.left(1),
+        Instruction::Op(OpCode::Right) => state.right(1),
+        Instruction::Op(OpCode::Up) => state.up(1),
+        Instruction::Op(OpCode::Down) => state.down(1),
         Instruction::Op(OpCode::In) => {
             let mut byte = [0];
             let _ = input.read_exact(&mut byte);

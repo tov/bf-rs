@@ -30,11 +30,11 @@ impl State {
     ///
     /// Panics if pointer is already 0.
     #[inline]
-    pub fn left(&mut self) {
-        if self.pointer == 0 {
+    pub fn left(&mut self, count: usize) {
+        if self.pointer < count {
             panic!("pointer underflow");
         } else {
-            self.pointer -= 1;
+            self.pointer -= count;
         }
     }
 
@@ -44,8 +44,8 @@ impl State {
     ///
     /// Panics if pointer would go past the end of the memory.
     #[inline]
-    pub fn right(&mut self) {
-        self.pointer += 1;
+    pub fn right(&mut self, count: usize) {
+        self.pointer += count;
         if self.pointer == self.memory.len() {
             panic!("pointer overflow");
         }
@@ -55,18 +55,18 @@ impl State {
     ///
     /// Wraps around modulo 256.
     #[inline]
-    pub fn up(&mut self) {
+    pub fn up(&mut self, count: u8) {
         let old = self.load();
-        self.store(old.wrapping_add(1));
+        self.store(old.wrapping_add(count));
     }
 
     /// Decrements the byte at the pointer.
     ///
     /// Wraps around modulo 256.
     #[inline]
-    pub fn down(&mut self) {
+    pub fn down(&mut self, count: u8) {
         let old = self.load();
-        self.store(old.wrapping_sub(1));
+        self.store(old.wrapping_sub(count));
     }
 
     /// Gets the value of the point at the pointer.
@@ -91,7 +91,7 @@ mod tests {
         let mut actual = make(&[0, 0, 0], 0);
         let expected = make(&[0, 0, 0], 1);
 
-        actual.right();
+        actual.right(1);
 
         assert_eq!(actual, expected);
     }
@@ -101,8 +101,8 @@ mod tests {
         let mut actual = make(&[0, 0, 0], 0);
         let expected = make(&[0, 0, 0], 0);
 
-        actual.right();
-        actual.left();
+        actual.right(1);
+        actual.left(1);
 
         assert_eq!(actual, expected);
     }
@@ -110,14 +110,14 @@ mod tests {
     #[test]
     fn up_goes_to_1() {
         let mut actual = make(&[0, 0, 0], 0);
-        actual.up();
+        actual.up(1);
         assert_eq!(actual, make(&[1, 0, 0], 0))
     }
 
     #[test]
     fn down_goes_to_255() {
         let mut actual = make(&[0, 0, 0], 0);
-        actual.down();
+        actual.down(1);
         assert_eq!(actual, make(&[255, 0, 0], 0))
     }
 
@@ -133,7 +133,7 @@ mod tests {
         let mut actual = make(&[0, 0, 0], 0);
         actual.store(5);
         assert_eq!(actual, make(&[5, 0, 0], 0));
-        actual.right();
+        actual.right(1);
         actual.store(8);
         assert_eq!(actual, make(&[5, 8, 0], 1));
     }
@@ -141,17 +141,17 @@ mod tests {
     #[test]
     fn longer_sequence_of_actions() {
         let mut actual = make(&[0, 0, 0], 0);
-        actual.up();
+        actual.up(1);
         assert_eq!(actual, make(&[1, 0, 0], 0));
-        actual.up();
+        actual.up(1);
         assert_eq!(actual, make(&[2, 0, 0], 0));
-        actual.right();
+        actual.right(1);
         assert_eq!(actual, make(&[2, 0, 0], 1));
-        actual.down();
+        actual.down(1);
         assert_eq!(actual, make(&[2, 255, 0], 1));
-        actual.down();
+        actual.down(1);
         assert_eq!(actual, make(&[2, 254, 0], 1));
-        actual.right();
+        actual.right(1);
         assert_eq!(actual, make(&[2, 254, 0], 2));
         actual.store(77);
         assert_eq!(actual, make(&[2, 254, 77], 2));
@@ -160,8 +160,8 @@ mod tests {
     #[test]
     fn right_to_right_edge_is_okay() {
         let mut actual = make(&[0, 0, 0], 0);
-        actual.right();
-        actual.right();
+        actual.right(1);
+        actual.right(1);
         assert_eq!(actual, make(&[0, 0, 0], 2));
     }
 
@@ -169,16 +169,16 @@ mod tests {
     #[should_panic]
     fn right_past_edge_is_error() {
         let mut actual = make(&[0, 0, 0], 0);
-        actual.right();
-        actual.right();
-        actual.right();
+        actual.right(1);
+        actual.right(1);
+        actual.right(1);
     }
 
     #[test]
     #[should_panic]
     fn move_left_is_error() {
         let mut machine = make(&[0, 0, 0], 0);
-        machine.left();
+        machine.left(1);
     }
 
     fn make(memory: &[u8], pointer: usize) -> State {
