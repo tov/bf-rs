@@ -1,12 +1,14 @@
 use super::*;
 use ::ast;
 
-struct Compiler {
+/// Represents the state of an RLE compiler from `ast::Instruction` to `Instruction`.
+pub struct Compiler {
     instructions: Vec<Instruction>,
     buffer: (OpCode, usize),
 }
 
 impl Compiler {
+    /// Creates a new RLE compiler.
     pub fn new() -> Self {
         Compiler {
             instructions: Vec::new(),
@@ -14,6 +16,7 @@ impl Compiler {
         }
     }
 
+    /// Compiles the given sequence of instructions.
     pub fn compile(&mut self, program: &[ast::Instruction]) {
         for instruction in program {
             match *instruction {
@@ -23,6 +26,7 @@ impl Compiler {
         }
     }
 
+    /// Extracts the compiled program.
     pub fn into_program(mut self) -> Program {
         self.push_op();
         self.instructions.into_boxed_slice()
@@ -50,6 +54,7 @@ impl Compiler {
     }
 }
 
+/// Compiles the given sequence of instructions into a program.
 pub fn compile(program: &[ast::Instruction]) -> Program {
     let mut compiler = Compiler::new();
     compiler.compile(program);
