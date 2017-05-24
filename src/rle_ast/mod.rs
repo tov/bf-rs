@@ -6,7 +6,7 @@ pub use self::compiler::compile;
 use op_code::OpCode;
 
 /// A BF program is a sequence of instructions.
-pub type Program = Box<[Instruction]>;
+pub type Program = [Instruction];
 
 pub type Count = usize;
 
@@ -14,7 +14,7 @@ pub type Count = usize;
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Instruction {
     Op((OpCode, Count)),
-    Loop(Program),
+    Loop(Box<Program>),
 }
 
 pub fn mk_left(count: Count)  -> Instruction { Instruction::Op((OpCode::Left, count)) }

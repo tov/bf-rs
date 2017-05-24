@@ -1,7 +1,7 @@
 use super::*;
 use result::{BfResult, Error};
 
-pub fn parse_program(input: &[u8]) -> BfResult<Program> {
+pub fn parse_program(input: &[u8]) -> BfResult<Box<Program>> {
     let (program, rest) = parse_instructions(input)?;
     if rest.is_empty() {
         Ok(program)
@@ -50,7 +50,7 @@ fn parse_instruction(mut input: &[u8]) -> Parser<Option<Instruction>> {
     }
 }
 
-fn parse_instructions(mut input: &[u8]) -> Parser<Program> {
+fn parse_instructions(mut input: &[u8]) -> Parser<Box<Program>> {
     let mut instructions = Vec::new();
 
     loop {

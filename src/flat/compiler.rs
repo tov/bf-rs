@@ -29,7 +29,7 @@ impl Compiler {
         }
     }
 
-    pub fn into_program(self) -> Program {
+    pub fn into_program(self) -> Box<Program> {
         self.instructions.into_boxed_slice()
     }
 
@@ -38,7 +38,7 @@ impl Compiler {
     }
 }
 
-pub fn compile(src: &[rle_ast::Instruction]) -> Program {
+pub fn compile(src: &[rle_ast::Instruction]) -> Box<Program> {
     let mut compiler = Compiler::new();
     compiler.compile(src);
     compiler.into_program()

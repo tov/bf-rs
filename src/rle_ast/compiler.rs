@@ -27,7 +27,7 @@ impl Compiler {
     }
 
     /// Extracts the compiled program.
-    pub fn into_program(mut self) -> Program {
+    pub fn into_program(mut self) -> Box<Program> {
         self.push_op();
         self.instructions.into_boxed_slice()
     }
@@ -48,14 +48,14 @@ impl Compiler {
         }
     }
 
-    fn issue_loop(&mut self, body: Program) {
+    fn issue_loop(&mut self, body: Box<Program>) {
         self.push_op();
         self.instructions.push(Instruction::Loop(body));
     }
 }
 
 /// Compiles the given sequence of instructions into a program.
-pub fn compile(program: &[ast::Instruction]) -> Program {
+pub fn compile(program: &[ast::Instruction]) -> Box<Program> {
     let mut compiler = Compiler::new();
     compiler.compile(program);
     compiler.into_program()

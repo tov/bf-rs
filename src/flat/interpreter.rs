@@ -5,7 +5,7 @@ use result::BfResult;
 use interpreter::Interpretable;
 use super::*;
 
-impl Interpretable for [Instruction] {
+impl Interpretable for Program {
     fn interpret_state<R: Read, W: Write>(
         &self, mut state: State, mut input: R, mut output: W) -> BfResult<()>
     {
@@ -13,7 +13,7 @@ impl Interpretable for [Instruction] {
     }
 }
 
-fn interpret<R, W>(instructions: &[Instruction], state: &mut State,
+fn interpret<R, W>(instructions: &Program, state: &mut State,
                    input: &mut R, output: &mut W)
                        -> BfResult<()>
     where R: Read, W: Write

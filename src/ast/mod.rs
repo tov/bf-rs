@@ -6,13 +6,13 @@ pub use self::parser::parse_program;
 use op_code::OpCode;
 
 /// A BF program is a sequence of instructions.
-pub type Program = Box<[Instruction]>;
+pub type Program = [Instruction];
 
 /// A BF instruction.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Instruction {
     Op(OpCode),
-    Loop(Program),
+    Loop(Box<Program>),
 }
 
 pub fn mk_left()  -> Instruction { Instruction::Op(OpCode::Left) }

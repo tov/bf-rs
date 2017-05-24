@@ -54,7 +54,7 @@ fn main() {
     }
 }
 
-fn parse(options: &Options) -> ast::Program {
+fn parse(options: &Options) -> Box<ast::Program> {
     ast::parse_program(&options.program_text)
         .unwrap_or_else(|e| error_exit(2, format!("Syntax error: {}.", e)))
 }
