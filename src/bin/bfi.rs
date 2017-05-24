@@ -7,44 +7,69 @@ use std::process::exit;
 
 use clap::{Arg, App};
 
-use bf::ast::parser;
+use bf::ast;
+use bf::state;
 use bf::rle_ast;
 use bf::flat;
 use bf::interpreter::Interpretable;
 
-fn main() {
-    let program = match parser::parse_program(&get_program()) {
-        Ok(program) => program,
-        Err(e) => error_exit(2, format!("Syntax error: {:?}.", e)),
-    };
+#[derive(Debug, Clone)]
+struct Options {
+    program_text: Vec<u8>,
+    memory_size:  Option<usize>,
+}
 
+fn main() {
+    // Process command-line options:
+    let options = get_options();
+
+    // Parse the program to AST:
+    let program = parse(&options);
+
+    // Two compilation/optimization passes:
     let program = rle_ast::compiler::compile(&program);
     let program = flat::compiler::compile(&program);
 
-    match program.interpret_stdin(None) {
+    // Run it:
+    interpret(&*program, &options);
+}
+
+fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
+    let state = options.memory_size.map(state::State::with_capacity);
+    match program.interpret_stdin(state) {
         Ok(()) => (),
         Err(e) => error_exit(3, format!("Runtime error: {:?}.", e)),
     }
 }
 
-fn get_program() -> Vec<u8> {
-    let mut input = Vec::new();
+fn parse(options: &Options) -> ast::Program {
+    match ast::parser::parse_program(&options.program_text) {
+        Ok(program) => program,
+        Err(e) => error_exit(2, format!("Syntax error: {:?}.", e)),
+    }
+}
+
+fn get_options() -> Options {
+    let mut result = Options {
+        program_text: Vec::new(),
+        memory_size:  None,
+    };
 
     let matches = build_clap_app().get_matches();
     if let Some(exprs) = matches.values_of("expr") {
         for e in exprs {
-            input.extend(e.as_bytes());
+            result.program_text.extend(e.as_bytes());
         }
     } else if let Some(files) = matches.values_of("INPUT") {
         for f in files {
             let mut file = File::open(f).unwrap();
-            file.read_to_end(&mut input).unwrap();
+            file.read_to_end(&mut result.program_text).unwrap();
         }
     } else {
         error_exit(1, "No program given.".to_owned());
     }
 
-    input
+    result
 }
 
 fn build_clap_app() -> App<'static, 'static> {
