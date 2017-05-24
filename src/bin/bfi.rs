@@ -15,8 +15,16 @@ use bf::interpreter::Interpretable;
 
 #[derive(Debug, Clone)]
 struct Options {
-    program_text: Vec<u8>,
-    memory_size:  Option<usize>,
+    program_text:  Vec<u8>,
+    memory_size:   Option<usize>,
+    compiler_pass: Pass,
+}
+
+#[derive(Debug, Clone, Copy)]
+enum Pass {
+    Ast,
+    Rle,
+    Flat,
 }
 
 fn main() {
@@ -26,12 +34,23 @@ fn main() {
     // Parse the program to AST:
     let program = parse(&options);
 
-    // Two compilation/optimization passes:
-    let program = rle_ast::compiler::compile(&program);
-    let program = flat::compiler::compile(&program);
+    match options.compiler_pass {
+        Pass::Ast => {
+            interpret(&*program, &options);
+        }
 
-    // Run it:
-    interpret(&*program, &options);
+        Pass::Rle => {
+            let program = rle_ast::compiler::compile(&program);
+            interpret(&*program, &options);
+        }
+
+        Pass::Flat => {
+            let program = rle_ast::compiler::compile(&program);
+            let program = flat::compiler::compile(&program);
+            interpret(&*program, &options);
+        }
+
+    }
 }
 
 fn parse(options: &Options) -> ast::Program {
@@ -47,8 +66,9 @@ fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
 
 fn get_options() -> Options {
     let mut result = Options {
-        program_text: Vec::new(),
-        memory_size:  None,
+        program_text:  Vec::new(),
+        memory_size:   None,
+        compiler_pass: Pass::Flat,
     };
 
     let matches = build_clap_app().get_matches();
@@ -57,6 +77,14 @@ fn get_options() -> Options {
         let size = size.parse()
             .unwrap_or_else(|e| error_exit(1, format!("Could not parse memory size: {}", e)));
         result.memory_size = Some(size);
+    }
+
+    if matches.is_present("ast") {
+        result.compiler_pass = Pass::Ast;
+    } else if matches.is_present("rle") {
+        result.compiler_pass = Pass::Rle;
+    } else if matches.is_present("flat") {
+        result.compiler_pass = Pass::Flat;
     }
 
     if let Some(exprs) = matches.values_of("expr") {
@@ -99,6 +127,18 @@ fn build_clap_app() -> App<'static, 'static> {
             .long("size")
             .help("Memory size in bytes")
             .takes_value(true))
+        .arg(Arg::with_name("ast")
+            .long("ast")
+            .help("Interpret the AST directly")
+            .conflicts_with_all(&["flat", "rle"]))
+        .arg(Arg::with_name("rle")
+            .long("rle")
+            .help("Interpret the run-length encoded AST directly")
+            .conflicts_with_all(&["ast", "flat"]))
+        .arg(Arg::with_name("flat")
+            .long("flat")
+            .help("Interpret the flattened AST (default)")
+            .conflicts_with_all(&["ast", "rle"]))
 }
 
 fn error_exit(code: i32, msg: String) -> ! {
