@@ -40,14 +40,14 @@ impl State {
     ///
     /// # Errors
     ///
-    /// Panics if pointer would go below 0.
+    /// Return `Err` if pointer would go below 0.
     #[inline]
     pub fn left(&mut self, count: usize) -> BfResult<()> {
-        if self.pointer < count {
-            Err(Error::PointerUnderflow)
-        } else {
+        if self.pointer >= count {
             self.pointer -= count;
             Ok(())
+        } else {
+            Err(Error::PointerUnderflow)
         }
     }
 
@@ -55,14 +55,14 @@ impl State {
     ///
     /// # Errors
     ///
-    /// Panics if pointer would go past the end of the memory.
+    /// Return `Err` if pointer would go past the end of the memory.
     #[inline]
     pub fn right(&mut self, count: usize) -> BfResult<()> {
-        if self.pointer + count >= self.memory.len() {
-            Err(Error::PointerOverflow)
-        } else {
+        if self.pointer + count < self.memory.len() {
             self.pointer += count;
             Ok(())
+        } else {
+            Err(Error::PointerOverflow)
         }
     }
 
