@@ -6,8 +6,9 @@ use state::State;
 /// Program forms which can be interpreted.
 pub trait Interpretable {
     /// Interprets a program against the given state.
-    fn interpret_state<R: Read, W: Write>(
-        &self, state: State, input: R, output: W) -> BfResult<()>;
+    fn interpret_state<R: Read, W: Write>(&self, state: State,
+                                          input: R, output: W)
+        -> BfResult<()>;
 
     /// Interprets a program. If the given `size` is `None`, the default memory size.
     fn interpret<R: Read, W: Write>(
