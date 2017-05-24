@@ -7,8 +7,8 @@ use std::process::exit;
 
 use clap::{Arg, App};
 
-use bf::ast;
 use bf::state;
+use bf::ast;
 use bf::rle_ast;
 use bf::flat;
 use bf::interpreter::Interpretable;
