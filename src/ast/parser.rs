@@ -1,23 +1,21 @@
 use super::*;
+use result::{BfResult, Error};
 
-pub fn parse_program(input: &[u8]) -> Result<Program, &'static str> {
+pub fn parse_program(input: &[u8]) -> BfResult<Program> {
     let (program, rest) = parse_instructions(input)?;
     if rest.is_empty() {
         Ok(program)
     } else {
-        Err("unmatched ]")
+        Err(Error::UnmatchedEnd)
     }
 }
 
-type Parser<'a, R> = Result<(R, &'a [u8]), &'static str>;
+type Parser<'a, R> = BfResult<(R, &'a [u8])>;
 
 fn parse_instruction(mut input: &[u8]) -> Parser<Option<Instruction>> {
     loop {
-        if input.is_empty() {
-            return Ok((None, input));
-        } else {
-            let c = input[0];
-            input = &input[1..];
+        if let Some((&c, next_input)) = input.split_first() {
+            input = next_input;
             match c {
                 b'<' => return Ok((Some(mk_left()),  input)),
                 b'>' => return Ok((Some(mk_right()), input)),
@@ -25,21 +23,19 @@ fn parse_instruction(mut input: &[u8]) -> Parser<Option<Instruction>> {
                 b'-' => return Ok((Some(mk_down()),  input)),
                 b',' => return Ok((Some(mk_in()),    input)),
                 b'.' => return Ok((Some(mk_out()),   input)),
-                b']' => return Err("unmatched ]"),
+                b']' => return Err(Error::UnmatchedEnd),
                 b'[' => match parse_instructions(input) {
                     Err(e) => return Err(e),
                     Ok((program, next_input)) => {
                         input = next_input;
                         loop {
-                            if input.is_empty() {
-                                return Err("unmatched [");
-                            } else {
-                                let c = input[0];
-                                input = &input[1..];
-                                match c {
-                                    b']' => return Ok((Some(Instruction::Loop(program)), input)),
-                                    _    => { /* pass */ }
-                                }
+                            match input.split_first() {
+                                Some((&b']', next_input)) =>
+                                    return Ok((Some((Instruction::Loop(program))), next_input)),
+                                Some((_, next_input)) =>
+                                    input = next_input,
+                                None =>
+                                    return Err(Error::UnmatchedBegin),
                             }
                         }
                     }
@@ -48,6 +44,8 @@ fn parse_instruction(mut input: &[u8]) -> Parser<Option<Instruction>> {
                     // pass
                 },
             }
+        } else {
+            return Ok((None, input));
         }
     }
 }
@@ -67,7 +65,7 @@ fn parse_instructions(mut input: &[u8]) -> Parser<Program> {
                 break;
             }
 
-            Err(e @ "unmatched [") => return Err(e),
+            Err(e @ Error::UnmatchedBegin) => return Err(e),
 
             _ => break,
         }
@@ -140,21 +138,21 @@ mod tests {
 
     #[test]
     fn left_bracket_without_right_is_error() {
-        assert_parse_error("[", "unmatched [");
-        assert_parse_error("[<[.]", "unmatched [");
+        assert_parse_error("[", Error::UnmatchedBegin);
+        assert_parse_error("[<[.]", Error::UnmatchedBegin);
     }
 
     #[test]
     fn right_bracket_without_left_is_error() {
-        assert_parse_error("]", "unmatched ]");
-        assert_parse_error(".[.].]", "unmatched ]");
+        assert_parse_error("]", Error::UnmatchedEnd);
+        assert_parse_error(".[.].]", Error::UnmatchedEnd);
     }
 
     fn assert_parse(input: &str, program: &[Instruction]) {
         assert_eq!(parse_program(input.as_bytes()), Ok(program.to_vec().into_boxed_slice()));
     }
 
-    fn assert_parse_error(input: &str, message: &str) {
+    fn assert_parse_error(input: &str, message: Error) {
         assert_eq!(parse_program(input.as_bytes()), Err(message));
     }
 }
