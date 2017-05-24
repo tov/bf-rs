@@ -1,38 +1,59 @@
 use super::*;
 use ::ast;
 
-pub fn compile(program: &[ast::Instruction]) -> Program {
-    let mut result = Vec::new();
-    let mut buffer = (OpCode::Right, 0);
+struct Compiler {
+    instructions: Vec<Instruction>,
+    buffer: (OpCode, usize),
+}
 
-    let push = |result: &mut Vec<Instruction>, buffer: &mut (OpCode, usize)| {
-        if buffer.1 > 0 {
-            result.push(Instruction::Op(*buffer));
-            *buffer = (OpCode::Right, 0);
+impl Compiler {
+    pub fn new() -> Self {
+        Compiler {
+            instructions: Vec::new(),
+            buffer: (OpCode::Right, 0),
         }
-    };
+    }
 
-    for instruction in program {
-        match *instruction {
-            ast::Instruction::Op(op_code) => {
-                if op_code == buffer.0 {
-                    buffer.1 += 1;
-                } else {
-                    push(&mut result, &mut buffer);
-                    buffer = (op_code, 1);
-                }
-            }
-
-            ast::Instruction::Loop(ref body) => {
-                push(&mut result, &mut buffer);
-                result.push(Instruction::Loop(compile(&body)));
+    pub fn compile(&mut self, program: &[ast::Instruction]) {
+        for instruction in program {
+            match *instruction {
+                ast::Instruction::Op(op_code) => self.issue_op(op_code),
+                ast::Instruction::Loop(ref body) => self.issue_loop(compile(body)),
             }
         }
     }
 
-    push(&mut result, &mut buffer);
+    pub fn into_program(mut self) -> Program {
+        self.push_op();
+        self.instructions.into_boxed_slice()
+    }
 
-    result.into_boxed_slice()
+    fn push_op(&mut self) {
+        if self.buffer.1 > 0 {
+            self.instructions.push(Instruction::Op(self.buffer));
+            self.buffer = (OpCode::Right, 0);
+        }
+    }
+
+    fn issue_op(&mut self, op_code: OpCode) {
+        if op_code == self.buffer.0 {
+            self.buffer.1 += 1;
+        } else {
+            self.push_op();
+            self.buffer = (op_code, 1)
+        }
+    }
+
+    fn issue_loop(&mut self, body: Program) {
+        self.push_op();
+        self.instructions.push(Instruction::Loop(body));
+    }
+}
+
+pub fn compile(program: &[ast::Instruction]) -> Program {
+    let mut compiler = Compiler::new();
+    compiler.compile(program);
+    compiler.into_program()
 }
 
 #[cfg(test)]
