@@ -7,11 +7,12 @@ use std::fs::File;
 use clap::{Arg, App};
 
 use bf::state;
-use bf::ast::{parser, interpreter};
-//use bf::rle_ast::{compiler, interpreter};
+use bf::ast::{parser};
+use bf::rle_ast::{compiler, interpreter};
 
 fn main() {
     let program = parser::parse_program(&get_program()).unwrap();
+    let program = compiler::compile(&program);
     let mut state = state::State::new();
     interpreter::interpret(&program, &mut state, &mut io::stdin(), &mut io::stdout());
 }

@@ -8,6 +8,7 @@ pub fn compile(program: &[ast::Instruction]) -> Program {
     let push = |result: &mut Vec<Instruction>, buffer: &mut (OpCode, usize)| {
         if buffer.1 > 0 {
             result.push(Instruction::Op(*buffer));
+            *buffer = (OpCode::Right, 0);
         }
     };
 
@@ -23,8 +24,8 @@ pub fn compile(program: &[ast::Instruction]) -> Program {
             }
 
             ast::Instruction::Loop(ref body) => {
-                let body = compile(&body);
-                result.push(Instruction::Loop(body));
+                push(&mut result, &mut buffer);
+                result.push(Instruction::Loop(compile(&body)));
             }
         }
     }
@@ -53,6 +54,13 @@ mod tests {
     fn two_rights_two_ups_compile() {
         assert_compile(&[ast::mk_right(), ast::mk_right(), ast::mk_up(), ast::mk_up()],
                        &[mk_right(2), mk_up(2)]);
+    }
+
+    #[test]
+    fn loop_compiles() {
+        assert_compile(&[ast::mk_in(), ast::mk_loop(vec![ast::mk_right()]), ast::mk_in()],
+                       &[mk_in(1), mk_loop(vec![mk_right(1)]), mk_in(1)]);
+
     }
 
     fn assert_compile(src: &[ast::Instruction], expected: &[Instruction]) {
