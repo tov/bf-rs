@@ -52,27 +52,27 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
 
 #[cfg(test)]
 mod tests {
-    use super::interpret;
     use super::super::*;
+    use test_helpers::*;
 
     #[test]
     fn assert_no_output() {
-        assert_interpret(&[mk_right()], &[], &[]);
+        assert_interpret(&[mk_right()] as &Program, &[], &[]);
     }
 
     #[test]
     fn assert_output_0() {
-        assert_interpret(&[mk_right(), mk_out()], &[], &[0]);
+        assert_interpret(&[mk_right(), mk_out()] as &Program, &[], &[0]);
     }
 
     #[test]
     fn assert_output_1() {
-        assert_interpret(&[mk_up(), mk_out()], &[], &[1]);
+        assert_interpret(&[mk_up(), mk_out()] as &Program, &[], &[1]);
     }
 
     #[test]
     fn assert_increment_input() {
-        let prog = &[mk_in(), mk_up(), mk_out()];
+        let prog: &Program = &[mk_in(), mk_up(), mk_out()];
         assert_interpret(prog, &[0], &[1]);
         assert_interpret(prog, &[5], &[6]);
         assert_interpret(prog, &[255], &[0]);
@@ -80,7 +80,7 @@ mod tests {
 
     #[test]
     fn assert_increment_loop() {
-        let prog = &[mk_in(), mk_loop(vec![mk_up(), mk_out(), mk_in()])];
+        let prog: &Program = &[mk_in(), mk_loop(vec![mk_up(), mk_out(), mk_in()])];
         assert_interpret(prog, &[0], &[]);
         assert_interpret(prog, &[1, 0], &[2]);
         assert_interpret(prog, &[1, 4, 0], &[2, 5]);
@@ -89,34 +89,26 @@ mod tests {
 
     #[test]
     fn hello_world() {
-        assert_parse_interpret("++++++[>++++++++++++<-]>.\
-                                >++++++++++[>++++++++++<-]>+.\
-                                +++++++..+++.>++++[>+++++++++++<-]>.\
-                                <+++[>----<-]>.<<<<<+++[>+++++<-]>.\
-                                >>.+++.------.--------.>>+.",
+        assert_parse_interpret(b"++++++[>++++++++++++<-]>.\
+                                 >++++++++++[>++++++++++<-]>+.\
+                                 +++++++..+++.>++++[>+++++++++++<-]>.\
+                                 <+++[>----<-]>.<<<<<+++[>+++++<-]>.\
+                                 >>.+++.------.--------.>>+.",
             "",
             "Hello, World!");
     }
 
-    fn assert_interpret(program: &[Instruction], input: &[u8], output: &[u8]) {
-        use ::state::State;
-        use std::io::Cursor;
-        use std::str;
-
-        let mut reader = Cursor::new(input);
-        let mut writer = Cursor::new(Vec::<u8>::new());
-        let mut state  = State::new();
-
-        assert_eq!(interpret(program, &mut state, &mut reader, &mut writer),
-                   Ok(()));
-        assert_eq!(str::from_utf8(writer.into_inner().as_slice()),
-                   str::from_utf8(output));
+    #[test]
+    fn factoring() {
+        assert_parse_interpret(FACTOR_SRC, "2\n", "2: 2\n");
+        assert_parse_interpret(FACTOR_SRC, "3\n", "3: 3\n");
+        assert_parse_interpret(FACTOR_SRC, "6\n", "6: 2 3\n");
     }
 
-    fn assert_parse_interpret(program: &str, input: &str, output: &str) {
+    fn assert_parse_interpret(program: &[u8], input: &str, output: &str) {
         use super::super::parser::parse_program;
 
-        let program = parse_program(program.as_bytes()).unwrap();
-        assert_interpret(&program, input.as_bytes(), output.as_bytes());
+        let program = parse_program(program).unwrap();
+        assert_interpret(&*program, input.as_bytes(), output.as_bytes());
     }
 }

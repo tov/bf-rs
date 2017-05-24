@@ -53,3 +53,9 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+
+
+}
