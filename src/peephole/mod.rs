@@ -1,4 +1,7 @@
 mod interpreter;
+mod compiler;
+
+pub use self::compiler::*;
 
 pub type Program = [Instruction];
 
@@ -20,11 +23,13 @@ pub enum Instruction {
     /// End a loop whose beginning is at the given address
     End(usize),
     /// Set the current byte to 0
-    ZeroByte,
-    /// Move the given byte to the specified offset, zeroing it.
-    MoveByteRight(usize),
-    /// Move the given byte to the specified offset, zeroing it.
-    MoveByteLeft(usize),
+    SetZero,
+    /// Add the byte at the pointer to the byte at the specified offset and zero the byte at the
+    /// pointer.
+    MoveAddRight(usize),
+    /// Add the byte at the pointer to the byte at the specified offset and zero the byte at the
+    /// pointer.
+    MoveAddLeft(usize),
     /// Move the pointer to a zero, skipping the offset at a time.
     FindZeroRight(usize),
     /// Move the pointer to a zero, skipping the offset at a time.
