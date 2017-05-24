@@ -5,7 +5,7 @@ pub fn parse_program(input: &[u8]) -> Result<Program, &'static str> {
     if rest.is_empty() {
         Ok(program)
     } else {
-        Err("extra input")
+        Err("unmatched ]")
     }
 }
 
@@ -25,7 +25,7 @@ fn parse_instruction(mut input: &[u8]) -> Parser<Option<Instruction>> {
                 b'-' => return Ok((Some(Instruction::Down), input)),
                 b',' => return Ok((Some(Instruction::In), input)),
                 b'.' => return Ok((Some(Instruction::Out), input)),
-                b']' => return Err("extra input"),
+                b']' => return Err("unmatched ]"),
                 b'[' => match parse_instructions(input) {
                     Err(e) => return Err(e),
                     Ok((program, next_input)) => {
@@ -142,11 +142,13 @@ mod tests {
     #[test]
     fn left_bracket_without_right_is_error() {
         assert_parse_error("[", "unmatched [");
+        assert_parse_error("[<[.]", "unmatched [");
     }
 
     #[test]
     fn right_bracket_without_left_is_error() {
-        assert_parse_error("]", "extra input");
+        assert_parse_error("]", "unmatched ]");
+        assert_parse_error(".[.].]", "unmatched ]");
     }
 
     fn assert_parse(input: &str, program: &[Instruction]) {
