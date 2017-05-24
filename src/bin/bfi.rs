@@ -13,6 +13,8 @@ use bf::rle_ast;
 use bf::flat;
 use bf::interpreter::Interpretable;
 
+const VERSION: &'static str = "0.1.0";
+
 #[derive(Debug, Clone)]
 struct Options {
     program_text:  Vec<u8>,
@@ -107,6 +109,7 @@ fn get_options() -> Options {
 
 fn build_clap_app() -> App<'static, 'static> {
     App::new("bfi")
+        .version(VERSION)
         .author("Jesse A. Tov <jesse.tov@gmail.com>")
         .about("A Brainfuck interpreter")
         .arg(Arg::with_name("expr")
@@ -125,6 +128,7 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("size")
             .short("s")
             .long("size")
+            .value_name("SIZE")
             .help("Memory size in bytes")
             .takes_value(true))
         .arg(Arg::with_name("ast")
