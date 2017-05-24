@@ -56,6 +56,25 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
 
 #[cfg(test)]
 mod tests {
+    use test_helpers::*;
 
+    #[test]
+    fn hello_world() {
+        assert_parse_interpret(HELLO_WORLD_SRC, "", "Hello, World!");
+    }
 
+    #[test]
+    fn factoring() {
+        assert_parse_interpret(FACTOR_SRC, "2\n", "2: 2\n");
+        assert_parse_interpret(FACTOR_SRC, "3\n", "3: 3\n");
+        assert_parse_interpret(FACTOR_SRC, "6\n", "6: 2 3\n");
+        assert_parse_interpret(FACTOR_SRC, "100\n", "100: 2 2 5 5\n");
+    }
+
+    fn assert_parse_interpret(program: &[u8], input: &str, output: &str) {
+        let program = ::ast::parse_program(program).unwrap();
+        let program = ::rle_ast::compile(&program);
+        let program = ::flat::compile(&program);
+        assert_interpret(&*program, input.as_bytes(), output.as_bytes());
+    }
 }
