@@ -56,6 +56,7 @@ fn get_options() -> Options {
     };
 
     let matches = build_clap_app().get_matches();
+
     if let Some(exprs) = matches.values_of("expr") {
         for e in exprs {
             result.program_text.extend(e.as_bytes());
@@ -67,6 +68,15 @@ fn get_options() -> Options {
         }
     } else {
         error_exit(1, "No program given.".to_owned());
+    }
+
+    if let Some(size) = matches.value_of("size") {
+        match size.parse() {
+            Ok(size) =>
+                result.memory_size = Some(size),
+            Err(e) =>
+                error_exit(1, format!("Could not parse memory size: {}", e)),
+        }
     }
 
     result
@@ -89,6 +99,11 @@ fn build_clap_app() -> App<'static, 'static> {
             .multiple(true)
             .conflicts_with("expr")
             .index(1))
+        .arg(Arg::with_name("size")
+            .short("s")
+            .long("size")
+            .help("Memory size in bytes")
+            .takes_value(true))
 }
 
 fn error_exit(code: i32, msg: String) -> ! {
