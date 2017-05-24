@@ -1,5 +1,7 @@
-pub mod compiler;
-pub mod interpreter;
+mod compiler;
+mod interpreter;
+
+pub use self::compiler::compile;
 
 use op_code::OpCode;
 

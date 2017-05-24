@@ -1,7 +1,9 @@
-pub mod compiler;
-pub mod interpreter;
+mod compiler;
+mod interpreter;
 
-use ::op_code::OpCode;
+pub use self::compiler::compile;
+
+use op_code::OpCode;
 
 pub type Program = Box<[Instruction]>;
 pub type Instruction = (OpCode, Parameter);

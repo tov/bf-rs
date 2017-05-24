@@ -1,7 +1,9 @@
-pub mod parser;
-pub mod interpreter;
+mod parser;
+mod interpreter;
 
-use ::op_code::OpCode;
+pub use self::parser::parse_program;
+
+use op_code::OpCode;
 
 /// A BF program is a sequence of instructions.
 pub type Program = Box<[Instruction]>;

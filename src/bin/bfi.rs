@@ -41,13 +41,13 @@ fn main() {
         }
 
         Pass::Rle => {
-            let program = rle_ast::compiler::compile(&program);
+            let program = rle_ast::compile(&program);
             interpret(&*program, &options);
         }
 
         Pass::Flat => {
-            let program = rle_ast::compiler::compile(&program);
-            let program = flat::compiler::compile(&program);
+            let program = rle_ast::compile(&program);
+            let program = flat::compile(&program);
             interpret(&*program, &options);
         }
 
@@ -55,7 +55,7 @@ fn main() {
 }
 
 fn parse(options: &Options) -> ast::Program {
-    ast::parser::parse_program(&options.program_text)
+    ast::parse_program(&options.program_text)
         .unwrap_or_else(|e| error_exit(2, format!("Syntax error: {}.", e)))
 }
 
