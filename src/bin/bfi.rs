@@ -7,7 +7,6 @@ use std::process::exit;
 
 use clap::{Arg, App};
 
-use bf::state;
 use bf::ast;
 use bf::rle_ast;
 use bf::flat;
@@ -61,8 +60,7 @@ fn parse(options: &Options) -> ast::Program {
 }
 
 fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
-    let state = options.memory_size.map(state::State::with_capacity);
-    program.interpret_stdin(state)
+    program.interpret_stdin(options.memory_size)
         .unwrap_or_else(|e| error_exit(3, format!("Runtime error: {}.", e)))
 }
 

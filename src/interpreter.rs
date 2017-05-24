@@ -11,23 +11,23 @@ pub trait Interpretable {
 
     /// Interprets a program. If the given `state` is `None`, uses a new, empty state.
     fn interpret<R: Read, W: Write>(
-        &self, state: Option<State>, input: R, output: W) -> BfResult<()>
+        &self, size: Option<usize>, input: R, output: W) -> BfResult<()>
     {
-        let state = state.unwrap_or_else(|| State::new());
+        let state = size.map(State::with_capacity).unwrap_or_else(|| State::new());
         self.interpret_state(state, input, output)
     }
 
     /// Interprets a program using stdin and stdout for input and output.
-    fn interpret_stdin(&self, state: Option<State>) -> BfResult<()> {
-        self.interpret(state, stdin(), stdout())
+    fn interpret_stdin(&self, size: Option<usize>) -> BfResult<()> {
+        self.interpret(size, stdin(), stdout())
     }
 
     /// Interprets a program from memory, returning a vector of its output.
-    fn interpret_memory(&self, state: Option<State>, input: &[u8]) -> BfResult<Vec<u8>> {
+    fn interpret_memory(&self, size: Option<usize>, input: &[u8]) -> BfResult<Vec<u8>> {
         let input = Cursor::new(input);
         let mut output = Cursor::new(Vec::new());
 
-        self.interpret(state, input, &mut output)?;
+        self.interpret(size, input, &mut output)?;
         Ok(output.into_inner())
     }
 }
