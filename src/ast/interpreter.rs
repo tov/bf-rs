@@ -103,6 +103,7 @@ mod tests {
         assert_parse_interpret(FACTOR_SRC, "2\n", "2: 2\n");
         assert_parse_interpret(FACTOR_SRC, "3\n", "3: 3\n");
         assert_parse_interpret(FACTOR_SRC, "6\n", "6: 2 3\n");
+        assert_parse_interpret(FACTOR_SRC, "100\n", "100: 2 2 5 5\n");
     }
 
     fn assert_parse_interpret(program: &[u8], input: &str, output: &str) {
