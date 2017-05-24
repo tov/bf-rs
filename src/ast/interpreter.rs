@@ -1,7 +1,7 @@
 use std::io::{Read, Write};
 
-use super::state::State;
-use super::ast::Instruction;
+use ::state::State;
+use super::*;
 
 pub fn interpret<R, W>(instructions: &[Instruction], state: &mut State,
                    input: &mut R, output: &mut W)
@@ -18,18 +18,20 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
     where R: Read, W: Write
 {
     match *instruction {
-        Instruction::Left => state.left(),
-        Instruction::Right => state.right(),
-        Instruction::Up => state.up(),
-        Instruction::Down => state.down(),
-        Instruction::In => {
+        Instruction::Op(OpCode::Left) => state.left(),
+        Instruction::Op(OpCode::Right) => state.right(),
+        Instruction::Op(OpCode::Up) => state.up(),
+        Instruction::Op(OpCode::Down) => state.down(),
+        Instruction::Op(OpCode::In) => {
             let mut byte = [0];
             let _ = input.read_exact(&mut byte);
             state.store(byte[0]);
         }
-        Instruction::Out => {
+        Instruction::Op(OpCode::Out) => {
             let _ = output.write_all(&[state.load()]);
         }
+        Instruction::Op(OpCode::Begin) | Instruction::Op(OpCode::End) =>
+            panic!("Invalid opcode"),
         Instruction::Loop(ref program) => {
             while state.load() != 0  {
                 interpret(&program, state, input, output);
@@ -41,27 +43,26 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
 #[cfg(test)]
 mod tests {
     use super::interpret;
-    use super::super::ast::{Instruction, make_loop};
-    use super::super::ast::Instruction::*;
+    use super::super::*;
 
     #[test]
     fn assert_no_output() {
-        assert_interpret(&[Right], &[], &[]);
+        assert_interpret(&[mk_right()], &[], &[]);
     }
 
     #[test]
     fn assert_output_0() {
-        assert_interpret(&[Right, Out], &[], &[0]);
+        assert_interpret(&[mk_right(), mk_out()], &[], &[0]);
     }
 
     #[test]
     fn assert_output_1() {
-        assert_interpret(&[Up, Out], &[], &[1]);
+        assert_interpret(&[mk_up(), mk_out()], &[], &[1]);
     }
 
     #[test]
     fn assert_increment_input() {
-        let prog = &[In, Up, Out];
+        let prog = &[mk_in(), mk_up(), mk_out()];
         assert_interpret(prog, &[0], &[1]);
         assert_interpret(prog, &[5], &[6]);
         assert_interpret(prog, &[255], &[0]);
@@ -69,7 +70,7 @@ mod tests {
 
     #[test]
     fn assert_increment_loop() {
-        let prog = &[In, make_loop(vec![Up, Out, In])];
+        let prog = &[mk_in(), mk_loop(vec![mk_up(), mk_out(), mk_in()])];
         assert_interpret(prog, &[0], &[]);
         assert_interpret(prog, &[1, 0], &[2]);
         assert_interpret(prog, &[1, 4, 0], &[2, 5]);
@@ -88,7 +89,7 @@ mod tests {
     }
 
     fn assert_interpret(program: &[Instruction], input: &[u8], output: &[u8]) {
-        use super::super::state::State;
+        use ::state::State;
         use std::io::Cursor;
         use std::str;
 

@@ -3,8 +3,11 @@ extern crate clap;
 
 use std::io::{self, Read};
 use std::fs::File;
-use bf::*;
+
 use clap::{Arg, App};
+
+use bf::state;
+use bf::ast::{parser, interpreter};
 
 fn main() {
     let program = parser::parse_program(&get_program()).unwrap();
