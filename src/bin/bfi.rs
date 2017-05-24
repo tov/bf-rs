@@ -13,9 +13,9 @@ fn main() {
 }
 
 fn get_program() -> Vec<u8> {
-    let matches = build_clap_app().get_matches();
-
     let mut input = Vec::new();
+
+    let matches = build_clap_app().get_matches();
     if let Some(exprs) = matches.values_of("expr") {
         for e in exprs {
             input.extend(e.as_bytes());
@@ -25,6 +25,8 @@ fn get_program() -> Vec<u8> {
             let mut file = File::open(f).unwrap();
             file.read_to_end(&mut input).unwrap();
         }
+    } else {
+        panic!("No program given");
     }
 
     input
@@ -43,7 +45,7 @@ fn build_clap_app() -> App<'static, 'static> {
             .takes_value(true)
             .conflicts_with("INPUT"))
         .arg(Arg::with_name("INPUT")
-            .help("The source file to interpret")
+            .help("The source file(s) to interpret")
             .multiple(true)
             .conflicts_with("expr")
             .index(1))
