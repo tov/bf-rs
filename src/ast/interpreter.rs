@@ -2,9 +2,18 @@ use std::io::{Read, Write};
 
 use state::State;
 use result::BfResult;
+use interpreter::Interpretable;
 use super::*;
 
-pub fn interpret<R, W>(instructions: &[Instruction], state: &mut State,
+impl Interpretable for [Instruction] {
+    fn interpret_state<R: Read, W: Write>(
+        &self, mut state: State, mut input: R, mut output: W) -> BfResult<()>
+    {
+        interpret(self, &mut state, &mut input, &mut output)
+    }
+}
+
+fn interpret<R, W>(instructions: &[Instruction], state: &mut State,
                        input: &mut R, output: &mut W)
                        -> BfResult<()>
     where R: Read, W: Write

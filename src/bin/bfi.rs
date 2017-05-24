@@ -7,10 +7,10 @@ use std::process::exit;
 
 use clap::{Arg, App};
 
-use bf::state;
 use bf::ast::parser;
 use bf::rle_ast;
 use bf::flat;
+use bf::interpreter::Interpretable;
 
 fn main() {
     let program = match parser::parse_program(&get_program()) {
@@ -21,10 +21,7 @@ fn main() {
     let program = rle_ast::compiler::compile(&program);
     let program = flat::compiler::compile(&program);
 
-    let mut state = state::State::new();
-
-    match flat::interpreter::interpret(&program, &mut state,
-                                       &mut io::stdin(), &mut io::stdout()) {
+    match program.interpret_stdin(None) {
         Ok(()) => (),
         Err(e) => error_exit(3, format!("Runtime error: {:?}.", e)),
     }
