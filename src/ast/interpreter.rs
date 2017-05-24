@@ -14,8 +14,8 @@ impl Interpretable for Program {
 }
 
 fn interpret<R, W>(instructions: &Program, state: &mut State,
-                       input: &mut R, output: &mut W)
-                       -> BfResult<()>
+                   input: &mut R, output: &mut W)
+                   -> BfResult<()>
     where R: Read, W: Write
 {
     for instruction in instructions {
