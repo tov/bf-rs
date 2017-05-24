@@ -1,25 +1,30 @@
 use std::io::{Read, Write};
 
-use ::state::State;
+use state::State;
+use result::BfResult;
 use super::*;
 
 pub fn interpret<R, W>(instructions: &[Instruction], state: &mut State,
                        input: &mut R, output: &mut W)
+                       -> BfResult<()>
     where R: Read, W: Write
 {
     for instruction in instructions {
-        interpret_instruction(instruction, state, input, output);
+        interpret_instruction(instruction, state, input, output)?;
     }
+
+    Ok(())
 }
 
 #[inline]
 fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
                                input: &mut R, output: &mut W)
+                               -> BfResult<()>
     where R: Read, W: Write
 {
     match *instruction {
-        Instruction::Op((OpCode::Left, count)) => state.left(count),
-        Instruction::Op((OpCode::Right, count)) => state.right(count),
+        Instruction::Op((OpCode::Left, count)) => state.left(count)?,
+        Instruction::Op((OpCode::Right, count)) => state.right(count)?,
         Instruction::Op((OpCode::Up, count)) => state.up(count as u8),
         Instruction::Op((OpCode::Down, count)) => state.down(count as u8),
         Instruction::Op((OpCode::In, count)) => {
@@ -36,8 +41,10 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
             panic!("Invalid opcode"),
         Instruction::Loop(ref program) => {
             while state.load() != 0  {
-                interpret(&program, state, input, output);
+                interpret(&program, state, input, output)?;
             }
         }
     }
+
+    Ok(())
 }

@@ -1,5 +1,7 @@
 use std::io::{Read, Write};
 
+use result::{BfResult, Error};
+
 /// The default number of 8-bit memory cells, as used by
 /// [`State::new`](struct.State.html#method.new).
 pub const DEFAULT_CAPACITY: usize = 30_000;
@@ -32,11 +34,12 @@ impl State {
     ///
     /// Panics if pointer is already 0.
     #[inline]
-    pub fn left(&mut self, count: usize) {
+    pub fn left(&mut self, count: usize) -> BfResult<()> {
         if self.pointer < count {
-            panic!("pointer underflow");
+            Err(Error::PointerUnderflow)
         } else {
             self.pointer -= count;
+            Ok(())
         }
     }
 
@@ -46,10 +49,12 @@ impl State {
     ///
     /// Panics if pointer would go past the end of the memory.
     #[inline]
-    pub fn right(&mut self, count: usize) {
-        self.pointer += count;
-        if self.pointer == self.memory.len() {
-            panic!("pointer overflow");
+    pub fn right(&mut self, count: usize) -> BfResult<()> {
+        if self.pointer + count >= self.memory.len() {
+            Err(Error::PointerOverflow)
+        } else {
+            self.pointer += count;
+            Ok(())
         }
     }
 
@@ -107,7 +112,7 @@ mod tests {
         let mut actual = make(&[0, 0, 0], 0);
         let expected = make(&[0, 0, 0], 1);
 
-        actual.right(1);
+        actual.right(1).unwrap();
 
         assert_eq!(actual, expected);
     }
@@ -117,8 +122,8 @@ mod tests {
         let mut actual = make(&[0, 0, 0], 0);
         let expected = make(&[0, 0, 0], 0);
 
-        actual.right(1);
-        actual.left(1);
+        actual.right(1).unwrap();
+        actual.left(1).unwrap();
 
         assert_eq!(actual, expected);
     }
@@ -149,7 +154,7 @@ mod tests {
         let mut actual = make(&[0, 0, 0], 0);
         actual.store(5);
         assert_eq!(actual, make(&[5, 0, 0], 0));
-        actual.right(1);
+        actual.right(1).unwrap();
         actual.store(8);
         assert_eq!(actual, make(&[5, 8, 0], 1));
     }
@@ -161,13 +166,13 @@ mod tests {
         assert_eq!(actual, make(&[1, 0, 0], 0));
         actual.up(1);
         assert_eq!(actual, make(&[2, 0, 0], 0));
-        actual.right(1);
+        actual.right(1).unwrap();
         assert_eq!(actual, make(&[2, 0, 0], 1));
         actual.down(1);
         assert_eq!(actual, make(&[2, 255, 0], 1));
         actual.down(1);
         assert_eq!(actual, make(&[2, 254, 0], 1));
-        actual.right(1);
+        actual.right(1).unwrap();
         assert_eq!(actual, make(&[2, 254, 0], 2));
         actual.store(77);
         assert_eq!(actual, make(&[2, 254, 77], 2));
@@ -176,8 +181,8 @@ mod tests {
     #[test]
     fn right_to_right_edge_is_okay() {
         let mut actual = make(&[0, 0, 0], 0);
-        actual.right(1);
-        actual.right(1);
+        actual.right(1).unwrap();
+        actual.right(1).unwrap();
         assert_eq!(actual, make(&[0, 0, 0], 2));
     }
 
@@ -185,16 +190,16 @@ mod tests {
     #[should_panic]
     fn right_past_edge_is_error() {
         let mut actual = make(&[0, 0, 0], 0);
-        actual.right(1);
-        actual.right(1);
-        actual.right(1);
+        actual.right(1).unwrap();
+        actual.right(1).unwrap();
+        actual.right(1).unwrap();
     }
 
     #[test]
     #[should_panic]
     fn move_left_is_error() {
         let mut machine = make(&[0, 0, 0], 0);
-        machine.left(1);
+        machine.left(1).unwrap();
     }
 
     fn make(memory: &[u8], pointer: usize) -> State {

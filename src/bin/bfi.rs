@@ -1,8 +1,9 @@
 extern crate bf;
 extern crate clap;
 
-use std::io::{self, Read};
+use std::io::{self, Read, Write};
 use std::fs::File;
+use std::process::exit;
 
 use clap::{Arg, App};
 
@@ -12,11 +13,21 @@ use bf::rle_ast;
 use bf::flat;
 
 fn main() {
-    let program = parser::parse_program(&get_program()).unwrap();
+    let program = match parser::parse_program(&get_program()) {
+        Ok(program) => program,
+        Err(e) => error_exit(2, format!("Syntax error: {:?}.", e)),
+    };
+
     let program = rle_ast::compiler::compile(&program);
     let program = flat::compiler::compile(&program);
+
     let mut state = state::State::new();
-    flat::interpreter::interpret(&program, &mut state, &mut io::stdin(), &mut io::stdout());
+
+    match flat::interpreter::interpret(&program, &mut state,
+                                       &mut io::stdin(), &mut io::stdout()) {
+        Ok(()) => (),
+        Err(e) => error_exit(3, format!("Runtime error: {:?}.", e)),
+    }
 }
 
 fn get_program() -> Vec<u8> {
@@ -33,7 +44,7 @@ fn get_program() -> Vec<u8> {
             file.read_to_end(&mut input).unwrap();
         }
     } else {
-        panic!("No program given");
+        error_exit(1, "No program given.".to_owned());
     }
 
     input
@@ -56,5 +67,10 @@ fn build_clap_app() -> App<'static, 'static> {
             .multiple(true)
             .conflicts_with("expr")
             .index(1))
+}
+
+fn error_exit(code: i32, msg: String) -> ! {
+    writeln!(io::stderr(), "{}", msg).unwrap();
+    exit(code)
 }
 

@@ -1,25 +1,30 @@
 use std::io::{Read, Write};
 
-use ::state::State;
+use state::State;
+use result::BfResult;
 use super::*;
 
 pub fn interpret<R, W>(instructions: &[Instruction], state: &mut State,
-                   input: &mut R, output: &mut W)
+                       input: &mut R, output: &mut W)
+                       -> BfResult<()>
     where R: Read, W: Write
 {
     for instruction in instructions {
-        interpret_instruction(instruction, state, input, output);
+        interpret_instruction(instruction, state, input, output)?;
     }
+
+    Ok(())
 }
 
 #[inline]
 fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
-                       input: &mut R, output: &mut W)
+                               input: &mut R, output: &mut W)
+                               -> BfResult<()>
     where R: Read, W: Write
 {
     match *instruction {
-        Instruction::Op(OpCode::Left) => state.left(1),
-        Instruction::Op(OpCode::Right) => state.right(1),
+        Instruction::Op(OpCode::Left) => state.left(1)?,
+        Instruction::Op(OpCode::Right) => state.right(1)?,
         Instruction::Op(OpCode::Up) => state.up(1),
         Instruction::Op(OpCode::Down) => state.down(1),
         Instruction::Op(OpCode::In) => state.read(input),
@@ -28,10 +33,12 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
             panic!("Invalid opcode"),
         Instruction::Loop(ref program) => {
             while state.load() != 0  {
-                interpret(&program, state, input, output);
+                interpret(&program, state, input, output)?;
             }
         }
     }
+
+    Ok(())
 }
 
 #[cfg(test)]
@@ -91,7 +98,8 @@ mod tests {
         let mut writer = Cursor::new(Vec::<u8>::new());
         let mut state  = State::new();
 
-        interpret(program, &mut state, &mut reader, &mut writer);
+        assert_eq!(interpret(program, &mut state, &mut reader, &mut writer),
+                   Ok(()));
         assert_eq!(str::from_utf8(writer.into_inner().as_slice()),
                    str::from_utf8(output));
     }
