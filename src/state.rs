@@ -13,6 +13,13 @@ pub struct State {
     pointer: usize,
 }
 
+/// The result of saving the pointer position, which allows restoring it without
+/// a bounds check.
+///
+/// Using a saved pointer from one machine on another will result in a panic if
+/// the pointer results in an out-of-bounds memory access.
+pub struct SavedPointer(usize);
+
 impl State {
     /// Creates a new BF machine state with capacity
     /// [`DEFAULT_CAPACITY`].
@@ -86,6 +93,23 @@ impl State {
     #[inline]
     pub fn store(&mut self, value: u8) {
         self.memory[self.pointer] = value;
+    }
+
+    /// Gets the current value of the pointer.
+    #[inline]
+    pub fn save_ptr(&self) -> SavedPointer {
+        SavedPointer(self.pointer)
+    }
+
+    /// Restores a previously saved value of the pointer.
+    ///
+    /// # Errors
+    ///
+    /// Does not panic if the pointer is out of bounds, but the next memory
+    /// access will panic.
+    #[inline]
+    pub fn restore_ptr(&mut self, old: SavedPointer) {
+        self.pointer = old.0;
     }
 
     /// Reads from a `Read` into the byte at the pointer.
