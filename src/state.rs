@@ -176,7 +176,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn move_left_crashes() {
+    fn move_left_is_error() {
         let mut machine = make(&[0, 0, 0], 0);
         machine.left();
     }
