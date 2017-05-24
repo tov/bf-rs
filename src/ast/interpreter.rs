@@ -89,13 +89,7 @@ mod tests {
 
     #[test]
     fn hello_world() {
-        assert_parse_interpret(b"++++++[>++++++++++++<-]>.\
-                                 >++++++++++[>++++++++++<-]>+.\
-                                 +++++++..+++.>++++[>+++++++++++<-]>.\
-                                 <+++[>----<-]>.<<<<<+++[>+++++<-]>.\
-                                 >>.+++.------.--------.>>+.",
-            "",
-            "Hello, World!");
+        assert_parse_interpret(HELLO_WORLD_SRC, "", "Hello, World!");
     }
 
     #[test]
