@@ -46,7 +46,8 @@ impl Compiler {
                 Loop(ref body) => {
                     let peephole = set_zero_peephole(&body)
                         .or_else(|| find_zero_peephole(&body))
-                        .or_else(|| find_move_peephole(&body));
+                        .or_else(|| find_move_peephole(&body))
+                    ;
 
                     if let Some(instr) = peephole {
                         self.push(instr);
@@ -102,9 +103,9 @@ pub fn find_move_peephole(body: &[rle_ast::Instruction]) -> Option<Instruction> 
     if body.len() == 4 {
         match (&body[0], &body[1], &body[2], &body[3]) {
             (&Op((OpCode::Down, 1)),
-                &Op((OpCode::Right, count_l)),
-                &Op((OpCode::Up, 1)),
-                &Op((OpCode::Left, count_r))) if count_l == count_r => {
+             &Op((OpCode::Right, count_l)),
+             &Op((OpCode::Up, 1)),
+             &Op((OpCode::Left, count_r))) if count_l == count_r => {
                 Some(Instruction::MoveAddRight(count_l))
             }
             (&Op((OpCode::Down, 1)),

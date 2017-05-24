@@ -10,6 +10,7 @@ use clap::{Arg, App};
 use bf::ast;
 use bf::rle_ast;
 use bf::flat;
+use bf::peephole;
 use bf::traits::Interpretable;
 
 const VERSION: &'static str = "0.1.0";
@@ -26,6 +27,7 @@ enum Pass {
     Ast,
     Rle,
     Flat,
+    Peep,
 }
 
 fn main() {
@@ -51,6 +53,11 @@ fn main() {
             interpret(&*program, &options);
         }
 
+        Pass::Peep => {
+            let program = rle_ast::compile(&program);
+            let program = peephole::compile(&program);
+            interpret(&*program, &options);
+        }
     }
 }
 
@@ -68,7 +75,7 @@ fn get_options() -> Options {
     let mut result = Options {
         program_text:  Vec::new(),
         memory_size:   None,
-        compiler_pass: Pass::Flat,
+        compiler_pass: Pass::Peep,
     };
 
     let matches = build_clap_app().get_matches();
@@ -85,6 +92,8 @@ fn get_options() -> Options {
         result.compiler_pass = Pass::Rle;
     } else if matches.is_present("flat") {
         result.compiler_pass = Pass::Flat;
+    } else if matches.is_present("peep") {
+        result.compiler_pass = Pass::Peep;
     }
 
     if let Some(exprs) = matches.values_of("expr") {
@@ -132,15 +141,19 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("ast")
             .long("ast")
             .help("Interpret the AST directly")
-            .conflicts_with_all(&["flat", "rle"]))
+            .conflicts_with_all(&["flat", "rle", "peep"]))
         .arg(Arg::with_name("rle")
             .long("rle")
             .help("Interpret the run-length encoded AST directly")
-            .conflicts_with_all(&["ast", "flat"]))
+            .conflicts_with_all(&["ast", "flat", "peep"]))
         .arg(Arg::with_name("flat")
             .long("flat")
-            .help("Interpret the flattened AST (default)")
-            .conflicts_with_all(&["ast", "rle"]))
+            .help("Interpret the flattened bytecode")
+            .conflicts_with_all(&["ast", "rle", "peep"]))
+        .arg(Arg::with_name("peep")
+            .long("peep")
+            .help("Interpret the peephole optimized bytecode (default)")
+            .conflicts_with_all(&["ast", "rle", "flat"]))
 }
 
 fn error_exit(code: i32, msg: String) -> ! {

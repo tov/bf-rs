@@ -6,7 +6,7 @@ pub use self::compiler::*;
 pub type Program = [Instruction];
 
 /// Instructions as output by the peephole optimizer.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Instruction {
     /// Move the pointer left by the specified offset.
     Left(usize),

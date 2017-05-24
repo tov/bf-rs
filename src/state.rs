@@ -18,6 +18,7 @@ pub struct State {
 ///
 /// Using a saved pointer from one machine on another will result in a panic if
 /// the pointer results in an out-of-bounds memory access.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct SavedPointer(usize);
 
 impl State {
@@ -39,7 +40,7 @@ impl State {
     ///
     /// # Errors
     ///
-    /// Panics if pointer is already 0.
+    /// Panics if pointer would go below 0.
     #[inline]
     pub fn left(&mut self, count: usize) -> BfResult<()> {
         if self.pointer < count {

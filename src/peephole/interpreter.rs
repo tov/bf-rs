@@ -47,24 +47,24 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
             Instruction::SetZero => state.store(0),
 
             Instruction::MoveAddRight(offset) => {
-                let value = state.load();
                 let ptr = state.save_ptr();
+                let value = state.load();
 
                 state.store(0);
                 state.right(offset)?;
                 let old = state.load();
-                state.store(old + value);
+                state.store(old.wrapping_add(value));
                 state.restore_ptr(ptr);
             }
 
             Instruction::MoveAddLeft(offset) => {
-                let value = state.load();
                 let ptr = state.save_ptr();
+                let value = state.load();
 
                 state.store(0);
                 state.left(offset)?;
                 let old = state.load();
-                state.store(old + value);
+                state.store(old.wrapping_add(value));
                 state.restore_ptr(ptr);
             }
 
