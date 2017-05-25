@@ -35,12 +35,8 @@ impl State {
     /// Return `Err` if pointer would go below 0.
     #[inline]
     pub fn left(&mut self, count: usize) -> BfResult<()> {
-        if self.check_neg_offset(count) {
-            self.pointer -= count;
-            Ok(())
-        } else {
-            Err(Error::PointerUnderflow)
-        }
+        self.pointer = self.neg_offset(count)?;
+        Ok(())
     }
 
     /// Increments the pointer.
@@ -50,22 +46,26 @@ impl State {
     /// Return `Err` if pointer would go past the end of the memory.
     #[inline]
     pub fn right(&mut self, count: usize) -> BfResult<()> {
-        if self.check_pos_offset(count) {
-            self.pointer += count;
-            Ok(())
+        self.pointer = self.pos_offset(count)?;
+        Ok(())
+    }
+
+    #[inline]
+    fn pos_offset(&self, offset: usize) -> BfResult<usize> {
+        if self.pointer + offset < self.memory.len() {
+            Ok(self.pointer + offset)
         } else {
             Err(Error::PointerOverflow)
         }
     }
 
     #[inline]
-    fn check_pos_offset(&self, offset: usize) -> bool {
-        self.pointer + offset < self.memory.len()
-    }
-
-    #[inline]
-    fn check_neg_offset(&self, offset: usize) -> bool {
-        self.pointer >= offset
+    fn neg_offset(&self, offset: usize) -> BfResult<usize> {
+        if self.pointer >= offset {
+            Ok(self.pointer - offset)
+        } else {
+            Err(Error::PointerUnderflow)
+        }
     }
 
     /// Increments the byte at the pointer.
@@ -101,25 +101,19 @@ impl State {
     /// Adds the given value at the given positive offset from the pointer.
     #[inline]
     pub fn up_pos_offset(&mut self, offset: usize, value: u8) -> BfResult<()> {
-        if self.check_pos_offset(offset) {
-            let old = self.memory[self.pointer + offset];
-            self.memory[self.pointer + offset] = old.wrapping_add(value);
-            Ok(())
-        } else {
-            Err(Error::PointerOverflow)
-        }
+        let address = self.pos_offset(offset)?;
+        let old = self.memory[address];
+        self.memory[address] = old.wrapping_add(value);
+        Ok(())
     }
 
     /// Adds the given value at the given negative offset from the pointer.
     #[inline]
     pub fn up_neg_offset(&mut self, offset: usize, value: u8) -> BfResult<()> {
-        if self.check_neg_offset(offset) {
-            let old = self.memory[self.pointer - offset];
-            self.memory[self.pointer - offset] = old.wrapping_add(value);
-            Ok(())
-        } else {
-            Err(Error::PointerUnderflow)
-        }
+        let address = self.neg_offset(offset)?;
+        let old = self.memory[address];
+        self.memory[address] = old.wrapping_add(value);
+        Ok(())
     }
 
     /// Reads from a `Read` into the byte at the pointer.
