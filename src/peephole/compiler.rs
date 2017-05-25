@@ -108,6 +108,7 @@ pub fn offset_add_peephole(body: &[rle_ast::Instruction]) -> Option<Instruction>
                 Some(Instruction::OffsetAddRight(count_l))
             }
 
+            // 36 is a magic number
             (&Op((OpCode::Down, 1)),
              &Op((OpCode::Left, count_l)),
              &Op((OpCode::Up, 1)),
