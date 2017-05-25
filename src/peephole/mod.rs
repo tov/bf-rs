@@ -19,9 +19,9 @@ pub enum Instruction {
     /// Write output.
     Out,
     /// Begin a loop whose end is at the given address
-    Begin(usize),
+    JumpZero(usize),
     /// End a loop whose beginning is at the given address
-    End(usize),
+    JumpNotZero(usize),
     /// Set the current byte to 0
     SetZero,
     /// Add the byte at the pointer to the byte at the specified offset and zero the byte at the

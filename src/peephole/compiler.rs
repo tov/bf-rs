@@ -52,11 +52,11 @@ impl Compiler {
                         self.push(instr);
                     } else {
                         let begin_pc = self.instructions.len();
-                        self.push(Instruction::Begin(0));
+                        self.push(Instruction::JumpZero(0));
                         self.compile(&body);
                         let end_pc = self.instructions.len();
-                        self.push(Instruction::End(begin_pc));
-                        self.instructions[begin_pc] = Instruction::Begin(end_pc);
+                        self.push(Instruction::JumpNotZero(begin_pc));
+                        self.instructions[begin_pc] = Instruction::JumpZero(end_pc);
                     }
                 }
             }

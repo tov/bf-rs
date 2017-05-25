@@ -32,13 +32,13 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
 
             Instruction::Out => state.write(output),
 
-            Instruction::Begin(addr) => {
+            Instruction::JumpZero(addr) => {
                 if state.load() == 0 {
                     pc = addr;
                 }
             }
 
-            Instruction::End(addr) => {
+            Instruction::JumpNotZero(addr) => {
                 if state.load() != 0 {
                     pc = addr;
                 }
