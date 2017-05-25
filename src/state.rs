@@ -1,4 +1,5 @@
 use std::io::{Read, Write};
+use std::num::Wrapping;
 
 use result::{BfResult, Error};
 
@@ -9,7 +10,7 @@ pub const DEFAULT_CAPACITY: usize = 30_000;
 /// The BF machine state.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct State {
-    memory: Box<[u8]>,
+    memory: Box<[Wrapping<u8>]>,
     pointer: usize,
 }
 
@@ -23,7 +24,7 @@ impl State {
     /// Creates a new BF machine state.
     pub fn with_capacity(capacity: usize) -> Self {
         State {
-            memory: vec![0; capacity].into_boxed_slice(),
+            memory: vec![Wrapping(0); capacity].into_boxed_slice(),
             pointer: 0,
         }
     }
@@ -73,8 +74,7 @@ impl State {
     /// Wraps around modulo 256.
     #[inline]
     pub fn up(&mut self, count: u8) {
-        let old = self.load();
-        self.store(old.wrapping_add(count));
+        self.memory[self.pointer] += Wrapping(count);
     }
 
     /// Decrements the byte at the pointer.
@@ -82,28 +82,26 @@ impl State {
     /// Wraps around modulo 256.
     #[inline]
     pub fn down(&mut self, count: u8) {
-        let old = self.load();
-        self.store(old.wrapping_sub(count));
+        self.memory[self.pointer] -= Wrapping(count);
     }
 
     /// Gets the value of the point at the pointer.
     #[inline]
     pub fn load(&self) -> u8 {
-        self.memory[self.pointer]
+        self.memory[self.pointer].0
     }
 
     /// Sets the value of the byte at the pointer.
     #[inline]
     pub fn store(&mut self, value: u8) {
-        self.memory[self.pointer] = value;
+        self.memory[self.pointer] = Wrapping(value);
     }
 
     /// Adds the given value at the given positive offset from the pointer.
     #[inline]
     pub fn up_pos_offset(&mut self, offset: usize, value: u8) -> BfResult<()> {
         let address = self.pos_offset(offset)?;
-        let old = self.memory[address];
-        self.memory[address] = old.wrapping_add(value);
+        self.memory[address] += Wrapping(value);
         Ok(())
     }
 
@@ -111,8 +109,7 @@ impl State {
     #[inline]
     pub fn up_neg_offset(&mut self, offset: usize, value: u8) -> BfResult<()> {
         let address = self.neg_offset(offset)?;
-        let old = self.memory[address];
-        self.memory[address] = old.wrapping_add(value);
+        self.memory[address] += Wrapping(value);
         Ok(())
     }
 
@@ -232,7 +229,7 @@ mod tests {
 
     fn make(memory: &[u8], pointer: usize) -> State {
         State {
-            memory: memory.to_vec().into_boxed_slice(),
+            memory: memory.iter().map(|&b| Wrapping(b)).collect::<Vec<_>>().into_boxed_slice(),
             pointer: pointer,
         }
     }
