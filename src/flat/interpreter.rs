@@ -38,7 +38,7 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
             }
             (OpCode::Begin, count) => {
                 if state.load() == 0 {
-                    pc = count - 1;
+                    pc = count;
                 }
             }
             (OpCode::End, count) => {

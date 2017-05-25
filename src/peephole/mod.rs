@@ -26,10 +26,10 @@ pub enum Instruction {
     SetZero,
     /// Add the byte at the pointer to the byte at the specified offset and zero the byte at the
     /// pointer.
-    MoveAddRight(usize),
+    OffsetAddRight(usize),
     /// Add the byte at the pointer to the byte at the specified offset and zero the byte at the
     /// pointer.
-    MoveAddLeft(usize),
+    OffsetAddLeft(usize),
     /// Move the pointer to a zero, skipping the offset at a time.
     FindZeroRight(usize),
     /// Move the pointer to a zero, skipping the offset at a time.

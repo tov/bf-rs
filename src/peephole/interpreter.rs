@@ -34,7 +34,7 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
 
             Instruction::Begin(addr) => {
                 if state.load() == 0 {
-                    pc = addr - 1;
+                    pc = addr;
                 }
             }
 
@@ -46,26 +46,16 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
 
             Instruction::SetZero => state.store(0),
 
-            Instruction::MoveAddRight(offset) => {
-                let ptr = state.save_ptr();
+            Instruction::OffsetAddRight(offset) => {
                 let value = state.load();
-
                 state.store(0);
-                state.right(offset)?;
-                let old = state.load();
-                state.store(old.wrapping_add(value));
-                state.restore_ptr(ptr);
+                state.up_pos_offset(offset, value)?;
             }
 
-            Instruction::MoveAddLeft(offset) => {
-                let ptr = state.save_ptr();
+            Instruction::OffsetAddLeft(offset) => {
                 let value = state.load();
-
                 state.store(0);
-                state.left(offset)?;
-                let old = state.load();
-                state.store(old.wrapping_add(value));
-                state.restore_ptr(ptr);
+                state.up_neg_offset(offset, value)?;
             }
 
             Instruction::FindZeroRight(skip) => {

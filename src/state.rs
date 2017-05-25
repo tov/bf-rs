@@ -13,14 +13,6 @@ pub struct State {
     pointer: usize,
 }
 
-/// The result of saving the pointer position, which allows restoring it without
-/// a bounds check.
-///
-/// Using a saved pointer from one machine on another will result in a panic if
-/// the pointer results in an out-of-bounds memory access.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct SavedPointer(usize);
-
 impl State {
     /// Creates a new BF machine state with capacity
     /// [`DEFAULT_CAPACITY`].
@@ -43,7 +35,7 @@ impl State {
     /// Return `Err` if pointer would go below 0.
     #[inline]
     pub fn left(&mut self, count: usize) -> BfResult<()> {
-        if self.pointer >= count {
+        if self.check_neg_offset(count) {
             self.pointer -= count;
             Ok(())
         } else {
@@ -58,12 +50,22 @@ impl State {
     /// Return `Err` if pointer would go past the end of the memory.
     #[inline]
     pub fn right(&mut self, count: usize) -> BfResult<()> {
-        if self.pointer + count < self.memory.len() {
+        if self.check_pos_offset(count) {
             self.pointer += count;
             Ok(())
         } else {
             Err(Error::PointerOverflow)
         }
+    }
+
+    #[inline]
+    fn check_pos_offset(&self, offset: usize) -> bool {
+        self.pointer + offset < self.memory.len()
+    }
+
+    #[inline]
+    fn check_neg_offset(&self, offset: usize) -> bool {
+        self.pointer >= offset
     }
 
     /// Increments the byte at the pointer.
@@ -96,21 +98,28 @@ impl State {
         self.memory[self.pointer] = value;
     }
 
-    /// Gets the current value of the pointer.
+    /// Adds the given value at the given positive offset from the pointer.
     #[inline]
-    pub fn save_ptr(&self) -> SavedPointer {
-        SavedPointer(self.pointer)
+    pub fn up_pos_offset(&mut self, offset: usize, value: u8) -> BfResult<()> {
+        if self.check_pos_offset(offset) {
+            let old = self.memory[self.pointer + offset];
+            self.memory[self.pointer + offset] = old.wrapping_add(value);
+            Ok(())
+        } else {
+            Err(Error::PointerOverflow)
+        }
     }
 
-    /// Restores a previously saved value of the pointer.
-    ///
-    /// # Errors
-    ///
-    /// Does not panic if the pointer is out of bounds, but the next memory
-    /// access will panic.
+    /// Adds the given value at the given negative offset from the pointer.
     #[inline]
-    pub fn restore_ptr(&mut self, old: SavedPointer) {
-        self.pointer = old.0;
+    pub fn up_neg_offset(&mut self, offset: usize, value: u8) -> BfResult<()> {
+        if self.check_neg_offset(offset) {
+            let old = self.memory[self.pointer - offset];
+            self.memory[self.pointer - offset] = old.wrapping_add(value);
+            Ok(())
+        } else {
+            Err(Error::PointerUnderflow)
+        }
     }
 
     /// Reads from a `Read` into the byte at the pointer.
