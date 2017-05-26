@@ -25,7 +25,7 @@ echo "$VERSION" > "$VERSION_FILE"
 chmod a-w "$VERSION_FILE"
 git add "$VERSION_FILE"
 
-"$PROJ_ROOT"/bin/change_version.sh "$VERSION"
+"$PROJ_ROOT"/scripts/change_version.sh "$VERSION"
 
 git add Cargo.toml src/lib.rs README.md
 git ci -m "Version: $VERSION"
