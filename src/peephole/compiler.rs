@@ -1,5 +1,4 @@
 use super::*;
-use common::Command;
 use rle;
 
 pub struct Compiler {
@@ -15,32 +14,33 @@ impl Compiler {
 
     pub fn compile(&mut self, src: &[rle::Instruction]) {
         use rle::Instruction::*;
+        use common::Command::*;
 
         for instruction in src {
             match *instruction {
-                Op((Command::Right, count)) =>
+                Op((Right, count)) =>
                     self.push(Instruction::Right(count)),
-                Op((Command::Left, count)) =>
+                Op((Left, count)) =>
                     self.push(Instruction::Left(count)),
-                Op((Command::Up, count)) => {
+                Op((Up, count)) => {
                     let amount = (count % 256) as u8;
                     self.push(Instruction::Change(amount));
                 }
-                Op((Command::Down, count)) => {
+                Op((Down, count)) => {
                     let amount = (256 - count % 256) as u8;
                     self.push(Instruction::Change(amount));
                 }
-                Op((Command::In, count)) => {
+                Op((In, count)) => {
                     for _ in 0 .. count {
                         self.push(Instruction::In);
                     }
                 }
-                Op((Command::Out, count)) => {
+                Op((Out, count)) => {
                     for _ in 0 .. count {
                         self.push(Instruction::Out);
                     }
                 }
-                Op((Command::Begin, _)) | Op((Command::End, _)) =>
+                Op((Begin, _)) | Op((End, _)) =>
                     panic!("bad opcode"),
 
                 Loop(ref body) => {
