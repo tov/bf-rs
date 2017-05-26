@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["DEFAULT_CAPACITY","The default number of 8-bit memory cells, as used by `State::new`."]],"struct":[["State","The BF machine state."]]});

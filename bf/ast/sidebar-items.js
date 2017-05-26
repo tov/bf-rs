@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Instruction","A BF instruction."]],"fn":[["mk_down",""],["mk_in",""],["mk_left",""],["mk_loop","Takes a vector of instructions and makes them into a loop."],["mk_out",""],["mk_right",""],["mk_up",""],["parse_program",""]],"type":[["Program","A BF program is a sequence of instructions."]]});
