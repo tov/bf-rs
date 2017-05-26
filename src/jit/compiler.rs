@@ -194,9 +194,8 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
                 ;; check_neg_offset!(asm, offset)
                 ; mov cl, BYTE [pointer]
                 ; mov BYTE [pointer], 0
-                ; mov rdx, pointer
-                ; sub rdx, rax
-                ; add BYTE [rdx], cl
+                ; neg rax
+                ; add BYTE [pointer + rax], cl
                 ; skip:
             );
         }
