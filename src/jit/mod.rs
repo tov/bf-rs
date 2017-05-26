@@ -4,6 +4,7 @@
 //! machine code from peephole-optimized AST. This is currently the fastest implementation,
 //! but it is available only on nightly Rust because `dynasm` uses a plugin.
 //!
+//! In the `bfi` interpreter, this pass is enabled by the `--jit` flag.
 //! To go even faster, pass the `--unchecked` flag to the `bfi` interpreter to disable
 //! memory bounds checking in the generated code. Note that this runs Brainfuck in
 //! unsafe mode, which means that programs that move the pointer outside the allocated
@@ -16,6 +17,13 @@ pub use self::compiler::*;
 
 use dynasmrt;
 
+/// The representation of a JIT-compiled program.
+///
+/// Relies on the `dynasmrt` run-time system. [This
+/// representation](../../src/bf/jit/mod.rs.html#26-29)
+/// is from [the `dynlib-rs` tutorial].
+///
+/// [the `dynlib-rs` tutorial]: https://censoredusername.github.io/dynasm-rs/language/tutorial.html#advanced-usage
 pub struct Program {
     code: dynasmrt::ExecutableBuffer,
     start: dynasmrt::AssemblyOffset,

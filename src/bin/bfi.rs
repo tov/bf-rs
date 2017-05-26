@@ -1,6 +1,28 @@
 //! The Brainfuck interpreter executable.
 //!
-//! Run with `--help` for help.
+//! ```
+//! USAGE:
+//! bfi [FLAGS] [OPTIONS] [--] [INPUT]...
+//!
+//! FLAGS:
+//! --ast          Interpret the unoptimized AST
+//! --flat         Flatten to bytecode (implies --peep)
+//! -h, --help         Prints help information
+//! --jit          JIT to native x64 (implies --peep)
+//! --peep         Peephole optimize (default, implies --rle)
+//! --rle          Run-length encode the AST
+//! -u, --unchecked    Omit memory bounds checks in JIT
+//! -V, --version      Prints version information
+//!
+//! OPTIONS:
+//! -e, --expr <CODE>...    BF code to execute
+//! -s, --size <SIZE>       Memory size in bytes (default 30,000)
+//!
+//! ARGS:
+//! <INPUT>...    The source file(s) to interpret
+//! ```
+//!
+//! See [the library crate documentation](../bf/index.html) for more.
 
 extern crate bf;
 extern crate clap;

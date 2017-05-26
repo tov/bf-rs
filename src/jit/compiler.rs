@@ -11,6 +11,9 @@ dynasm!(asm
     ; .alias rts, r15
 );
 
+/// Compiles peephole-optimized AST to x64 machine code.
+///
+/// Uses the `dynasmrt` assembler
 pub fn compile(program: &peephole::Program, checked: bool) -> Program {
     let mut asm = dynasmrt::x64::Assembler::new();
     let start = asm.offset();
@@ -56,19 +59,13 @@ pub fn compile(program: &peephole::Program, checked: bool) -> Program {
     }
 }
 
-pub fn compile_sequence(asm: &mut Assembler,
-                        program: &[peephole::Instruction],
-                        checked: bool)
-{
+fn compile_sequence(asm: &mut Assembler, program: &[peephole::Instruction], checked: bool) {
     for instruction in program {
         compile_instruction(asm, instruction, checked);
     }
 }
 
-pub fn compile_instruction(asm: &mut Assembler,
-                           instruction: &peephole::Instruction,
-                           checked: bool)
-{
+fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction, checked: bool) {
     use peephole::Instruction::*;
 
     match *instruction {

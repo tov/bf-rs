@@ -3,7 +3,7 @@ use std::io::{Cursor, Read, Write, stdin, stdout};
 use common::BfResult;
 use state::State;
 
-/// Program forms which can be interpreted.
+/// Program forms that can be interpreted.
 pub trait Interpretable {
     /// Interprets a program against the given state.
     fn interpret_state<R: Read, W: Write>(&self, state: State,
