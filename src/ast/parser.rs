@@ -12,18 +12,23 @@ pub fn parse_program(input: &[u8]) -> BfResult<Box<Program>> {
 
 type Parser<'a, R> = BfResult<(R, &'a [u8])>;
 
-fn parse_instruction(mut input: &[u8]) -> Parser<Option<Instruction>> {
+fn parse_instruction<'a>(mut input: &'a [u8]) -> Parser<Option<Instruction>> {
+    use common::Command::*;
+
+    let ok = |cmd, inp: &'a [u8]| Ok((Some(Instruction::Op(cmd)), inp));
+
     loop {
         if let Some((&c, next_input)) = input.split_first() {
             input = next_input;
             match c {
-                b'<' => return Ok((Some(mk_left()),  input)),
-                b'>' => return Ok((Some(mk_right()), input)),
-                b'+' => return Ok((Some(mk_up()),    input)),
-                b'-' => return Ok((Some(mk_down()),  input)),
-                b',' => return Ok((Some(mk_in()),    input)),
-                b'.' => return Ok((Some(mk_out()),   input)),
+                b'<' => return ok(Left, input),
+                b'>' => return ok(Right, input),
+                b'+' => return ok(Up, input),
+                b'-' => return ok(Down, input),
+                b',' => return ok(In, input),
+                b'.' => return ok(Out, input),
                 b']' => return Err(Error::UnmatchedEnd),
+
                 b'[' => match parse_instructions(input) {
                     Err(e) => return Err(e),
                     Ok((program, next_input)) => {
@@ -154,5 +159,9 @@ mod tests {
 
     fn assert_parse_error(input: &str, message: Error) {
         assert_eq!(parse_program(input.as_bytes()), Err(message));
+    }
+
+    fn mk_loop(instructions: Vec<Instruction>) -> Instruction {
+        Instruction::Loop(instructions.into_boxed_slice())
     }
 }
