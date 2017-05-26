@@ -1,14 +1,19 @@
+//! The Brainfuck machine state.
+//!
+//! Useful for creating initial states for testing, and also the interface used by the
+//! interpreters to access the state.
+
 use std::io::{Read, Write};
 use std::mem;
 use std::num::Wrapping;
 
 use common::{BfResult, Error};
 
-/// The default number of 8-bit memory cells, as used by
+/// (`== 30_000`) The default number of 8-bit memory cells, as used by
 /// [`State::new`](struct.State.html#method.new).
 pub const DEFAULT_CAPACITY: usize = 30_000;
 
-/// The BF machine state.
+/// The Brainfuck machine state.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct State {
     memory: Box<[Wrapping<u8>]>,
@@ -16,21 +21,21 @@ pub struct State {
 }
 
 impl State {
-    /// Creates a new BF machine state with capacity
-    /// [`DEFAULT_CAPACITY`].
+    /// Creates a new BF machine state with memory capacity
+    /// [`DEFAULT_CAPACITY`](constant.DEFAULT_CAPACITY.html) (30_000).
     pub fn new() -> Self {
         Self::with_capacity(DEFAULT_CAPACITY)
     }
 
-    /// Creates a new BF machine state.
-    pub fn with_capacity(capacity: usize) -> Self {
+    /// Creates a new BF machine state with the given memory capacity.
+    pub fn with_capacity(memory_size: usize) -> Self {
         State {
-            memory: vec![Wrapping(0); capacity].into_boxed_slice(),
+            memory: vec![Wrapping(0); memory_size].into_boxed_slice(),
             pointer: 0,
         }
     }
 
-    /// Decrements the pointer.
+    /// Decrements/decreases the pointer.
     ///
     /// # Errors
     ///
@@ -41,7 +46,7 @@ impl State {
         Ok(())
     }
 
-    /// Increments the pointer.
+    /// Increments/increases the pointer.
     ///
     /// # Errors
     ///
@@ -70,7 +75,7 @@ impl State {
         }
     }
 
-    /// Increments the byte at the pointer.
+    /// Increments/increases the byte at the pointer.
     ///
     /// Wraps around modulo 256.
     #[inline]
@@ -78,7 +83,7 @@ impl State {
         self.memory[self.pointer] += Wrapping(count);
     }
 
-    /// Decrements the byte at the pointer.
+    /// Decrements/decreases the byte at the pointer.
     ///
     /// Wraps around modulo 256.
     #[inline]
@@ -86,7 +91,7 @@ impl State {
         self.memory[self.pointer] -= Wrapping(count);
     }
 
-    /// Gets the value of the point at the pointer.
+    /// Gets the value of the byte at the pointer.
     #[inline]
     pub fn load(&self) -> u8 {
         self.memory[self.pointer].0
@@ -134,6 +139,8 @@ impl State {
     }
 
     /// Gets a mutable, raw pointer to the start of memory.
+    ///
+    /// This is used by the JIT RTS to pass the memory pointer to the generated code.
     pub fn as_mut_ptr(&mut self) -> *mut u8 {
         // Assumes that Wrapping<u8> == u8:
         unsafe { mem::transmute(self.memory.as_mut_ptr()) }

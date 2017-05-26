@@ -1,8 +1,23 @@
 use super::*;
 use rle;
 
+
+/// Peephole-optimizes run-length encoded AST.
+///
+/// See [`Instruction`](struct.Instruction.html) for descriptions of the peepholes.
+pub fn compile(src: &[rle::Instruction]) -> Box<Program> {
+    let mut compiler = Compiler::new();
+    compiler.compile(src);
+    compiler.into_program()
+}
+
 pub struct Compiler {
     instructions: Vec<Instruction>,
+}
+
+macro_rules! or_else {
+    ($x:expr) => ($x);
+    ($x:expr, $($y:expr),+) => ($x.or_else(|| or_else!($($y),+)))
 }
 
 impl Compiler {
@@ -46,9 +61,11 @@ impl Compiler {
                 Loop(ref body) => {
                     let body = compile(&*body);
 
-                    let peephole = set_zero_peephole(&body)
-                        .or_else(|| find_zero_peephole(&body))
-                        .or_else(|| offset_add_peephole(&body));
+                    let peephole = or_else!(
+                        set_zero_peephole(&body),
+                        find_zero_peephole(&body),
+                        offset_add_peephole(&body)
+                    );
 
                     if let Some(instr) = peephole {
                         self.push(instr);
@@ -114,8 +131,3 @@ pub fn offset_add_peephole(body: &[Instruction]) -> Option<Instruction> {
     }
 }
 
-pub fn compile(src: &[rle::Instruction]) -> Box<Program> {
-    let mut compiler = Compiler::new();
-    compiler.compile(src);
-    compiler.into_program()
-}

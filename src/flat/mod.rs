@@ -32,9 +32,9 @@ pub type Program = [Instruction];
 /// instead of two to see if that goes faster.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Instruction {
-    /// Decrease the pointer left by the specified offset.
+    /// Decrease the pointer by the specified offset.
     Left(usize),
-    /// Increase the pointer right by the specified offset.
+    /// Increase the pointer by the specified offset.
     Right(usize),
     /// Increase the current byte value by the specified offset.
     Change(u8),

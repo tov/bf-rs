@@ -1,3 +1,6 @@
+//! Contains the Interpretable trait, which provides a common interface for running a Brainfuck
+//! program.
+
 use std::io::{Cursor, Read, Write, stdin, stdout};
 
 use common::BfResult;
