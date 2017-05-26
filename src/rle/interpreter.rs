@@ -31,24 +31,27 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
                                -> BfResult<()>
     where R: Read, W: Write
 {
+    use self::Instruction::*;
+    use self::Command::*;
+
     match *instruction {
-        Instruction::Op((Command::Left, count)) => state.left(count)?,
-        Instruction::Op((Command::Right, count)) => state.right(count)?,
-        Instruction::Op((Command::Up, count)) => state.up(count as u8),
-        Instruction::Op((Command::Down, count)) => state.down(count as u8),
-        Instruction::Op((Command::In, count)) => {
+        Op((Left, count)) => state.left(count)?,
+        Op((Right, count)) => state.right(count)?,
+        Op((Up, count)) => state.up(count as u8),
+        Op((Down, count)) => state.down(count as u8),
+        Op((In, count)) => {
             for _ in 0 .. count {
                 state.read(input);
             }
         }
-        Instruction::Op((Command::Out, count)) => {
+        Op((Out, count)) => {
             for _ in 0 .. count {
                 state.write(output);
             }
         }
-        Instruction::Op((Command::Begin, _)) | Instruction::Op((Command::End, _)) =>
+        Op((Begin, _)) | Instruction::Op((End, _)) =>
             panic!("Invalid opcode"),
-        Instruction::Loop(ref program) => {
+        Loop(ref program) => {
             while state.load() != 0  {
                 interpret(&program, state, input, output)?;
             }
