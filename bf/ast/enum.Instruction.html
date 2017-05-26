@@ -48,13 +48,16 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/ast/mod.rs.html#21-26' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/bf/ast/mod.rs.html#21-30' title='goto source code'>[src]</a></span></h1>
 <pre class='rust enum'>pub enum Instruction {
-    Op(<a class="enum" href="../../bf/common/enum.Command.html" title="enum bf::common::Command">Command</a>),
+    Cmd(<a class="enum" href="../../bf/common/enum.Command.html" title="enum bf::common::Command">Command</a>),
     Loop(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">[</a><a class="enum" href="../../bf/ast/enum.Instruction.html" title="enum bf::ast::Instruction">Instruction</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>&gt;),
 }</pre><div class='docblock'><p>An unoptimized BF instruction.</p>
 </div><h2 id='variants' class='variants'>Variants</h2>
-<span id='variant.Op' class='variant'><span id='Op.v' class='invisible'><code>Op(<a class="enum" href="../../bf/common/enum.Command.html" title="enum bf::common::Command">Command</a>)</code></span></span><div class='docblock'><p>A non-loop command.</p>
+<span id='variant.Cmd' class='variant'><span id='Cmd.v' class='invisible'><code>Cmd(<a class="enum" href="../../bf/common/enum.Command.html" title="enum bf::common::Command">Command</a>)</code></span></span><div class='docblock'><p>A non-loop command.</p>
+
+<h1 id='invariants' class='section-header'><a href='#invariants'>Invariants</a></h1>
+<p>Cannot be <code>Begin</code> or <code>End</code>.</p>
 </div><span id='variant.Loop' class='variant'><span id='Loop.v' class='invisible'><code>Loop(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">[</a><a class="enum" href="../../bf/ast/enum.Instruction.html" title="enum bf::ast::Instruction">Instruction</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>&gt;)</code></span></span><div class='docblock'><p>A loop surrounding a sequence of instructions.</p>
 </div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="enum" href="../../bf/ast/enum.Instruction.html" title="enum bf::ast::Instruction">Instruction</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/ast/mod.rs.html#20' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="enum" href="../../bf/ast/enum.Instruction.html" title="enum bf::ast::Instruction">Instruction</a></code></span></h4>

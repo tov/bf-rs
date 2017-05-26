@@ -4,20 +4,20 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `Program` type in crate `bf`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, Program">
+    <meta name="description" content="API documentation for the Rust `RtsState` struct in crate `bf`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, RtsState">
 
-    <title>bf::rle::Program - Rust</title>
+    <title>bf::jit::rts::RtsState - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
     
 
     
     
 </head>
-<body class="rustdoc type">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>rle</a></p><script>window.sidebarCurrent = {name: 'Program', ty: 'type', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Struct RtsState</p><div class="block items"><ul><li><a href="#methods">Methods</a></li></ul></div><p class='location'><a href='../../index.html'>bf</a>::<wbr><a href='../index.html'>jit</a>::<wbr><a href='index.html'>rts</a></p><script>window.sidebarCurrent = {name: 'RtsState', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,12 +44,17 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Type Definition <a href='../index.html'>bf</a>::<wbr><a href='index.html'>rle</a>::<wbr><a class="type" href=''>Program</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>bf</a>::<wbr><a href='../index.html'>jit</a>::<wbr><a href='index.html'>rts</a>::<wbr><a class="struct" href=''>RtsState</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/rle/mod.rs.html#14' title='goto source code'>[src]</a></span></h1>
-<pre class='rust typedef'>type Program = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">[</a><a class="enum" href="../../bf/rle/enum.Instruction.html" title="enum bf::rle::Instruction">Instruction</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>;</pre><div class='docblock'><p>A BF program is a rose tree of instructions.</p>
+               </span><a class='srclink' href='../../../src/bf/jit/rts.rs.html#32-37' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct RtsState&lt;'a&gt; { /* fields omitted */ }</pre><div class='docblock'><p>Minimal state for our minimal run-time system.</p>
+
+<p>Trait objects providing channels for standard input and output.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class="struct" href="../../../bf/jit/rts/struct.RtsState.html" title="struct bf::jit::rts::RtsState">RtsState</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/bf/jit/rts.rs.html#74-91' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.read' class="method"><span id='read.v' class='invisible'><code>extern &quot;win64&quot; fn <a href='#method.read' class='fnname'>read</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code></span></h4>
+<h4 id='method.write' class="method"><span id='write.v' class='invisible'><code>extern &quot;win64&quot; fn <a href='#method.write' class='fnname'>write</a>(&amp;mut self, byte: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>)</code></span></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -104,10 +109,10 @@
     
 
     <script>
-        window.rootPath = "../../";
+        window.rootPath = "../../../";
         window.currentCrate = "bf";
     </script>
-    <script src="../../main.js"></script>
-    <script defer src="../../search-index.js"></script>
+    <script src="../../../main.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

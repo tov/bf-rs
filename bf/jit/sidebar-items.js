@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["compile",""],["compile_instruction",""],["compile_sequence",""]],"struct":[["Program",""]]});
+initSidebarItems({"fn":[["compile","Compiles peephole-optimized AST to x64 machine code."]],"struct":[["Program","The representation of a JIT-compiled program."]]});

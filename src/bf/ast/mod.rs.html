@@ -70,6 +70,10 @@
 <span id="25">25</span>
 <span id="26">26</span>
 <span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Parsing and interpretation for unoptimized Brainfuck abstract syntax trees.</span>
 <span class="doccomment">//!</span>
@@ -93,7 +97,11 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Instruction</span> {
     <span class="doccomment">/// A non-loop command.</span>
-    <span class="ident">Op</span>(<span class="ident">Command</span>),
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Invariants</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Cannot be `Begin` or `End`.</span>
+    <span class="ident">Cmd</span>(<span class="ident">Command</span>),
     <span class="doccomment">/// A loop surrounding a sequence of instructions.</span>
     <span class="ident">Loop</span>(<span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Instruction</span>]<span class="op">&gt;</span>),
 }

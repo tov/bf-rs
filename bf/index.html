@@ -59,8 +59,8 @@ Brainfuck programs.</p>
 that requires nightly Rust. To build and install from crates.io with the JIT
 enabled:</p>
 
-<pre class="rust rust-example-rendered">
-$ <span class="ident">rustup</span> <span class="ident">run</span> <span class="ident">nightly</span> <span class="ident">cargo</span> <span class="ident">install</span> <span class="op">-</span><span class="op">-</span><span class="ident">features</span><span class="op">=</span><span class="ident">jit</span> <span class="ident">bf</span></pre>
+<pre><code class="language-shell">$ rustup run nightly cargo install --features=jit bf
+</code></pre>
 
 <p>This library implements a number of compilation passes:</p>
 
@@ -114,14 +114,15 @@ all representations of Brainfuck programs implement the
                            <td><a class="mod" href="peephole/index.html"
                                   title='mod bf::peephole'>peephole</a></td>
                            <td class='docblock-short'>
-                                
+                                <p>The peephole optimizir, which replaces common loop forms with single (non-Brainfuck)
+instructions.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class="mod" href="rle/index.html"
                                   title='mod bf::rle'>rle</a></td>
                            <td class='docblock-short'>
-                                
+                                <p>Run-length encodes Brainfuck commands.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>

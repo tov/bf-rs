@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'>Module peephole</p><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'><a href='../index.html'>bf</a></p><script>window.sidebarCurrent = {name: 'peephole', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'>Module peephole</p><div class="block items"><ul><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'><a href='../index.html'>bf</a></p><script>window.sidebarCurrent = {name: 'peephole', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -48,16 +48,15 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/peephole/mod.rs.html#1-35' title='goto source code'>[src]</a></span></h1>
-<h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Compiler.html"
-                                  title='struct bf::peephole::Compiler'>Compiler</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+               </span><a class='srclink' href='../../src/bf/peephole/mod.rs.html#1-58' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>The peephole optimizir, which replaces common loop forms with single (non-Brainfuck)
+instructions.</p>
+
+<p>For example, we detect the pattern <code>[-]</code>, which decrements the current byte until it reaches
+zero, and replaces it with the <a href="../../src/bf/peephole/mod.rs.html#21-22"><code>SetZero</code></a>
+instruction. See the <a href="enum.Instruction.html"><code>Instruction</code></a> enum for a list of the
+instructions produced by the <a href="fn.compile.html">peephole compiler</a>.</p>
+</div><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class="enum" href="enum.Instruction.html"
@@ -71,28 +70,7 @@
                            <td><a class="fn" href="fn.compile.html"
                                   title='fn bf::peephole::compile'>compile</a></td>
                            <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.find_zero_peephole.html"
-                                  title='fn bf::peephole::find_zero_peephole'>find_zero_peephole</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.offset_add_peephole.html"
-                                  title='fn bf::peephole::offset_add_peephole'>offset_add_peephole</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.set_zero_peephole.html"
-                                  title='fn bf::peephole::set_zero_peephole'>set_zero_peephole</a></td>
-                           <td class='docblock-short'>
-                                
+                                <p>Peephole-optimizes run-length encoded AST.</p>
                            </td>
                        </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
 <table>
@@ -100,7 +78,7 @@
                            <td><a class="type" href="type.Program.html"
                                   title='type bf::peephole::Program'>Program</a></td>
                            <td class='docblock-short'>
-                                
+                                <p>At this level, a program is a rose tree of instructions.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>

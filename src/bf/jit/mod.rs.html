@@ -118,6 +118,14 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Just-in-time compiles Brainfuck AST to x64 machine code (`--features jit`, nightly only)</span>
 <span class="doccomment">//!</span>
@@ -125,6 +133,7 @@
 <span class="doccomment">//! machine code from peephole-optimized AST. This is currently the fastest implementation,</span>
 <span class="doccomment">//! but it is available only on nightly Rust because `dynasm` uses a plugin.</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! In the `bfi` interpreter, this pass is enabled by the `--jit` flag.</span>
 <span class="doccomment">//! To go even faster, pass the `--unchecked` flag to the `bfi` interpreter to disable</span>
 <span class="doccomment">//! memory bounds checking in the generated code. Note that this runs Brainfuck in</span>
 <span class="doccomment">//! unsafe mode, which means that programs that move the pointer outside the allocated</span>
@@ -137,6 +146,13 @@
 
 <span class="kw">use</span> <span class="ident">dynasmrt</span>;
 
+<span class="doccomment">/// The representation of a JIT-compiled program.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Relies on the `dynasmrt` run-time system. [This</span>
+<span class="doccomment">/// representation](../../src/bf/jit/mod.rs.html#26-29)</span>
+<span class="doccomment">/// is from [the `dynlib-rs` tutorial].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [the `dynlib-rs` tutorial]: https://censoredusername.github.io/dynasm-rs/language/tutorial.html#advanced-usage</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Program</span> {
     <span class="ident">code</span>: <span class="ident">dynasmrt</span>::<span class="ident">ExecutableBuffer</span>,
     <span class="ident">start</span>: <span class="ident">dynasmrt</span>::<span class="ident">AssemblyOffset</span>,

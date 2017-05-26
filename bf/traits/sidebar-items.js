@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["Interpretable","Program forms which can be interpreted."]]});
+initSidebarItems({"trait":[["Interpretable","Program forms that can be interpreted."]]});

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Instruction","Instructions as output by the peephole optimizer."]],"fn":[["compile",""],["find_zero_peephole",""],["offset_add_peephole",""],["set_zero_peephole",""]],"struct":[["Compiler",""]],"type":[["Program",""]]});
+initSidebarItems({"enum":[["Instruction","Instructions as output by the peephole optimizer."]],"fn":[["compile","Peephole-optimizes run-length encoded AST."]],"type":[["Program","At this level, a program is a rose tree of instructions."]]});

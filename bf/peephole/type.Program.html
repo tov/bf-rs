@@ -48,8 +48,11 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/peephole/mod.rs.html#6' title='goto source code'>[src]</a></span></h1>
-<pre class='rust typedef'>type Program = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">[</a><a class="enum" href="../../bf/peephole/enum.Instruction.html" title="enum bf::peephole::Instruction">Instruction</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>;</pre></section>
+               </span><a class='srclink' href='../../src/bf/peephole/mod.rs.html#17' title='goto source code'>[src]</a></span></h1>
+<pre class='rust typedef'>type Program = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">[</a><a class="enum" href="../../bf/peephole/enum.Instruction.html" title="enum bf::peephole::Instruction">Instruction</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>;</pre><div class='docblock'><p>At this level, a program is a rose tree of instructions.</p>
+
+<p>All instructions are leaves except for the <code>Loop</code> instruction, which contains a boxed <code>Program</code>.</p>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
