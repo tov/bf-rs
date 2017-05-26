@@ -1,6 +1,12 @@
 use super::*;
 use common::{BfResult, Error};
 
+/// Parses Brainfuck concrete syntax into an abstract syntax tree.
+///
+/// # Errors
+///
+/// Unmatched square brackets will result in an `Err` return. See
+/// [`common::Error`](../common/enum.Error.html).
 pub fn parse_program(input: &[u8]) -> BfResult<Box<Program>> {
     let (program, rest) = parse_instructions(input)?;
     if rest.is_empty() {
@@ -10,6 +16,10 @@ pub fn parse_program(input: &[u8]) -> BfResult<Box<Program>> {
     }
 }
 
+/// The type returned by a parser.
+///
+/// A successful parse returns `Ok` of a pair of the result value and a slice of the
+/// remaining input. A failed parse returns `Err`.
 type Parser<'a, R> = BfResult<(R, &'a [u8])>;
 
 fn parse_instruction<'a>(mut input: &'a [u8]) -> Parser<Option<Instruction>> {

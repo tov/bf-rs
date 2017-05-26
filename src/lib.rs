@@ -1,3 +1,41 @@
+//!
+//! `bf-rs` is a optimizing Brainfuck interpreter and JIT compiler
+//! inspired by Eli Bendersky’s [series on JIT compilation].
+//! It includes a library crate `bf` that exports most of the functionality,
+//! and an executable `bfi` that provides a command-line interface for executing
+//! Brainfuck programs.
+//!
+//! By default, installing `bf` does not enable the JIT compiler because
+//! that requires nightly Rust. To build and install from crates.io with the JIT
+//! enabled:
+//!
+//! ```
+//! $ rustup run nightly cargo install --features=jit bf
+//! ```
+//!
+//! [series on JIT compilation]: http://eli.thegreenplace.net/2017/adventures-in-jit-compilation-part-1-an-interpreter/
+//!
+//! This library implements a number of compilation passes:
+//!
+//!  - First, Brainfuck concrete syntax is parsed into
+//! [an abstract syntax tree](ast/index.html).
+//!
+//!  - Then, repeated sequences of the same command are
+//! [run-length encoded](rle/index.html).
+//!
+//!  - Then, common loop forms are converted to new (non-Brainfuck)
+//! instructions by the [peephole optimizer](peephole/index.html).
+//!
+//!  - The peephole output can be [flattened to bytecode](flat/index.html),
+//! which is then interpreted.
+//!
+//!  - Or, if the `jit` feature is enabled (nightly only), the peephole output
+//! can be [just-in-time compiled to x64 machine code](jit/index.html).
+//!
+//! Interpreters are provided for the intermediate forms as well. In particular,
+//! all representations of Brainfuck programs implement the
+//! [`Interpretable`](traits/trait.Interpretable.html) trait.
+
 #![cfg_attr(feature = "jit", feature(plugin))]
 #![cfg_attr(feature = "jit", plugin(dynasm))]
 

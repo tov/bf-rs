@@ -1,6 +1,13 @@
 use super::*;
 use peephole;
 
+/// Compiles peephole-optimized AST to a flat bytecode program.
+pub fn compile(src: &[peephole::Instruction]) -> Box<Program> {
+    let mut compiler = Compiler::new();
+    compiler.compile(src);
+    compiler.into_program()
+}
+
 pub struct Compiler {
     instructions: Vec<Instruction>,
 }
@@ -50,8 +57,3 @@ impl Compiler {
     }
 }
 
-pub fn compile(src: &[peephole::Instruction]) -> Box<Program> {
-    let mut compiler = Compiler::new();
-    compiler.compile(src);
-    compiler.into_program()
-}
