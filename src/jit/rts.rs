@@ -3,12 +3,14 @@ use std::mem;
 
 use super::*;
 use result::{BfResult, Error};
+use state::State;
+use traits::Interpretable;
 
 const OKAY: u64      = 0;
 const UNDERFLOW: u64 = 1;
 const OVERFLOW: u64  = 2;
 
-struct RtsState<'a> {
+pub struct RtsState<'a> {
     input:  &'a mut Read,
     output: &'a mut Write,
 }
@@ -16,6 +18,26 @@ struct RtsState<'a> {
 type EntryFunction<'a> = extern "win64" fn(memory: *mut u8,
                                            memory_size: u64,
                                            rts_state: *mut RtsState<'a>) -> u64;
+
+impl Interpretable for Executable {
+    fn interpret_state<R: Read, W: Write>(&self, mut state: State,
+                                          mut input: R, mut output: W)
+                                          -> BfResult<()>
+    {
+        let mut rts = RtsState::new(&mut input, &mut output);
+
+        let f: EntryFunction = unsafe { mem::transmute(self.code.ptr(self.start)) };
+
+        let result = f(state.as_mut_ptr(), state.capacity() as u64, &mut rts);;
+
+        match result {
+            OKAY      => Ok(()),
+            UNDERFLOW => Err(Error::PointerUnderflow),
+            OVERFLOW  => Err(Error::PointerOverflow),
+            _ => panic!(format!("Unknown result code: {}", result)),
+        }
+    }
+}
 
 impl<'a> RtsState<'a> {
     fn new<R: Read, W: Write>(input: &'a mut R, output: &'a mut W) -> Self {
@@ -34,31 +56,32 @@ impl<'a> RtsState<'a> {
     pub extern "win64" fn write(&mut self, byte: u8) {
         let _ = self.output.write_all(&[byte]);
     }
-
-    pub fn run(&mut self, memory_size: usize, exe: &Executable) -> BfResult<()> {
-        let mut memory = vec![0u8; memory_size];
-
-        let f: EntryFunction = unsafe { mem::transmute(exe.code.ptr(exe.start)) };
-
-        let result = f(memory.as_mut_ptr(), memory_size as u64, self);
-
-        match result {
-            0 => Ok(()),
-            1 => Err(Error::PointerUnderflow),
-            2 => Err(Error::PointerOverflow),
-            _ => panic!(format!("Unknown result code: {}", result)),
-        }
-    }
 }
 
 #[cfg(test)]
 mod tests {
-//    use super::*;
-//    use jit::compiler::compile;
+    use test_helpers::*;
 
-//    #[test]
-//    fn run_it() {
-//        let exe = compile(&[]);
-//        assert_eq!(exe.run(3, 4), 7);
-//    }
+    #[test]
+    fn move_right_once() {
+        assert_parse_interpret(b">", "", "");
+    }
+
+    #[test]
+    fn echo_one_byte() {
+        assert_parse_interpret(b",.", "A", "A");
+    }
+
+    #[test]
+    fn inc_echo_one_byte() {
+        assert_parse_interpret(b",+.", "A", "B");
+    }
+
+
+    fn assert_parse_interpret(program: &[u8], input: &str, output: &str) {
+        let program = ::ast::parse_program(program).unwrap();
+        let program = ::rle_ast::compile(&program);
+        let program = ::jit::compile(&program);
+        assert_interpret(&program, input.as_bytes(), output.as_bytes());
+    }
 }

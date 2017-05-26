@@ -1,4 +1,5 @@
 use std::io::{Read, Write};
+use std::mem;
 use std::num::Wrapping;
 
 use result::{BfResult, Error};
@@ -125,6 +126,17 @@ impl State {
     #[inline]
     pub fn write<W: Write>(&self, output: &mut W) {
         let _ = output.write_all(&[self.load()]);
+    }
+
+    /// The memory capacity.
+    pub fn capacity(&self) -> usize {
+        self.memory.len()
+    }
+
+    /// Gets a mutable, raw pointer to the start of memory.
+    pub fn as_mut_ptr(&mut self) -> *mut u8 {
+        // Assumes that Wrapping<u8> == u8:
+        unsafe { mem::transmute(self.memory.as_mut_ptr()) }
     }
 }
 

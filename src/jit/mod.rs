@@ -1,6 +1,8 @@
 mod compiler;
 mod rts;
 
+pub use self::compiler::*;
+
 use dynasmrt;
 
 pub struct Executable {
