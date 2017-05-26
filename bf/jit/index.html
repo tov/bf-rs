@@ -48,8 +48,18 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/jit/mod.rs.html#1-63' title='goto source code'>[src]</a></span></h1>
-<h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+               </span><a class='srclink' href='../../src/bf/jit/mod.rs.html#1-74' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Just-in-time compiles Brainfuck AST to x64 machine code (<code>--features jit</code>, nightly only)</p>
+
+<p>This uses the <a href="https://crates.io/search?q=dynasm"><code>dynasm</code></a> crate to generate x86-64
+machine code from peephole-optimized AST. This is currently the fastest implementation,
+but it is available only on nightly Rust because <code>dynasm</code> uses a plugin.</p>
+
+<p>To go even faster, pass the <code>--unchecked</code> flag to the <code>bfi</code> interpreter to disable
+memory bounds checking in the generated code. Note that this runs Brainfuck in
+unsafe mode, which means that programs that move the pointer outside the allocated
+memory will access and possibly overwrite arbitrary memory locations.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class="struct" href="struct.Program.html"
