@@ -8,9 +8,6 @@ authors = ["Jesse A. Tov <jesse.tov@gmail.com>"]
 # Enables native x64 JIT; requires nightly Rust
 jit = ["dynasmrt", "dynasm"]
 
-# Omits memory bounds checks from emitted code; implies jit
-omit_bounds_checks = ["jit"]
-
 [dependencies]
 clap = "2.24"
 

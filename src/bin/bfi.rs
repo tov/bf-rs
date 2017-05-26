@@ -24,6 +24,7 @@ struct Options {
     program_text:  Vec<u8>,
     memory_size:   Option<usize>,
     compiler_pass: Pass,
+    unchecked:     bool,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -70,7 +71,7 @@ fn main() {
         Pass::Jit => {
             let program = rle::compile(&program);
             let program = peephole::compile(&program);
-            let program = jit::compile(&program, true);
+            let program = jit::compile(&program, !options.unchecked);
             interpret(&program, &options);
         }
     }
@@ -91,6 +92,7 @@ fn get_options() -> Options {
         program_text:  Vec::new(),
         memory_size:   None,
         compiler_pass: Pass::Peep,
+        unchecked:     false,
     };
 
     let matches = build_clap_app().get_matches();
@@ -112,6 +114,10 @@ fn get_options() -> Options {
         result.compiler_pass = Pass::Peep;
     } else if matches.is_present("rle") {
         result.compiler_pass = Pass::Rle;
+    }
+
+    if matches.is_present("unchecked") {
+        result.unchecked = true;
     }
 
     if let Some(exprs) = matches.values_of("expr") {
@@ -176,7 +182,11 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("jit")
             .long("jit")
             .help("JIT to native x64 (implies --peep)")
-            .conflicts_with("flat"));
+            .conflicts_with("flat"))
+        .arg(Arg::with_name("unchecked")
+            .short("u")
+            .long("unchecked")
+            .help("Omit memory bounds checks in JIT"));
 
     app
 }
