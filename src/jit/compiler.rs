@@ -151,27 +151,25 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
 
         FindZeroRight(skip) => {
             dynasm!(asm
-                ; cmp BYTE [pointer], 0
-                ; jz >end_loop
+                ; jmp >end_loop
                 ; begin_loop:
                 ;; check_pos_offset!(asm, skip)
                 ; add pointer, rax
+                ; end_loop:
                 ; cmp BYTE [pointer], 0
                 ; jnz <begin_loop
-                ; end_loop:
             )
         }
 
         FindZeroLeft(skip) => {
             dynasm!(asm
-                ; cmp BYTE [pointer], 0
-                ; jz >end_loop
+                ; jmp >end_loop
                 ; begin_loop:
                 ;; check_neg_offset!(asm, skip)
                 ; sub pointer, rax
+                ; end_loop:
                 ; cmp BYTE [pointer], 0
                 ; jnz <begin_loop
-                ; end_loop:
             )
         }
 
