@@ -176,7 +176,7 @@ fn build_clap_app() -> App<'static, 'static> {
     let app = app
         .arg(Arg::with_name("jit")
             .long("jit")
-            .help("Use native X-64 JIT")
+            .help("Use native x64 JIT")
             .conflicts_with_all(&["ast", "rle", "flat", "peep"]));
 
     app
