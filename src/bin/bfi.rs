@@ -153,7 +153,7 @@ fn build_clap_app() -> App<'static, 'static> {
             .short("s")
             .long("size")
             .value_name("SIZE")
-            .help("Memory size in bytes")
+            .help("Memory size in bytes (default 30,000)")
             .takes_value(true))
         .arg(Arg::with_name("ast")
             .long("ast")
