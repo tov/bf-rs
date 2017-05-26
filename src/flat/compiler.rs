@@ -1,5 +1,5 @@
 use super::*;
-use ::rle_ast;
+use peephole;
 
 pub struct Compiler {
     instructions: Vec<Instruction>,
@@ -12,18 +12,30 @@ impl Compiler {
         }
     }
 
-    pub fn compile(&mut self, src: &[rle_ast::Instruction]) {
+    pub fn compile(&mut self, src: &[peephole::Instruction]) {
+        use peephole::Instruction as Src;
+        use super::Instruction as Obj;
+
         for instruction in src {
             match *instruction {
-                rle_ast::Instruction::Op((op_code, count)) =>
-                    self.issue_op(op_code, count),
-                rle_ast::Instruction::Loop(ref body) => {
+                Src::Right(count) => self.issue(Obj::Right(count)),
+                Src::Left(count) => self.issue(Obj::Left(count)),
+                Src::Change(count) => self.issue(Obj::Change(count)),
+                Src::In => self.issue(Obj::In),
+                Src::Out => self.issue(Obj::Out),
+                Src::SetZero => self.issue(Obj::SetZero),
+                Src::OffsetAddRight(offset) => self.issue(Obj::OffsetAddRight(offset)),
+                Src::OffsetAddLeft(offset) => self.issue(Obj::OffsetAddLeft(offset)),
+                Src::FindZeroRight(offset) => self.issue(Obj::FindZeroRight(offset)),
+                Src::FindZeroLeft(offset) => self.issue(Obj::FindZeroLeft(offset)),
+
+                Src::Loop(ref body) => {
                     let begin_pc = self.instructions.len();
-                    self.issue_op(OpCode::Begin, 0);
+                    self.issue(Obj::JumpZero(0));
                     self.compile(&body);
                     let end_pc = self.instructions.len();
-                    self.issue_op(OpCode::End, begin_pc);
-                    self.instructions[begin_pc] = (OpCode::Begin, end_pc);
+                    self.issue(Obj::JumpNotZero(begin_pc));
+                    self.instructions[begin_pc] = Obj::JumpZero(end_pc);
                 }
             }
         }
@@ -33,12 +45,12 @@ impl Compiler {
         self.instructions.into_boxed_slice()
     }
 
-    fn issue_op(&mut self, op_code: OpCode, count: usize) {
-        self.instructions.push((op_code, count));
+    fn issue(&mut self, instruction: Instruction) {
+        self.instructions.push(instruction);
     }
 }
 
-pub fn compile(src: &[rle_ast::Instruction]) -> Box<Program> {
+pub fn compile(src: &[peephole::Instruction]) -> Box<Program> {
     let mut compiler = Compiler::new();
     compiler.compile(src);
     compiler.into_program()

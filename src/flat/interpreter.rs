@@ -18,32 +18,57 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
                        -> BfResult<()>
     where R: Read, W: Write
 {
+    use super::Instruction::*;
+
     let mut pc = 0;
 
     while pc < instructions.len() {
         match instructions[pc] {
-            (OpCode::Left, count) => state.left(count)?,
-            (OpCode::Right, count) => state.right(count)?,
-            (OpCode::Up, count) => state.up(count as u8),
-            (OpCode::Down, count) => state.down(count as u8),
-            (OpCode::In, count) => {
-                for _ in 0 .. count {
-                    state.read(input);
-                }
-            }
-            (OpCode::Out, count) => {
-                for _ in 0 .. count {
-                    state.write(output);
-                }
-            }
-            (OpCode::Begin, count) => {
+            Left(count) => state.left(count)?,
+            Right(count) => state.right(count)?,
+            Change(count) => state.up(count),
+            In => state.read(input),
+            Out => state.write(output),
+
+            JumpZero(address) => {
                 if state.load() == 0 {
-                    pc = count;
+                    pc = address;
                 }
             }
-            (OpCode::End, count) => {
+
+            JumpNotZero(address) => {
                 if state.load() != 0 {
-                    pc = count;
+                    pc = address;
+                }
+            }
+
+            SetZero => state.store(0),
+
+            OffsetAddRight(offset) => {
+                if state.load() != 0 {
+                    let value = state.load();
+                    state.store(0);
+                    state.up_pos_offset(offset, value)?;
+                }
+            }
+
+            OffsetAddLeft(offset) => {
+                if state.load() != 0 {
+                    let value = state.load();
+                    state.store(0);
+                    state.up_neg_offset(offset, value)?;
+                }
+            }
+
+            FindZeroRight(offset) => {
+                while state.load() != 0 {
+                    state.right(offset)?;
+                }
+            }
+
+            FindZeroLeft(offset) => {
+                while state.load() != 0 {
+                    state.left(offset)?;
                 }
             }
         }
@@ -74,6 +99,7 @@ mod tests {
     fn assert_parse_interpret(program: &[u8], input: &str, output: &str) {
         let program = ::ast::parse_program(program).unwrap();
         let program = ::rle_ast::compile(&program);
+        let program = ::peephole::compile(&program);
         let program = ::flat::compile(&program);
         assert_interpret(&*program, input.as_bytes(), output.as_bytes());
     }
