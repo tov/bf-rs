@@ -1,5 +1,5 @@
 use super::*;
-use ::ast;
+use ast;
 
 /// Represents the state of an RLE compiler from `ast::Instruction` to `Instruction`.
 pub struct Compiler {
