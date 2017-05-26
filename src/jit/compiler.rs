@@ -205,17 +205,16 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
             let end_label   = asm.new_dynamic_label();
 
             dynasm!(asm
-                ; cmp BYTE [pointer], 0
-                ; jz =>end_label
+                ; jmp =>end_label
                 ; =>begin_label
             );
 
             compile_sequence(asm, body);
 
             dynasm!(asm
+                ; =>end_label
                 ; cmp BYTE [pointer], 0
                 ; jnz =>begin_label
-                ; =>end_label
             );
         }
     }
