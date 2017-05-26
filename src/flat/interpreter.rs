@@ -98,7 +98,7 @@ mod tests {
 
     fn assert_parse_interpret(program: &[u8], input: &str, output: &str) {
         let program = ::ast::parse_program(program).unwrap();
-        let program = ::rle_ast::compile(&program);
+        let program = ::rle::compile(&program);
         let program = ::peephole::compile(&program);
         let program = ::flat::compile(&program);
         assert_interpret(&*program, input.as_bytes(), output.as_bytes());

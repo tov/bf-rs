@@ -6,7 +6,7 @@ extern crate bf;
 #[cfg(feature = "jit")]
 mod jit_only {
     use bf::ast;
-    use bf::rle_ast;
+    use bf::rle;
     use bf::peephole;
     use bf::jit;
 
@@ -20,7 +20,7 @@ mod jit_only {
         let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
 
         b.iter(|| {
-            let program = rle_ast::compile(&program);
+            let program = rle::compile(&program);
             let program = peephole::compile(&program);
             jit::compile(&program)
         });
@@ -29,7 +29,7 @@ mod jit_only {
     #[bench]
     fn interpret_factor_million(b: &mut Bencher) {
         let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
-        let program = rle_ast::compile(&program);
+        let program = rle::compile(&program);
         let program = peephole::compile(&program);
         let program = jit::compile(&program);
 

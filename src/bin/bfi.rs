@@ -8,7 +8,7 @@ use std::process::exit;
 use clap::{Arg, App};
 
 use bf::ast;
-use bf::rle_ast;
+use bf::rle;
 use bf::flat;
 use bf::peephole;
 
@@ -49,18 +49,18 @@ fn main() {
         }
 
         Pass::Rle => {
-            let program = rle_ast::compile(&program);
+            let program = rle::compile(&program);
             interpret(&*program, &options);
         }
 
         Pass::Peep => {
-            let program = rle_ast::compile(&program);
+            let program = rle::compile(&program);
             let program = peephole::compile(&program);
             interpret(&*program, &options);
         }
 
         Pass::Flat => {
-            let program = rle_ast::compile(&program);
+            let program = rle::compile(&program);
             let program = peephole::compile(&program);
             let program = flat::compile(&program);
             interpret(&*program, &options);
@@ -68,7 +68,7 @@ fn main() {
 
         #[cfg(feature = "jit")]
         Pass::Jit => {
-            let program = rle_ast::compile(&program);
+            let program = rle::compile(&program);
             let program = peephole::compile(&program);
             let program = jit::compile(&program);
             interpret(&program, &options);

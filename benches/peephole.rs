@@ -4,7 +4,7 @@ extern crate test;
 extern crate bf;
 
 use bf::ast;
-use bf::rle_ast;
+use bf::rle;
 use bf::peephole;
 use bf::traits::Interpretable;
 use bf::test_helpers;
@@ -16,7 +16,7 @@ fn compile_factor(b: &mut Bencher) {
     let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
 
     b.iter(|| {
-        let program = rle_ast::compile(&program);
+        let program = rle::compile(&program);
         peephole::compile(&program)
     });
 }
@@ -24,7 +24,7 @@ fn compile_factor(b: &mut Bencher) {
 #[bench]
 fn interpret_factor_million(b: &mut Bencher) {
     let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
-    let program = rle_ast::compile(&program);
+    let program = rle::compile(&program);
     let program = peephole::compile(&program);
 
     b.iter(|| {

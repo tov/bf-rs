@@ -1,6 +1,6 @@
 use super::*;
 use op_code::OpCode;
-use rle_ast;
+use rle;
 
 pub struct Compiler {
     instructions: Vec<Instruction>,
@@ -13,8 +13,8 @@ impl Compiler {
         }
     }
 
-    pub fn compile(&mut self, src: &[rle_ast::Instruction]) {
-        use rle_ast::Instruction::*;
+    pub fn compile(&mut self, src: &[rle::Instruction]) {
+        use rle::Instruction::*;
 
         for instruction in src {
             match *instruction {
@@ -114,7 +114,7 @@ pub fn offset_add_peephole(body: &[Instruction]) -> Option<Instruction> {
     }
 }
 
-pub fn compile(src: &[rle_ast::Instruction]) -> Box<Program> {
+pub fn compile(src: &[rle::Instruction]) -> Box<Program> {
     let mut compiler = Compiler::new();
     compiler.compile(src);
     compiler.into_program()

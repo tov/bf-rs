@@ -10,7 +10,7 @@ pub mod state;
 pub mod traits;
 
 pub mod ast;
-pub mod rle_ast;
+pub mod rle;
 pub mod flat;
 pub mod peephole;
 
