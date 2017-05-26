@@ -2,13 +2,13 @@
 name = "bf"
 version = "0.2.2"
 authors = ["Jesse A. Tov <jesse.tov@gmail.com>"]
-description = "An optimizing Brainfuck interpreter"
+description = "An optimizing Brainfuck implementation framework"
 repository = "https://github.com/tov/bf-rs"
 homepage = "https://github.com/tov/bf-rs"
 documentation = "http://tov.github.io/bf-rs/"
 readme = "README.md"
 license = "MIT"
-keywords = ["brainfuck", "interpreters", "jit", "x64"]
+keywords = ["brainfuck", "interpreters", "compilers", "jit", "x64"]
 
 [features]
 
