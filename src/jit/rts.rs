@@ -6,9 +6,9 @@ use result::{BfResult, Error};
 use state::State;
 use traits::Interpretable;
 
-const OKAY: u64      = 0;
-const UNDERFLOW: u64 = 1;
-const OVERFLOW: u64  = 2;
+pub const OKAY: u64      = 0;
+pub const UNDERFLOW: u64 = 1;
+pub const OVERFLOW: u64  = 2;
 
 pub struct RtsState<'a> {
     input:  &'a mut Read,

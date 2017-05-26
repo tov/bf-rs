@@ -30,13 +30,13 @@ pub fn compile(program: &peephole::Program) -> Program {
     compile_sequence(&mut asm, program);
 
     dynasm!(asm
-        ; mov rax, 0
+        ; mov rax, rts::OKAY as i32
         ; jmp ->finish
         ; ->underflow:
-        ; mov rax, 1
+        ; mov rax, rts::UNDERFLOW as i32
         ; jmp ->finish
         ; ->overflow:
-        ; mov rax, 2
+        ; mov rax, rts::OVERFLOW as i32
         ; ->finish:
         ; pop r15
         ; pop r14
