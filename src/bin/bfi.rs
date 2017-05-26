@@ -68,6 +68,7 @@ fn main() {
         #[cfg(feature = "jit")]
         Pass::Jit => {
             let program = rle_ast::compile(&program);
+            let program = peephole::compile(&program);
             let program = jit::compile(&program);
             interpret(&program, &options);
         }

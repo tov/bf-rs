@@ -2,8 +2,7 @@ use dynasmrt::x64::Assembler;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use super::*;
-use op_code::OpCode;
-use rle_ast;
+use peephole;
 
 dynasm!(asm
     ; .alias pointer, r12
@@ -12,7 +11,7 @@ dynasm!(asm
     ; .alias rts, r15
 );
 
-pub fn compile(program: &rle_ast::Program) -> Program {
+pub fn compile(program: &peephole::Program) -> Program {
     let mut asm = dynasmrt::x64::Assembler::new();
     let start = asm.offset();
 
@@ -54,78 +53,140 @@ pub fn compile(program: &rle_ast::Program) -> Program {
     }
 }
 
-pub fn compile_sequence(asm: &mut Assembler, program: &[rle_ast::Instruction]) {
+pub fn compile_sequence(asm: &mut Assembler, program: &[peephole::Instruction]) {
     for instruction in program {
         compile_instruction(asm, instruction);
     }
 }
 
-pub fn compile_instruction(asm: &mut Assembler, instruction: &rle_ast::Instruction) {
-    use rle_ast::Instruction::*;
+macro_rules! check_pos_offset {
+    ($asm:ident, $offset:expr) => {{
+        dynasm!($asm
+            ; mov rax, QWORD $offset as i64
+            ; mov rcx, mem_limit
+            ; sub rcx, pointer
+            ; cmp rcx, rax
+            ; jle ->overflow
+        );
+    }}
+}
+
+macro_rules! check_neg_offset {
+    ($asm:ident, $offset:expr) => {{
+        dynasm!($asm
+            ; mov rax, QWORD $offset as i64
+            ; mov rcx, pointer
+            ; sub rcx, mem_start
+            ; cmp rcx, rax
+            ; jl ->underflow
+        );
+    }}
+}
+
+pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction) {
+    use peephole::Instruction::*;
 
     match *instruction {
-        Op((OpCode::Right, count)) => {
+        Right(count) => {
             dynasm!(asm
-                ; mov rax, QWORD count as i64
-                ; mov rcx, mem_limit
-                ; sub rcx, pointer
-                ; cmp rcx, rax
-                ; jle ->overflow
+                ;; check_pos_offset!(asm, count)
                 ; add pointer, rax
             );
         }
 
-        Op((OpCode::Left, count)) => {
+        Left(count) => {
             dynasm!(asm
-                ; mov rax, QWORD count as i64
-                ; mov rcx, pointer
-                ; sub rcx, mem_start
-                ; cmp rcx, rax
-                ; jl ->underflow
+                ;; check_neg_offset!(asm, count)
                 ; sub pointer, rax
             );
         }
 
-        Op((OpCode::Up, count)) => {
+        Change(count) => {
             dynasm!(asm
-                ; add [pointer], BYTE usize_to_i8(count)
+                ; add [pointer], BYTE u8_to_i8(count)
             );
         }
 
-        Op((OpCode::Down, count)) => {
+        In => {
             dynasm!(asm
-                ; sub [pointer], BYTE usize_to_i8(count)
+                ; mov rax, QWORD rts::RtsState::read as _
+                ; mov rcx, rts
+                ; sub rsp, BYTE 0x28
+                ; call rax
+                ; add rsp, BYTE 0x28
+                ; mov [pointer], al
             );
         }
 
-        Op((OpCode::In, count)) => {
-            for _ in 0 .. count {
-                dynasm!(asm
-                    ; mov rax, QWORD rts::RtsState::read as _
-                    ; mov rcx, rts
-                    ; sub rsp, BYTE 0x28
-                    ; call rax
-                    ; add rsp, BYTE 0x28
-                    ; mov [pointer], al
-                );
-            }
+        Out => {
+            dynasm!(asm
+                ; mov rax, QWORD rts::RtsState::write as _
+                ; mov rcx, rts
+                ; xor rdx, rdx
+                ; mov dl, [pointer]
+                ; sub rsp, BYTE 0x28
+                ; call rax
+                ; add rsp, BYTE 0x28
+            );
         }
 
-        Op((OpCode::Out, count)) => {
-            for _ in 0 .. count {
-                dynasm!(asm
-                    ; mov rax, QWORD rts::RtsState::write as _
-                    ; mov rcx, rts
-                    ; xor rdx, rdx
-                    ; mov dl, [pointer]
-                    ; sub rsp, BYTE 0x28
-                    ; call rax
-                    ; add rsp, BYTE 0x28
-                );
-            }
+        SetZero => {
+            dynasm!(asm
+                ; mov BYTE [pointer], 0
+            )
         }
 
-        Op((OpCode::Begin, _)) | Op((OpCode::End, _)) => panic!("bad opcode"),
+        FindZeroRight(skip) => {
+            dynasm!(asm
+                ; cmp BYTE [pointer], 0
+                ; jz >end_loop
+                ; begin_loop:
+                ;; check_pos_offset!(asm, skip)
+                ; add pointer, rax
+                ; cmp BYTE [pointer], 0
+                ; jnz <begin_loop
+                ; end_loop:
+            )
+        }
+
+        FindZeroLeft(skip) => {
+            dynasm!(asm
+                ; cmp BYTE [pointer], 0
+                ; jz >end_loop
+                ; begin_loop:
+                ;; check_neg_offset!(asm, skip)
+                ; sub pointer, rax
+                ; cmp BYTE [pointer], 0
+                ; jnz <begin_loop
+                ; end_loop:
+            )
+        }
+
+        OffsetAddRight(offset) => {
+            dynasm!(asm
+                ; cmp BYTE [pointer], 0
+                ; jz >skip
+                ;; check_pos_offset!(asm, offset)
+                ; mov cl, BYTE [pointer]
+                ; mov BYTE [pointer], 0
+                ; add BYTE [pointer + rax], cl
+                ; skip:
+            );
+        }
+
+        OffsetAddLeft(offset) => {
+            dynasm!(asm
+                ; cmp BYTE [pointer], 0
+                ; jz >skip
+                ;; check_neg_offset!(asm, offset)
+                ; mov cl, BYTE [pointer]
+                ; mov BYTE [pointer], 0
+                ; mov rdx, pointer
+                ; sub rdx, rax
+                ; add BYTE [rdx], cl
+                ; skip:
+            );
+        }
 
         Loop(ref body) => {
             let begin_label = asm.new_dynamic_label();
@@ -148,8 +209,8 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &rle_ast::Instructi
     }
 }
 
-fn usize_to_i8(n: usize) -> i8 {
-    let mut n = n % 256;
-    if n > 127 {n -= 256 };
+fn u8_to_i8(n: u8) -> i8 {
+    let mut n = n as isize % 256;
+    if n > 127 { n -= 256 };
     n as i8
 }
