@@ -27,7 +27,7 @@ pub fn compile(program: &peephole::Program) -> Program {
         ; mov rts, r8
     );
 
-    compile_sequence(&mut asm, program);
+    compile_sequence(&mut asm, program, true);
 
     dynasm!(asm
         ; mov rax, rts::OKAY as i32
@@ -56,26 +56,32 @@ pub fn compile(program: &peephole::Program) -> Program {
     }
 }
 
-pub fn compile_sequence(asm: &mut Assembler, program: &[peephole::Instruction]) {
+pub fn compile_sequence(asm: &mut Assembler,
+                        program: &[peephole::Instruction],
+                        checked: bool)
+{
     for instruction in program {
-        compile_instruction(asm, instruction);
+        compile_instruction(asm, instruction, checked);
     }
 }
 
-pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction) {
+pub fn compile_instruction(asm: &mut Assembler,
+                           instruction: &peephole::Instruction,
+                           checked: bool)
+{
     use peephole::Instruction::*;
 
     match *instruction {
         Right(count) => {
             dynasm!(asm
-                ;; load_pos_offset(asm, count)
+                ;; load_pos_offset(asm, count, checked)
                 ; add pointer, rax
             );
         }
 
         Left(count) => {
             dynasm!(asm
-                ;; load_neg_offset(asm, count)
+                ;; load_neg_offset(asm, count, checked)
                 ; sub pointer, rax
             );
         }
@@ -119,7 +125,7 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
             dynasm!(asm
                 ; jmp >end_loop
                 ; begin_loop:
-                ;; load_pos_offset(asm, skip)
+                ;; load_pos_offset(asm, skip, checked)
                 ; add pointer, rax
                 ; end_loop:
                 ; cmp BYTE [pointer], 0
@@ -131,7 +137,7 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
             dynasm!(asm
                 ; jmp >end_loop
                 ; begin_loop:
-                ;; load_neg_offset(asm, skip)
+                ;; load_neg_offset(asm, skip, checked)
                 ; sub pointer, rax
                 ; end_loop:
                 ; cmp BYTE [pointer], 0
@@ -143,7 +149,7 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
             dynasm!(asm
                 ; cmp BYTE [pointer], 0
                 ; jz >skip
-                ;; load_pos_offset(asm, offset)
+                ;; load_pos_offset(asm, offset, checked)
                 ; mov cl, BYTE [pointer]
                 ; mov BYTE [pointer], 0
                 ; add BYTE [pointer + rax], cl
@@ -155,7 +161,7 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
             dynasm!(asm
                 ; cmp BYTE [pointer], 0
                 ; jz >skip
-                ;; load_neg_offset(asm, offset)
+                ;; load_neg_offset(asm, offset, checked)
                 ; mov cl, BYTE [pointer]
                 ; mov BYTE [pointer], 0
                 ; neg rax
@@ -173,7 +179,7 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
                 ; =>begin_label
             );
 
-            compile_sequence(asm, body);
+            compile_sequence(asm, body, checked);
 
             dynasm!(asm
                 ; =>end_label
@@ -184,12 +190,12 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
     }
 }
 
-fn load_pos_offset(asm: &mut Assembler, offset: usize) {
+fn load_pos_offset(asm: &mut Assembler, offset: usize, checked: bool) {
     dynasm!(asm
         ; mov rax, QWORD offset as i64
     );
 
-    if cfg!(not(feature = "omit_bounds_checks")) {
+    if checked {
         dynasm!(asm
             ; mov rcx, mem_limit
             ; sub rcx, pointer
@@ -199,12 +205,12 @@ fn load_pos_offset(asm: &mut Assembler, offset: usize) {
     }
 }
 
-fn load_neg_offset(asm: &mut Assembler, offset: usize) {
+fn load_neg_offset(asm: &mut Assembler, offset: usize, checked: bool) {
     dynasm!(asm
         ; mov rax, QWORD offset as i64
     );
 
-    if cfg!(not(feature = "omit_bounds_checks")) {
+    if checked {
         dynasm!(asm
             ; mov rcx, pointer
             ; sub rcx, mem_start
