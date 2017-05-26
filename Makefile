@@ -10,7 +10,7 @@ build:
 	make doc
 
 doc:
-	cargo doc --no-deps -p libffi -p libffi-sys --features=complex
+	rustup run nightly cargo doc --no-deps -p bf --features=jit
 	echo "<meta http-equiv='refresh' content='0;url=$(CRATE)/'>" > target/doc/index.html
 
 test:
