@@ -35,21 +35,21 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
     use self::Command::*;
 
     match *instruction {
-        Op((Left, count)) => state.left(count)?,
-        Op((Right, count)) => state.right(count)?,
-        Op((Up, count)) => state.up(count as u8),
-        Op((Down, count)) => state.down(count as u8),
-        Op((In, count)) => {
+        Cmd(Left, count) => state.left(count)?,
+        Cmd(Right, count) => state.right(count)?,
+        Cmd(Up, count) => state.up(count as u8),
+        Cmd(Down, count) => state.down(count as u8),
+        Cmd(In, count) => {
             for _ in 0 .. count {
                 state.read(input);
             }
         }
-        Op((Out, count)) => {
+        Cmd(Out, count) => {
             for _ in 0 .. count {
                 state.write(output);
             }
         }
-        Op((Begin, _)) | Instruction::Op((End, _)) =>
+        Cmd(Begin, _) | Cmd(End, _) =>
             panic!("Invalid opcode"),
         Loop(ref program) => {
             while state.load() != 0  {

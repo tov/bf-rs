@@ -18,29 +18,29 @@ impl Compiler {
 
         for instruction in src {
             match *instruction {
-                Op((Right, count)) =>
+                Cmd(Right, count) =>
                     self.push(Instruction::Right(count)),
-                Op((Left, count)) =>
+                Cmd(Left, count) =>
                     self.push(Instruction::Left(count)),
-                Op((Up, count)) => {
+                Cmd(Up, count) => {
                     let amount = (count % 256) as u8;
                     self.push(Instruction::Change(amount));
                 }
-                Op((Down, count)) => {
+                Cmd(Down, count) => {
                     let amount = (256 - count % 256) as u8;
                     self.push(Instruction::Change(amount));
                 }
-                Op((In, count)) => {
+                Cmd(In, count) => {
                     for _ in 0 .. count {
                         self.push(Instruction::In);
                     }
                 }
-                Op((Out, count)) => {
+                Cmd(Out, count) => {
                     for _ in 0 .. count {
                         self.push(Instruction::Out);
                     }
                 }
-                Op((Begin, _)) | Op((End, _)) =>
+                Cmd(Begin, _) | Cmd(End, _) =>
                     panic!("bad opcode"),
 
                 Loop(ref body) => {

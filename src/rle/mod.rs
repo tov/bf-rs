@@ -14,7 +14,7 @@ pub type Count = usize;
 /// A run-length encoded BF instruction.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Instruction {
-    Op((Command, Count)),
+    Cmd(Command, Count),
     Loop(Box<Program>),
 }
 

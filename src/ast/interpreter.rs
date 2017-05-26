@@ -31,16 +31,19 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
                                -> BfResult<()>
     where R: Read, W: Write
 {
+    use super::Instruction::*;
+    use super::Command::*;
+
     match *instruction {
-        Instruction::Op(Command::Left) => state.left(1)?,
-        Instruction::Op(Command::Right) => state.right(1)?,
-        Instruction::Op(Command::Up) => state.up(1),
-        Instruction::Op(Command::Down) => state.down(1),
-        Instruction::Op(Command::In) => state.read(input),
-        Instruction::Op(Command::Out) => state.write(output),
-        Instruction::Op(Command::Begin) | Instruction::Op(Command::End) =>
-            panic!("Invalid opcode"),
-        Instruction::Loop(ref program) => {
+        Cmd(Left) => state.left(1)?,
+        Cmd(Right) => state.right(1)?,
+        Cmd(Up) => state.up(1),
+        Cmd(Down) => state.down(1),
+        Cmd(In) => state.read(input),
+        Cmd(Out) => state.write(output),
+        Cmd(Begin) | Cmd(End) =>
+            panic!("Invalid instruction: Begin or End"),
+        Loop(ref program) => {
             while state.load() != 0  {
                 interpret(&program, state, input, output)?;
             }
@@ -52,27 +55,29 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
 
 #[cfg(test)]
 mod tests {
-    use super::super::*;
     use test_helpers::*;
+    use super::*;
+    use common::Command::*;
+    use super::Instruction::*;
 
     #[test]
     fn assert_no_output() {
-        assert_interpret(&[mk_right()] as &Program, &[], &[]);
+        assert_interpret(&[Cmd(Right)] as &Program, &[], &[]);
     }
 
     #[test]
     fn assert_output_0() {
-        assert_interpret(&[mk_right(), mk_out()] as &Program, &[], &[0]);
+        assert_interpret(&[Cmd(Right), Cmd(Out)] as &Program, &[], &[0]);
     }
 
     #[test]
     fn assert_output_1() {
-        assert_interpret(&[mk_up(), mk_out()] as &Program, &[], &[1]);
+        assert_interpret(&[Cmd(Up), Cmd(Out)] as &Program, &[], &[1]);
     }
 
     #[test]
     fn assert_increment_input() {
-        let prog: &Program = &[mk_in(), mk_up(), mk_out()];
+        let prog: &Program = &[Cmd(In), Cmd(Up), Cmd(Out)];
         assert_interpret(prog, &[0], &[1]);
         assert_interpret(prog, &[5], &[6]);
         assert_interpret(prog, &[255], &[0]);
@@ -80,7 +85,7 @@ mod tests {
 
     #[test]
     fn assert_increment_loop() {
-        let prog: &Program = &[mk_in(), mk_loop(vec![mk_up(), mk_out(), mk_in()])];
+        let prog: &Program = &[Cmd(In), mk_loop(vec![Cmd(Up), Cmd(Out), Cmd(In)])];
         assert_interpret(prog, &[0], &[]);
         assert_interpret(prog, &[1, 0], &[2]);
         assert_interpret(prog, &[1, 4, 0], &[2, 5]);
@@ -105,5 +110,9 @@ mod tests {
 
         let program = parse_program(program).unwrap();
         assert_interpret(&*program, input.as_bytes(), output.as_bytes());
+    }
+
+    fn mk_loop(instructions: Vec<Instruction>) -> Instruction {
+        Instruction::Loop(instructions.into_boxed_slice())
     }
 }

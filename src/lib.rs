@@ -9,7 +9,7 @@
 //! that requires nightly Rust. To build and install from crates.io with the JIT
 //! enabled:
 //!
-//! ```
+//! ```shell
 //! $ rustup run nightly cargo install --features=jit bf
 //! ```
 //!

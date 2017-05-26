@@ -25,7 +25,7 @@ type Parser<'a, R> = BfResult<(R, &'a [u8])>;
 fn parse_instruction<'a>(mut input: &'a [u8]) -> Parser<Option<Instruction>> {
     use common::Command::*;
 
-    let ok = |cmd, inp: &'a [u8]| Ok((Some(Instruction::Op(cmd)), inp));
+    let ok = |cmd, inp: &'a [u8]| Ok((Some(Instruction::Cmd(cmd)), inp));
 
     loop {
         if let Some((&c, next_input)) = input.split_first() {
@@ -92,22 +92,24 @@ fn parse_instructions(mut input: &[u8]) -> Parser<Box<Program>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use common::Command::*;
+    use super::Instruction::*;
 
     #[test]
     fn single_byte_instructions_parse() {
-        assert_parse("<", &[mk_left()]);
-        assert_parse(">", &[mk_right()]);
-        assert_parse("+", &[mk_up()]);
-        assert_parse("-", &[mk_down()]);
-        assert_parse(",", &[mk_in()]);
-        assert_parse(".", &[mk_out()]);
+        assert_parse("<", &[Cmd(Left)]);
+        assert_parse(">", &[Cmd(Right)]);
+        assert_parse("+", &[Cmd(Up)]);
+        assert_parse("-", &[Cmd(Down)]);
+        assert_parse(",", &[Cmd(In)]);
+        assert_parse(".", &[Cmd(Out)]);
     }
 
     #[test]
     fn multiple_instructions_parse() {
         assert_parse("<><>+-+-.",
-                     &[mk_left(), mk_right(), mk_left(), mk_right(),
-                         mk_up(), mk_down(), mk_up(), mk_down(), mk_out()]);
+                     &[Cmd(Left), Cmd(Right), Cmd(Left), Cmd(Right),
+                       Cmd(Up), Cmd(Down), Cmd(Up), Cmd(Down), Cmd(Out)]);
     }
 
     #[test]
@@ -122,28 +124,28 @@ mod tests {
 
     #[test]
     fn non_empty_loop_parses() {
-        assert_parse("[<]", &[mk_loop(vec![mk_left()])]);
-        assert_parse("[<.>]", &[mk_loop(vec![mk_left(), mk_out(), mk_right()])]);
+        assert_parse("[<]", &[mk_loop(vec![Cmd(Left)])]);
+        assert_parse("[<.>]", &[mk_loop(vec![Cmd(Left), Cmd(Out), Cmd(Right)])]);
     }
 
     #[test]
     fn nested_loops_parse() {
         assert_parse("[<[]]",
-                     &[mk_loop(vec![mk_left(), mk_loop(vec![])])]);
+                     &[mk_loop(vec![Cmd(Left), mk_loop(vec![])])]);
         assert_parse("[<[+],]",
-                     &[mk_loop(vec![mk_left(), mk_loop(vec![mk_up()]), mk_in()])]);
+                     &[mk_loop(vec![Cmd(Left), mk_loop(vec![Cmd(Up)]), Cmd(In)])]);
     }
 
     #[test]
     fn comment_is_ignored() {
-        assert_parse("hello <", &[mk_left()]);
+        assert_parse("hello <", &[Cmd(Left)]);
         assert_parse("h[e<l[l+o] ,world]",
-                     &[mk_loop(vec![mk_left(), mk_loop(vec![mk_up()]), mk_in()])]);
+                     &[mk_loop(vec![Cmd(Left), mk_loop(vec![Cmd(Up)]), Cmd(In)])]);
     }
 
     #[test]
     fn trailing_comment_is_ignored() {
-        assert_parse("< hello", &[mk_left()]);
+        assert_parse("< hello", &[Cmd(Left)]);
     }
 
     #[test]

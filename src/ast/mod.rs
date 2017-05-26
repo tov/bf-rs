@@ -20,7 +20,7 @@ pub type Program = [Instruction];
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Instruction {
     /// A non-loop command.
-    Op(Command),
+    Cmd(Command),
     /// A loop surrounding a sequence of instructions.
     Loop(Box<[Instruction]>),
 }

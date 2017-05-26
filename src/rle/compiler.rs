@@ -11,7 +11,8 @@ pub fn compile(program: &[ast::Instruction]) -> Box<Program> {
 /// Represents the state of an RLE compiler from `ast::Instruction` to `Instruction`.
 pub struct Compiler {
     instructions: Vec<Instruction>,
-    buffer: (Command, usize),
+    last_command: Command,
+    last_repeat: usize,
 }
 
 impl Compiler {
@@ -19,7 +20,8 @@ impl Compiler {
     pub fn new() -> Self {
         Compiler {
             instructions: Vec::new(),
-            buffer: (Command::Right, 0),
+            last_command: Command::Right,
+            last_repeat:  0,
         }
     }
 
@@ -27,7 +29,7 @@ impl Compiler {
     pub fn compile(&mut self, program: &[ast::Instruction]) {
         for instruction in program {
             match *instruction {
-                ast::Instruction::Op(op_code) => self.issue_op(op_code),
+                ast::Instruction::Cmd(op_code) => self.issue_op(op_code),
                 ast::Instruction::Loop(ref body) => self.issue_loop(compile(body)),
             }
         }
@@ -40,18 +42,20 @@ impl Compiler {
     }
 
     fn push_op(&mut self) {
-        if self.buffer.1 > 0 {
-            self.instructions.push(Instruction::Op(self.buffer));
-            self.buffer = (Command::Right, 0);
+        if self.last_repeat > 0 {
+            self.instructions.push(Instruction::Cmd(self.last_command, self.last_repeat));
+            self.last_command = Command::Right;
+            self.last_repeat = 0;
         }
     }
 
-    fn issue_op(&mut self, op_code: Command) {
-        if op_code == self.buffer.0 {
-            self.buffer.1 += 1;
+    fn issue_op(&mut self, cmd: Command) {
+        if cmd == self.last_command {
+            self.last_repeat += 1;
         } else {
             self.push_op();
-            self.buffer = (op_code, 1)
+            self.last_command = cmd;
+            self.last_repeat = 1;
         }
     }
 
@@ -65,33 +69,44 @@ impl Compiler {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use ast::Instruction as Src;
+    use super::Instruction as Obj;
+    use super::Command::*;
 
     #[test]
     fn right_compiles() {
-        assert_compile(&[ast::mk_right()], &[mk_right(1)]);
+        assert_compile(&[Src::Cmd(Right)], &[Obj::Cmd(Right, 1)]);
     }
 
     #[test]
     fn three_rights_compile() {
-        assert_compile(&[ast::mk_right(), ast::mk_right(), ast::mk_right()],
-                       &[mk_right(3)]);
+        assert_compile(&[Src::Cmd(Right), Src::Cmd(Right), Src::Cmd(Right)],
+                       &[Obj::Cmd(Right, 3)]);
     }
 
     #[test]
     fn two_rights_two_ups_compile() {
-        assert_compile(&[ast::mk_right(), ast::mk_right(), ast::mk_up(), ast::mk_up()],
-                       &[mk_right(2), mk_up(2)]);
+        assert_compile(&[Src::Cmd(Right), Src::Cmd(Right), Src::Cmd(Up), Src::Cmd(Up)],
+                       &[Obj::Cmd(Right, 2), Obj::Cmd(Up, 2)]);
     }
 
     #[test]
     fn loop_compiles() {
-        assert_compile(&[ast::mk_in(), ast::mk_loop(vec![ast::mk_right()]), ast::mk_in()],
-                       &[mk_in(1), mk_loop(vec![mk_right(1)]), mk_in(1)]);
+        assert_compile(&[Src::Cmd(In), src_mk_loop(vec![Src::Cmd(Right)]), Src::Cmd(In)],
+                       &[Obj::Cmd(In, 1), mk_loop(vec![Obj::Cmd(Right, 1)]), Obj::Cmd(In, 1)]);
 
     }
 
     fn assert_compile(src: &[ast::Instruction], expected: &[Instruction]) {
         let actual = compile(src);
         assert_eq!(&*actual, expected);
+    }
+
+    fn src_mk_loop(body: Vec<Src>) -> Src {
+        Src::Loop(body.into_boxed_slice())
+    }
+
+    fn mk_loop(body: Vec<Instruction>) -> Instruction {
+        Obj::Loop(body.into_boxed_slice())
     }
 }
