@@ -11,6 +11,8 @@ use bf::ast;
 use bf::rle_ast;
 use bf::flat;
 use bf::peephole;
+use bf::jit;
+
 use bf::traits::Interpretable;
 
 const VERSION: &'static str = "0.1.0";
@@ -28,6 +30,7 @@ enum Pass {
     Rle,
     Flat,
     Peep,
+    Jit,
 }
 
 fn main() {
@@ -57,6 +60,12 @@ fn main() {
             let program = rle_ast::compile(&program);
             let program = peephole::compile(&program);
             interpret(&*program, &options);
+        }
+
+        Pass::Jit => {
+            let program = rle_ast::compile(&program);
+            let program = jit::compile(&program);
+            interpret(&program, &options);
         }
     }
 }
@@ -94,6 +103,8 @@ fn get_options() -> Options {
         result.compiler_pass = Pass::Flat;
     } else if matches.is_present("peep") {
         result.compiler_pass = Pass::Peep;
+    } else if matches.is_present("jit") {
+        result.compiler_pass = Pass::Jit;
     }
 
     if let Some(exprs) = matches.values_of("expr") {
@@ -141,19 +152,23 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("ast")
             .long("ast")
             .help("Interpret the AST directly")
-            .conflicts_with_all(&["flat", "rle", "peep"]))
+            .conflicts_with_all(&["flat", "rle", "peep", "jit"]))
         .arg(Arg::with_name("rle")
             .long("rle")
             .help("Interpret the run-length encoded AST directly")
-            .conflicts_with_all(&["ast", "flat", "peep"]))
+            .conflicts_with_all(&["ast", "flat", "peep", "jit"]))
         .arg(Arg::with_name("flat")
             .long("flat")
             .help("Interpret the flattened bytecode (default)")
-            .conflicts_with_all(&["ast", "rle", "peep"]))
+            .conflicts_with_all(&["ast", "rle", "peep", "jit"]))
         .arg(Arg::with_name("peep")
             .long("peep")
             .help("Interpret the peephole optimized bytecode (broken?)")
-            .conflicts_with_all(&["ast", "rle", "flat"]))
+            .conflicts_with_all(&["ast", "rle", "flat", "jit"]))
+        .arg(Arg::with_name("jit")
+            .long("jit")
+            .help("Use native X-64 JIT")
+            .conflicts_with_all(&["ast", "rle", "flat", "peep"]))
 }
 
 fn error_exit(code: i32, msg: String) -> ! {
