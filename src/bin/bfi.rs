@@ -1,3 +1,7 @@
+//! The Brainfuck interpreter executable.
+//!
+//! Run with `--help` for help.
+
 extern crate bf;
 extern crate clap;
 

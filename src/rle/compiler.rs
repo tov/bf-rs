@@ -1,6 +1,13 @@
 use super::*;
 use ast;
 
+/// Compiles an unoptimized [`ast`](../ast/index.html) program to a run-length encoded program.
+pub fn compile(program: &[ast::Instruction]) -> Box<Program> {
+    let mut compiler = Compiler::new();
+    compiler.compile(program);
+    compiler.into_program()
+}
+
 /// Represents the state of an RLE compiler from `ast::Instruction` to `Instruction`.
 pub struct Compiler {
     instructions: Vec<Instruction>,
@@ -54,12 +61,6 @@ impl Compiler {
     }
 }
 
-
-pub fn compile(program: &[ast::Instruction]) -> Box<Program> {
-    let mut compiler = Compiler::new();
-    compiler.compile(program);
-    compiler.into_program()
-}
 
 #[cfg(test)]
 mod tests {
