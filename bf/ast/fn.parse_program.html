@@ -48,8 +48,13 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/ast/parser.rs.html#4-11' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn parse_program(input: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>) -&gt; <a class="type" href="../../bf/result/type.BfResult.html" title="type bf::result::BfResult">BfResult</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/ast/type.Program.html" title="type bf::ast::Program">Program</a>&gt;&gt;</pre></section>
+               </span><a class='srclink' href='../../src/bf/ast/parser.rs.html#10-17' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn parse_program(input: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>) -&gt; <a class="type" href="../../bf/common/type.BfResult.html" title="type bf::common::BfResult">BfResult</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/ast/type.Program.html" title="type bf::ast::Program">Program</a>&gt;&gt;</pre><div class='docblock'><p>Parses Brainfuck concrete syntax into an abstract syntax tree.</p>
+
+<h1 id='errors' class='section-header'><a href='#errors'>Errors</a></h1>
+<p>Unmatched square brackets will result in an <code>Err</code> return. See
+<a href="../common/enum.Error.html"><code>common::Error</code></a>.</p>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

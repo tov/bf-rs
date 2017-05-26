@@ -81,42 +81,110 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
 </pre><pre class="rust ">
+<span class="doccomment">//! Brainfuck bytecode, flat instead of an abstract syntax tree.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This is closer to</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Previous passes represent the Brainfuck program as an [abstract syntax</span>
+<span class="doccomment">//! tree](../ast.index.html), with</span>
+<span class="doccomment">//! child trees for loops. This pass transforms the program to a flat array of</span>
+<span class="doccomment">//! [`Instruction`](enum.Instruction.html)s, where loop operations take the</span>
+<span class="doccomment">//! address to possibly jump to as a parameter. This representation includes</span>
+<span class="doccomment">//! run-length encoding for some instructions, with moving and arithmetic</span>
+<span class="doccomment">//! commands taking the count as a parameter. It also includes the</span>
+<span class="doccomment">//! instructions produced by the peephole optimizer.</span>
+
 <span class="kw">mod</span> <span class="ident">compiler</span>;
 <span class="kw">mod</span> <span class="ident">interpreter</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">compiler</span>::<span class="ident">compile</span>;
 
+<span class="doccomment">/// A program is a flat sequence of instructions.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Program</span> <span class="op">=</span> [<span class="ident">Instruction</span>];
 
 <span class="doccomment">/// Instructions as output by the bytecode flattener.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Unlike in the earlier passes, the loop instructions</span>
+<span class="doccomment">/// do not include a boxed slice of instructions as a</span>
+<span class="doccomment">/// subtree. Note that this type is `Copy`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This is not necessary for interpretation, but it might</span>
+<span class="doccomment">/// perform better because of the cache. So far, it appears</span>
+<span class="doccomment">/// to perform worse than the peephole-optimized AST, but</span>
+<span class="doccomment">/// I’m going to try making the operations fit in a word</span>
+<span class="doccomment">/// instead of two to see if that goes faster.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Instruction</span> {
-    <span class="doccomment">/// Move the pointer left by the specified offset.</span>
+    <span class="doccomment">/// Decrease the pointer left by the specified offset.</span>
     <span class="ident">Left</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Move the pointer right by the specified offset.</span>
+    <span class="doccomment">/// Increase the pointer right by the specified offset.</span>
     <span class="ident">Right</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Change the value at the pointer by the specified offset.</span>
+    <span class="doccomment">/// Increase the current byte value by the specified offset.</span>
     <span class="ident">Change</span>(<span class="ident">u8</span>),
-    <span class="doccomment">/// Read input.</span>
+    <span class="doccomment">/// Read a byte of input.</span>
     <span class="ident">In</span>,
-    <span class="doccomment">/// Write output.</span>
+    <span class="doccomment">/// Write a byte of output.</span>
     <span class="ident">Out</span>,
-    <span class="doccomment">/// Begin a loop</span>
+    <span class="doccomment">/// Begin a loop, jumping to the end if the current byte value.</span>
     <span class="ident">JumpZero</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// End a loop</span>
+    <span class="doccomment">/// End a loop if the current byte value is 0; otherwise repeat the loop.</span>
     <span class="ident">JumpNotZero</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Set the current byte to 0</span>
+    <span class="doccomment">/// Set the current byte value to 0.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Equivalent to the concrete Braincode loop `[-]`.</span>
     <span class="ident">SetZero</span>,
     <span class="doccomment">/// Add the byte at the pointer to the byte at the specified offset and zero the byte at the</span>
     <span class="doccomment">/// pointer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `OffsetAddRight(5)` is equivalent to the concrete Brainfuck loop `[-&gt;&gt;&gt;&gt;&gt;+&lt;&lt;&lt;&lt;&lt;]`.</span>
     <span class="ident">OffsetAddRight</span>(<span class="ident">usize</span>),
     <span class="doccomment">/// Add the byte at the pointer to the byte at the specified offset and zero the byte at the</span>
     <span class="doccomment">/// pointer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `OffsetAddRight(5)` is equivalent to the concrete Brainfuck loop `[-&lt;&lt;&lt;&lt;&lt;+&gt;&gt;&gt;&gt;&gt;]`.</span>
     <span class="ident">OffsetAddLeft</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Move the pointer to a zero, skipping the offset at a time.</span>
+    <span class="doccomment">/// Finds the nearest zero to the left that appears offset by a multiple of the given `usize`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `FindZeroRight(3)` is equivalent to the concrete Brainfuck loop `[&gt;&gt;&gt;]`.</span>
     <span class="ident">FindZeroRight</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Move the pointer to a zero, skipping the offset at a time.</span>
+    <span class="doccomment">/// Finds the nearest zero to the right that appears offset by a multiple of the given `usize`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `FindZeroLeft(3)` is equivalent to the concrete Brainfuck loop `[&lt;&lt;&lt;]`.</span>
     <span class="ident">FindZeroLeft</span>(<span class="ident">usize</span>),
 }
 

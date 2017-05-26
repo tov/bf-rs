@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `result` mod in crate `bf`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, result">
+    <meta name="description" content="API documentation for the Rust `BfResult` type in crate `bf`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, BfResult">
 
-    <title>bf::result - Rust</title>
+    <title>bf::common::BfResult - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc mod">
+<body class="rustdoc type">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'>Module result</p><div class="block items"><ul><li><a href="#enums">Enums</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'><a href='../index.html'>bf</a></p><script>window.sidebarCurrent = {name: 'result', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>common</a></p><script>window.sidebarCurrent = {name: 'BfResult', ty: 'type', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,28 +44,16 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>bf</a>::<wbr><a class="mod" href=''>result</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Type Definition <a href='../index.html'>bf</a>::<wbr><a href='index.html'>common</a>::<wbr><a class="type" href=''>BfResult</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/result.rs.html#1-24' title='goto source code'>[src]</a></span></h1>
-<h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Error.html"
-                                  title='enum bf::result::Error'>Error</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="type" href="type.BfResult.html"
-                                  title='type bf::result::BfResult'>BfResult</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr></table></section>
+               </span><a class='srclink' href='../../src/bf/common.rs.html#11' title='goto source code'>[src]</a></span></h1>
+<pre class='rust typedef'>type BfResult&lt;T&gt; = <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;T, <a class="enum" href="../../bf/common/enum.Error.html" title="enum bf::common::Error">Error</a>&gt;;</pre><div class='docblock'><p>The result type for Brainfuck operations that can fail.</p>
+
+<p>This is <code>Result</code> specialized to the four kinds of Brainfuck
+<a href="enum.Error.html"><code>Error</code></a>s</p>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

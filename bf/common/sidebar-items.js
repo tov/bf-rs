@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Command","The eight Brainfuck commands."],["Error","The static and dynamic errors that can happen in Brainfuck."]],"type":[["BfResult","The result type for Brainfuck operations that can fail."]]});

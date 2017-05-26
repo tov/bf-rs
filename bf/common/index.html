@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `mk_in` fn in crate `bf`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, mk_in">
+    <meta name="description" content="API documentation for the Rust `common` mod in crate `bf`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, common">
 
-    <title>bf::ast::mk_in - Rust</title>
+    <title>bf::common - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc fn">
+<body class="rustdoc mod">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>ast</a></p><script>window.sidebarCurrent = {name: 'mk_in', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Module common</p><div class="block items"><ul><li><a href="#enums">Enums</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'><a href='../index.html'>bf</a></p><script>window.sidebarCurrent = {name: 'common', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,12 +44,38 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Function <a href='../index.html'>bf</a>::<wbr><a href='index.html'>ast</a>::<wbr><a class="fn" href=''>mk_in</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>bf</a>::<wbr><a class="mod" href=''>common</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/ast/mod.rs.html#22' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn mk_in() -&gt; <a class="enum" href="../../bf/ast/enum.Instruction.html" title="enum bf::ast::Instruction">Instruction</a></pre></section>
+               </span><a class='srclink' href='../../src/bf/common.rs.html#1-60' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Definitions common to multiple passes.</p>
+
+<p>This includes error handling and the basic definition of Brainfuck commands.</p>
+</div><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Command.html"
+                                  title='enum bf::common::Command'>Command</a></td>
+                           <td class='docblock-short'>
+                                <p>The eight Brainfuck commands.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Error.html"
+                                  title='enum bf::common::Error'>Error</a></td>
+                           <td class='docblock-short'>
+                                <p>The static and dynamic errors that can happen in Brainfuck.</p>
+                           </td>
+                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="type" href="type.BfResult.html"
+                                  title='type bf::common::BfResult'>BfResult</a></td>
+                           <td class='docblock-short'>
+                                <p>The result type for Brainfuck operations that can fail.</p>
+                           </td>
+                       </tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

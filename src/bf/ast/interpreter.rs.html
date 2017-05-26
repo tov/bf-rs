@@ -156,7 +156,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="ident">Read</span>, <span class="ident">Write</span>};
 
 <span class="kw">use</span> <span class="ident">state</span>::<span class="ident">State</span>;
-<span class="kw">use</span> <span class="ident">result</span>::<span class="ident">BfResult</span>;
+<span class="kw">use</span> <span class="ident">common</span>::<span class="ident">BfResult</span>;
 <span class="kw">use</span> <span class="ident">traits</span>::<span class="ident">Interpretable</span>;
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
@@ -187,13 +187,13 @@
     <span class="kw">where</span> <span class="ident">R</span>: <span class="ident">Read</span>, <span class="ident">W</span>: <span class="ident">Write</span>
 {
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">instruction</span> {
-        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">OpCode</span>::<span class="ident">Left</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">left</span>(<span class="number">1</span>)<span class="question-mark">?</span>,
-        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">OpCode</span>::<span class="ident">Right</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">right</span>(<span class="number">1</span>)<span class="question-mark">?</span>,
-        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">OpCode</span>::<span class="ident">Up</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">up</span>(<span class="number">1</span>),
-        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">OpCode</span>::<span class="ident">Down</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">down</span>(<span class="number">1</span>),
-        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">OpCode</span>::<span class="ident">In</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">read</span>(<span class="ident">input</span>),
-        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">OpCode</span>::<span class="ident">Out</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">write</span>(<span class="ident">output</span>),
-        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">OpCode</span>::<span class="ident">Begin</span>) <span class="op">|</span> <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">OpCode</span>::<span class="ident">End</span>) <span class="op">=&gt;</span>
+        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">Command</span>::<span class="ident">Left</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">left</span>(<span class="number">1</span>)<span class="question-mark">?</span>,
+        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">Command</span>::<span class="ident">Right</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">right</span>(<span class="number">1</span>)<span class="question-mark">?</span>,
+        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">Command</span>::<span class="ident">Up</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">up</span>(<span class="number">1</span>),
+        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">Command</span>::<span class="ident">Down</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">down</span>(<span class="number">1</span>),
+        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">Command</span>::<span class="ident">In</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">read</span>(<span class="ident">input</span>),
+        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">Command</span>::<span class="ident">Out</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">write</span>(<span class="ident">output</span>),
+        <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">Command</span>::<span class="ident">Begin</span>) <span class="op">|</span> <span class="ident">Instruction</span>::<span class="ident">Op</span>(<span class="ident">Command</span>::<span class="ident">End</span>) <span class="op">=&gt;</span>
             <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Invalid opcode&quot;</span>),
         <span class="ident">Instruction</span>::<span class="ident">Loop</span>(<span class="kw-2">ref</span> <span class="ident">program</span>) <span class="op">=&gt;</span> {
             <span class="kw">while</span> <span class="ident">state</span>.<span class="ident">load</span>() <span class="op">!=</span> <span class="number">0</span>  {

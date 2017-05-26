@@ -63,15 +63,89 @@
 <span id="18">18</span>
 <span id="19">19</span>
 <span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
 </pre><pre class="rust ">
+<span class="doccomment">//!</span>
+<span class="doccomment">//! `bf-rs` is a optimizing Brainfuck interpreter and JIT compiler</span>
+<span class="doccomment">//! inspired by Eli Bendersky’s [series on JIT compilation].</span>
+<span class="doccomment">//! It includes a library crate `bf` that exports most of the functionality,</span>
+<span class="doccomment">//! and an executable `bfi` that provides a command-line interface for executing</span>
+<span class="doccomment">//! Brainfuck programs.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! By default, installing `bf` does not enable the JIT compiler because</span>
+<span class="doccomment">//! that requires nightly Rust. To build and install from crates.io with the JIT</span>
+<span class="doccomment">//! enabled:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! $ rustup run nightly cargo install --features=jit bf</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [series on JIT compilation]: http://eli.thegreenplace.net/2017/adventures-in-jit-compilation-part-1-an-interpreter/</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This library implements a number of compilation passes:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!  - First, Brainfuck concrete syntax is parsed into</span>
+<span class="doccomment">//! [an abstract syntax tree](ast/index.html).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!  - Then, repeated sequences of the same command are</span>
+<span class="doccomment">//! [run-length encoded](rle/index.html).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!  - Then, common loop forms are converted to new (non-Brainfuck)</span>
+<span class="doccomment">//! instructions by the [peephole optimizer](peephole/index.html).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!  - The peephole output can be [flattened to bytecode](flat/index.html),</span>
+<span class="doccomment">//! which is then interpreted.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!  - Or, if the `jit` feature is enabled (nightly only), the peephole output</span>
+<span class="doccomment">//! can be [just-in-time compiled to x64 machine code](jit/index.html).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Interpreters are provided for the intermediate forms as well. In particular,</span>
+<span class="doccomment">//! all representations of Brainfuck programs implement the</span>
+<span class="doccomment">//! [`Interpretable`](traits/trait.Interpretable.html) trait.</span>
+
 <span class="attribute">#<span class="op">!</span>[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;jit&quot;</span>, <span class="ident">feature</span>(<span class="ident">plugin</span>))]</span>
 <span class="attribute">#<span class="op">!</span>[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;jit&quot;</span>, <span class="ident">plugin</span>(<span class="ident">dynasm</span>))]</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;jit&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">dynasmrt</span>;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">result</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">op_code</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">common</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">state</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">traits</span>;
 

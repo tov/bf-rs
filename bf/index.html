@@ -48,21 +48,59 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/bf/lib.rs.html#1-20' title='goto source code'>[src]</a></span></h1>
-<h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+               </span><a class='srclink' href='../src/bf/lib.rs.html#1-57' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p><code>bf-rs</code> is a optimizing Brainfuck interpreter and JIT compiler
+inspired by Eli Bendersky’s <a href="http://eli.thegreenplace.net/2017/adventures-in-jit-compilation-part-1-an-interpreter/">series on JIT compilation</a>.
+It includes a library crate <code>bf</code> that exports most of the functionality,
+and an executable <code>bfi</code> that provides a command-line interface for executing
+Brainfuck programs.</p>
+
+<p>By default, installing <code>bf</code> does not enable the JIT compiler because
+that requires nightly Rust. To build and install from crates.io with the JIT
+enabled:</p>
+
+<pre class="rust rust-example-rendered">
+$ <span class="ident">rustup</span> <span class="ident">run</span> <span class="ident">nightly</span> <span class="ident">cargo</span> <span class="ident">install</span> <span class="op">-</span><span class="op">-</span><span class="ident">features</span><span class="op">=</span><span class="ident">jit</span> <span class="ident">bf</span></pre>
+
+<p>This library implements a number of compilation passes:</p>
+
+<ul>
+<li><p>First, Brainfuck concrete syntax is parsed into
+<a href="ast/index.html">an abstract syntax tree</a>.</p></li>
+<li><p>Then, repeated sequences of the same command are
+<a href="rle/index.html">run-length encoded</a>.</p></li>
+<li><p>Then, common loop forms are converted to new (non-Brainfuck)
+instructions by the <a href="peephole/index.html">peephole optimizer</a>.</p></li>
+<li><p>The peephole output can be <a href="flat/index.html">flattened to bytecode</a>,
+which is then interpreted.</p></li>
+<li><p>Or, if the <code>jit</code> feature is enabled (nightly only), the peephole output
+can be <a href="jit/index.html">just-in-time compiled to x64 machine code</a>.</p></li>
+</ul>
+
+<p>Interpreters are provided for the intermediate forms as well. In particular,
+all representations of Brainfuck programs implement the
+<a href="traits/trait.Interpretable.html"><code>Interpretable</code></a> trait.</p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class="mod" href="ast/index.html"
                                   title='mod bf::ast'>ast</a></td>
                            <td class='docblock-short'>
-                                
+                                <p>Parsing and interpretation for unoptimized Brainfuck abstract syntax trees.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="mod" href="common/index.html"
+                                  title='mod bf::common'>common</a></td>
+                           <td class='docblock-short'>
+                                <p>Definitions common to multiple passes.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class="mod" href="flat/index.html"
                                   title='mod bf::flat'>flat</a></td>
                            <td class='docblock-short'>
-                                
+                                <p>Brainfuck bytecode, flat instead of an abstract syntax tree.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -73,22 +111,8 @@
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="mod" href="op_code/index.html"
-                                  title='mod bf::op_code'>op_code</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="mod" href="peephole/index.html"
                                   title='mod bf::peephole'>peephole</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="result/index.html"
-                                  title='mod bf::result'>result</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
