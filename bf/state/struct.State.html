@@ -48,34 +48,34 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/state.rs.html#13-16' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct State { /* fields omitted */ }</pre><div class='docblock'><p>The BF machine state.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/state.rs.html#18-141' title='goto source code'>[src]</a></span></h3>
+               </span><a class='srclink' href='../../src/bf/state.rs.html#18-21' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct State { /* fields omitted */ }</pre><div class='docblock'><p>The Brainfuck machine state.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/state.rs.html#23-148' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; Self</code></span></h4>
-<div class='docblock'><p>Creates a new BF machine state with capacity
-[<code>DEFAULT_CAPACITY</code>].</p>
-</div><h4 id='method.with_capacity' class="method"><span id='with_capacity.v' class='invisible'><code>fn <a href='#method.with_capacity' class='fnname'>with_capacity</a>(capacity: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; Self</code></span></h4>
-<div class='docblock'><p>Creates a new BF machine state.</p>
+<div class='docblock'><p>Creates a new BF machine state with memory capacity
+<a href="constant.DEFAULT_CAPACITY.html"><code>DEFAULT_CAPACITY</code></a> (30_000).</p>
+</div><h4 id='method.with_capacity' class="method"><span id='with_capacity.v' class='invisible'><code>fn <a href='#method.with_capacity' class='fnname'>with_capacity</a>(memory_size: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; Self</code></span></h4>
+<div class='docblock'><p>Creates a new BF machine state with the given memory capacity.</p>
 </div><h4 id='method.left' class="method"><span id='left.v' class='invisible'><code>fn <a href='#method.left' class='fnname'>left</a>(&amp;mut self, count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="type" href="../../bf/common/type.BfResult.html" title="type bf::common::BfResult">BfResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">()</a>&gt;</code></span></h4>
-<div class='docblock'><p>Decrements the pointer.</p>
+<div class='docblock'><p>Decrements/decreases the pointer.</p>
 
 <h1 id='errors' class='section-header'><a href='#errors'>Errors</a></h1>
 <p>Return <code>Err</code> if pointer would go below 0.</p>
 </div><h4 id='method.right' class="method"><span id='right.v' class='invisible'><code>fn <a href='#method.right' class='fnname'>right</a>(&amp;mut self, count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="type" href="../../bf/common/type.BfResult.html" title="type bf::common::BfResult">BfResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">()</a>&gt;</code></span></h4>
-<div class='docblock'><p>Increments the pointer.</p>
+<div class='docblock'><p>Increments/increases the pointer.</p>
 
 <h1 id='errors-1' class='section-header'><a href='#errors-1'>Errors</a></h1>
 <p>Return <code>Err</code> if pointer would go past the end of the memory.</p>
 </div><h4 id='method.up' class="method"><span id='up.v' class='invisible'><code>fn <a href='#method.up' class='fnname'>up</a>(&amp;mut self, count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>)</code></span></h4>
-<div class='docblock'><p>Increments the byte at the pointer.</p>
+<div class='docblock'><p>Increments/increases the byte at the pointer.</p>
 
 <p>Wraps around modulo 256.</p>
 </div><h4 id='method.down' class="method"><span id='down.v' class='invisible'><code>fn <a href='#method.down' class='fnname'>down</a>(&amp;mut self, count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>)</code></span></h4>
-<div class='docblock'><p>Decrements the byte at the pointer.</p>
+<div class='docblock'><p>Decrements/decreases the byte at the pointer.</p>
 
 <p>Wraps around modulo 256.</p>
 </div><h4 id='method.load' class="method"><span id='load.v' class='invisible'><code>fn <a href='#method.load' class='fnname'>load</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code></span></h4>
-<div class='docblock'><p>Gets the value of the point at the pointer.</p>
+<div class='docblock'><p>Gets the value of the byte at the pointer.</p>
 </div><h4 id='method.store' class="method"><span id='store.v' class='invisible'><code>fn <a href='#method.store' class='fnname'>store</a>(&amp;mut self, value: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>)</code></span></h4>
 <div class='docblock'><p>Sets the value of the byte at the pointer.</p>
 </div><h4 id='method.up_pos_offset' class="method"><span id='up_pos_offset.v' class='invisible'><code>fn <a href='#method.up_pos_offset' class='fnname'>up_pos_offset</a>(&amp;mut self, offset: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>, value: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>) -&gt; <a class="type" href="../../bf/common/type.BfResult.html" title="type bf::common::BfResult">BfResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">()</a>&gt;</code></span></h4>
@@ -90,16 +90,18 @@
 <div class='docblock'><p>The memory capacity.</p>
 </div><h4 id='method.as_mut_ptr' class="method"><span id='as_mut_ptr.v' class='invisible'><code>fn <a href='#method.as_mut_ptr' class='fnname'>as_mut_ptr</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code></span></h4>
 <div class='docblock'><p>Gets a mutable, raw pointer to the start of memory.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/state.rs.html#12' title='goto source code'>[src]</a></span></h3>
+
+<p>This is used by the JIT RTS to pass the memory pointer to the generated code.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/state.rs.html#17' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span></h4>
 <div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
 </div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/state.rs.html#12' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/state.rs.html#17' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html" title="trait core::cmp::Eq">Eq</a> for <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/state.rs.html#12' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/state.rs.html#12' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html" title="trait core::cmp::Eq">Eq</a> for <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/state.rs.html#17' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/bf/state.rs.html#17' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
 <div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
 </div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class="struct" href="../../bf/state/struct.State.html" title="struct bf::state::State">State</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>

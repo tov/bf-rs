@@ -291,18 +291,30 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
 </pre><pre class="rust ">
+<span class="doccomment">//! The Brainfuck machine state.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Useful for creating initial states for testing, and also the interface used by the</span>
+<span class="doccomment">//! interpreters to access the state.</span>
+
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="ident">Read</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">num</span>::<span class="ident">Wrapping</span>;
 
 <span class="kw">use</span> <span class="ident">common</span>::{<span class="ident">BfResult</span>, <span class="ident">Error</span>};
 
-<span class="doccomment">/// The default number of 8-bit memory cells, as used by</span>
+<span class="doccomment">/// (`== 30_000`) The default number of 8-bit memory cells, as used by</span>
 <span class="doccomment">/// [`State::new`](struct.State.html#method.new).</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEFAULT_CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">30_000</span>;
 
-<span class="doccomment">/// The BF machine state.</span>
+<span class="doccomment">/// The Brainfuck machine state.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">State</span> {
     <span class="ident">memory</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]<span class="op">&gt;</span>,
@@ -310,21 +322,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">State</span> {
-    <span class="doccomment">/// Creates a new BF machine state with capacity</span>
-    <span class="doccomment">/// [`DEFAULT_CAPACITY`].</span>
+    <span class="doccomment">/// Creates a new BF machine state with memory capacity</span>
+    <span class="doccomment">/// [`DEFAULT_CAPACITY`](constant.DEFAULT_CAPACITY.html) (30_000).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span>::<span class="ident">with_capacity</span>(<span class="ident">DEFAULT_CAPACITY</span>)
     }
 
-    <span class="doccomment">/// Creates a new BF machine state.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="doccomment">/// Creates a new BF machine state with the given memory capacity.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">memory_size</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">State</span> {
-            <span class="ident">memory</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">Wrapping</span>(<span class="number">0</span>); <span class="ident">capacity</span>].<span class="ident">into_boxed_slice</span>(),
+            <span class="ident">memory</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">Wrapping</span>(<span class="number">0</span>); <span class="ident">memory_size</span>].<span class="ident">into_boxed_slice</span>(),
             <span class="ident">pointer</span>: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Decrements the pointer.</span>
+    <span class="doccomment">/// Decrements/decreases the pointer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
@@ -335,7 +347,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Increments the pointer.</span>
+    <span class="doccomment">/// Increments/increases the pointer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
@@ -364,7 +376,7 @@
         }
     }
 
-    <span class="doccomment">/// Increments the byte at the pointer.</span>
+    <span class="doccomment">/// Increments/increases the byte at the pointer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Wraps around modulo 256.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -372,7 +384,7 @@
         <span class="self">self</span>.<span class="ident">memory</span>[<span class="self">self</span>.<span class="ident">pointer</span>] <span class="op">+=</span> <span class="ident">Wrapping</span>(<span class="ident">count</span>);
     }
 
-    <span class="doccomment">/// Decrements the byte at the pointer.</span>
+    <span class="doccomment">/// Decrements/decreases the byte at the pointer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Wraps around modulo 256.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -380,7 +392,7 @@
         <span class="self">self</span>.<span class="ident">memory</span>[<span class="self">self</span>.<span class="ident">pointer</span>] <span class="op">-=</span> <span class="ident">Wrapping</span>(<span class="ident">count</span>);
     }
 
-    <span class="doccomment">/// Gets the value of the point at the pointer.</span>
+    <span class="doccomment">/// Gets the value of the byte at the pointer.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">memory</span>[<span class="self">self</span>.<span class="ident">pointer</span>].<span class="number">0</span>
@@ -428,6 +440,8 @@
     }
 
     <span class="doccomment">/// Gets a mutable, raw pointer to the start of memory.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is used by the JIT RTS to pass the memory pointer to the generated code.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_ptr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span> {
         <span class="comment">// Assumes that Wrapping&lt;u8&gt; == u8:</span>
         <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="self">self</span>.<span class="ident">memory</span>.<span class="ident">as_mut_ptr</span>()) }
