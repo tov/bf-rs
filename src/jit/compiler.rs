@@ -62,54 +62,20 @@ pub fn compile_sequence(asm: &mut Assembler, program: &[peephole::Instruction]) 
     }
 }
 
-macro_rules! check_pos_offset {
-    ($asm:ident, $offset:expr) => {{
-        dynasm!($asm
-            ; mov rax, QWORD $offset as i64
-        );
-
-        if cfg!(not(feature = "omit_bounds_checks")) {
-            dynasm!($asm
-                ; mov rcx, mem_limit
-                ; sub rcx, pointer
-                ; cmp rcx, rax
-                ; jle -> overflow
-            );
-        }
-    }}
-}
-
-macro_rules! check_neg_offset {
-    ($asm:ident, $offset:expr) => {{
-        dynasm!($asm
-            ; mov rax, QWORD $offset as i64
-        );
-
-        if cfg!(not(feature = "omit_bounds_checks")) {
-            dynasm!($asm
-                ; mov rcx, pointer
-                ; sub rcx, mem_start
-                ; cmp rcx, rax
-                ; jl ->underflow
-            );
-        }
-    }}
-}
-
 pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction) {
     use peephole::Instruction::*;
 
     match *instruction {
         Right(count) => {
             dynasm!(asm
-                ;; check_pos_offset!(asm, count)
+                ;; load_pos_offset(asm, count)
                 ; add pointer, rax
             );
         }
 
         Left(count) => {
             dynasm!(asm
-                ;; check_neg_offset!(asm, count)
+                ;; load_neg_offset(asm, count)
                 ; sub pointer, rax
             );
         }
@@ -153,7 +119,7 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
             dynasm!(asm
                 ; jmp >end_loop
                 ; begin_loop:
-                ;; check_pos_offset!(asm, skip)
+                ;; load_pos_offset(asm, skip)
                 ; add pointer, rax
                 ; end_loop:
                 ; cmp BYTE [pointer], 0
@@ -165,7 +131,7 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
             dynasm!(asm
                 ; jmp >end_loop
                 ; begin_loop:
-                ;; check_neg_offset!(asm, skip)
+                ;; load_neg_offset(asm, skip)
                 ; sub pointer, rax
                 ; end_loop:
                 ; cmp BYTE [pointer], 0
@@ -177,7 +143,7 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
             dynasm!(asm
                 ; cmp BYTE [pointer], 0
                 ; jz >skip
-                ;; check_pos_offset!(asm, offset)
+                ;; load_pos_offset(asm, offset)
                 ; mov cl, BYTE [pointer]
                 ; mov BYTE [pointer], 0
                 ; add BYTE [pointer + rax], cl
@@ -189,7 +155,7 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
             dynasm!(asm
                 ; cmp BYTE [pointer], 0
                 ; jz >skip
-                ;; check_neg_offset!(asm, offset)
+                ;; load_neg_offset(asm, offset)
                 ; mov cl, BYTE [pointer]
                 ; mov BYTE [pointer], 0
                 ; neg rax
@@ -215,6 +181,36 @@ pub fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruct
                 ; jnz =>begin_label
             );
         }
+    }
+}
+
+fn load_pos_offset(asm: &mut Assembler, offset: usize) {
+    dynasm!(asm
+        ; mov rax, QWORD offset as i64
+    );
+
+    if cfg!(not(feature = "omit_bounds_checks")) {
+        dynasm!(asm
+            ; mov rcx, mem_limit
+            ; sub rcx, pointer
+            ; cmp rcx, rax
+            ; jle ->overflow
+        );
+    }
+}
+
+fn load_neg_offset(asm: &mut Assembler, offset: usize) {
+    dynasm!(asm
+        ; mov rax, QWORD offset as i64
+    );
+
+    if cfg!(not(feature = "omit_bounds_checks")) {
+        dynasm!(asm
+            ; mov rcx, pointer
+            ; sub rcx, mem_start
+            ; cmp rcx, rax
+            ; jl ->underflow
+        );
     }
 }
 
