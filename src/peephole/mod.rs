@@ -6,7 +6,7 @@ pub use self::compiler::*;
 pub type Program = [Instruction];
 
 /// Instructions as output by the peephole optimizer.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Instruction {
     /// Move the pointer left by the specified offset.
     Left(usize),
@@ -18,10 +18,6 @@ pub enum Instruction {
     In,
     /// Write output.
     Out,
-    /// Begin a loop whose end is at the given address
-    JumpZero(usize),
-    /// End a loop whose beginning is at the given address
-    JumpNotZero(usize),
     /// Set the current byte to 0
     SetZero,
     /// Add the byte at the pointer to the byte at the specified offset and zero the byte at the
@@ -34,4 +30,6 @@ pub enum Instruction {
     FindZeroRight(usize),
     /// Move the pointer to a zero, skipping the offset at a time.
     FindZeroLeft(usize),
+    /// A loop
+    Loop(Box<Program>),
 }

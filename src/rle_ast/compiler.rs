@@ -54,7 +54,7 @@ impl Compiler {
     }
 }
 
-/// Compiles the given sequence of instructions into a program.
+
 pub fn compile(program: &[ast::Instruction]) -> Box<Program> {
     let mut compiler = Compiler::new();
     compiler.compile(program);

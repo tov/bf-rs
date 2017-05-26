@@ -13,69 +13,69 @@ impl Interpretable for Program {
     }
 }
 
-fn interpret<R, W>(instructions: &Program, state: &mut State,
-                   input: &mut R, output: &mut W)
-                   -> BfResult<()>
+fn interpret<R, W>(instructions: &[Instruction], state: &mut State,
+                            input: &mut R, output: &mut W)
+                            -> BfResult<()>
     where R: Read, W: Write
 {
-    let mut pc = 0;
+    for instruction in instructions {
+        interpret_instruction(instruction, state, input, output)?;
+    }
 
-    while pc < instructions.len() {
-        match instructions[pc] {
-            Instruction::Left(count) => state.left(count)?,
+    Ok(())
+}
 
-            Instruction::Right(count) => state.right(count)?,
+fn interpret_instruction<R, W>(instructions: &Instruction, state: &mut State,
+                               input: &mut R, output: &mut W)
+                               -> BfResult<()>
+    where R: Read, W: Write
+{
+    match *instructions {
+        Instruction::Left(count) => state.left(count)?,
 
-            Instruction::Change(amount) => state.up(amount),
+        Instruction::Right(count) => state.right(count)?,
 
-            Instruction::In => state.read(input),
+        Instruction::Change(amount) => state.up(amount),
 
-            Instruction::Out => state.write(output),
+        Instruction::In => state.read(input),
 
-            Instruction::JumpZero(addr) => {
-                if state.load() == 0 {
-                    pc = addr;
-                }
-            }
+        Instruction::Out => state.write(output),
 
-            Instruction::JumpNotZero(addr) => {
-                if state.load() != 0 {
-                    pc = addr;
-                }
-            }
+        Instruction::SetZero => state.store(0),
 
-            Instruction::SetZero => state.store(0),
-
-            Instruction::OffsetAddRight(offset) => {
-                let value = state.load();
-                if value != 0 {
-                    state.store(0);
-                    state.up_pos_offset(offset, value)?;
-                }
-            }
-
-            Instruction::OffsetAddLeft(offset) => {
-                let value = state.load();
-                if value != 0 {
-                    state.store(0);
-                    state.up_neg_offset(offset, value)?;
-                }
-            }
-
-            Instruction::FindZeroRight(skip) => {
-                while state.load() != 0 {
-                    state.right(skip)?;
-                }
-            }
-
-            Instruction::FindZeroLeft(skip) => {
-                while state.load() != 0 {
-                    state.left(skip)?;
-                }
+        Instruction::OffsetAddRight(offset) => {
+            let value = state.load();
+            if value != 0 {
+                state.store(0);
+                state.up_pos_offset(offset, value)?;
             }
         }
 
-        pc += 1;
+        Instruction::OffsetAddLeft(offset) => {
+            let value = state.load();
+            if value != 0 {
+                state.store(0);
+                state.up_neg_offset(offset, value)?;
+            }
+        }
+
+        Instruction::FindZeroRight(skip) => {
+            while state.load() != 0 {
+                state.right(skip)?;
+            }
+        }
+
+        Instruction::FindZeroLeft(skip) => {
+            while state.load() != 0 {
+                state.left(skip)?;
+            }
+        }
+
+        Instruction::Loop(ref body) => {
+            while state.load() != 0 {
+                interpret(body, state, input, output)?;
+            }
+        }
     }
 
     Ok(())

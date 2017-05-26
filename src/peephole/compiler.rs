@@ -44,6 +44,8 @@ impl Compiler {
                     panic!("bad opcode"),
 
                 Loop(ref body) => {
+                    let body = compile(&*body);
+
                     let peephole = set_zero_peephole(&body)
                         .or_else(|| find_zero_peephole(&body))
                         .or_else(|| offset_add_peephole(&body));
@@ -51,12 +53,7 @@ impl Compiler {
                     if let Some(instr) = peephole {
                         self.push(instr);
                     } else {
-                        let begin_pc = self.instructions.len();
-                        self.push(Instruction::JumpZero(0));
-                        self.compile(&body);
-                        let end_pc = self.instructions.len();
-                        self.push(Instruction::JumpNotZero(begin_pc));
-                        self.instructions[begin_pc] = Instruction::JumpZero(end_pc);
+                        self.push(Instruction::Loop(body))
                     }
                 }
             }
@@ -72,22 +69,21 @@ impl Compiler {
     }
 }
 
-pub fn set_zero_peephole(body: &[rle_ast::Instruction]) -> Option<Instruction> {
+pub fn set_zero_peephole(body: &[Instruction]) -> Option<Instruction> {
     if body.len() == 1 &&
-        (body[0] == rle_ast::Instruction::Op((OpCode::Up, 1)) ||
-         body[0] == rle_ast::Instruction::Op((OpCode::Down, 1))) {
+        body[0] == Instruction::Change(1) {
         Some(Instruction::SetZero)
     } else {
         None
     }
 }
 
-pub fn find_zero_peephole(body: &[rle_ast::Instruction]) -> Option<Instruction> {
+pub fn find_zero_peephole(body: &[Instruction]) -> Option<Instruction> {
     if body.len() == 1 {
         match body[0] {
-            rle_ast::Instruction::Op((OpCode::Right, count)) =>
+            Instruction::Right(count) =>
                 Some(Instruction::FindZeroRight(count)),
-            rle_ast::Instruction::Op((OpCode::Left, count)) =>
+            Instruction::Left(count) =>
                 Some(Instruction::FindZeroLeft(count)),
             _ => None,
         }
@@ -96,22 +92,18 @@ pub fn find_zero_peephole(body: &[rle_ast::Instruction]) -> Option<Instruction> 
     }
 }
 
-pub fn offset_add_peephole(body: &[rle_ast::Instruction]) -> Option<Instruction> {
-    use rle_ast::Instruction::*;
+pub fn offset_add_peephole(body: &[Instruction]) -> Option<Instruction> {
+    use self::Instruction::*;
 
     if body.len() == 4 {
         match (&body[0], &body[1], &body[2], &body[3]) {
-            (&Op((OpCode::Down, 1)),
-             &Op((OpCode::Right, count_l)),
-             &Op((OpCode::Up, 1)),
-             &Op((OpCode::Left, count_r))) if count_l == count_r => {
+            (&Change(255), &Right(count_l), &Change(1), &Left(count_r))
+            if count_l == count_r => {
                 Some(Instruction::OffsetAddRight(count_l))
             }
 
-            (&Op((OpCode::Down, 1)),
-             &Op((OpCode::Left, count_l)),
-             &Op((OpCode::Up, 1)),
-             &Op((OpCode::Right, count_r))) if count_l == count_r => {
+            (&Change(255), &Left(count_l), &Change(1), &Right(count_r))
+            if count_l == count_r => {
                 Some(Instruction::OffsetAddLeft(count_l))
             }
 
