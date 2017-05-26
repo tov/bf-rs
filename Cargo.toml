@@ -3,5 +3,11 @@ name = "bf"
 version = "0.1.0"
 authors = ["Jesse A. Tov <jesse.tov@gmail.com>"]
 
+[features]
+jit = ["dynasmrt", "dynasm"]
+
 [dependencies]
 clap = "2.24"
+
+dynasmrt = { version = "*", optional = true }
+dynasm = { version = "*", optional = true }
