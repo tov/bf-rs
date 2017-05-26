@@ -88,7 +88,7 @@ fn get_options() -> Options {
     let mut result = Options {
         program_text:  Vec::new(),
         memory_size:   None,
-        compiler_pass: Pass::Flat,
+        compiler_pass: Pass::Peep,
     };
 
     let matches = build_clap_app().get_matches();
@@ -164,11 +164,11 @@ fn build_clap_app() -> App<'static, 'static> {
             .conflicts_with_all(&["ast", "flat", "peep", "jit"]))
         .arg(Arg::with_name("flat")
             .long("flat")
-            .help("Interpret the flattened bytecode (default)")
+            .help("Interpret the flattened bytecode")
             .conflicts_with_all(&["ast", "rle", "peep", "jit"]))
         .arg(Arg::with_name("peep")
             .long("peep")
-            .help("Interpret the peephole optimized bytecode (broken?)")
+            .help("Interpret the peephole optimized bytecode (default)")
             .conflicts_with_all(&["ast", "rle", "flat", "jit"]));
 
     #[cfg(feature = "jit")]
