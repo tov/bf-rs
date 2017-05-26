@@ -19,7 +19,7 @@ type EntryFunction<'a> = extern "win64" fn(memory: *mut u8,
                                            memory_size: u64,
                                            rts_state: *mut RtsState<'a>) -> u64;
 
-impl Interpretable for Executable {
+impl Interpretable for Program {
     fn interpret_state<R: Read, W: Write>(&self, mut state: State,
                                           mut input: R, mut output: W)
                                           -> BfResult<()>

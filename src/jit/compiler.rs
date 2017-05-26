@@ -3,7 +3,7 @@ use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use super::*;
 use op_code::OpCode;
-use rle_ast::{Program, Instruction};
+use rle_ast;
 
 dynasm!(asm
     ; .alias pointer, r12
@@ -12,7 +12,7 @@ dynasm!(asm
     ; .alias rts, r15
 );
 
-pub fn compile(program: &Program) -> Executable {
+pub fn compile(program: &rle_ast::Program) -> Program {
     let mut asm = dynasmrt::x64::Assembler::new();
     let start = asm.offset();
 
@@ -48,20 +48,20 @@ pub fn compile(program: &Program) -> Executable {
 
     let code = asm.finalize().unwrap();
 
-    Executable {
+    Program {
         code: code,
         start: start,
     }
 }
 
-pub fn compile_sequence(asm: &mut Assembler, program: &[Instruction]) {
+pub fn compile_sequence(asm: &mut Assembler, program: &[rle_ast::Instruction]) {
     for instruction in program {
         compile_instruction(asm, instruction);
     }
 }
 
-pub fn compile_instruction(asm: &mut Assembler, instruction: &Instruction) {
-    use self::Instruction::*;
+pub fn compile_instruction(asm: &mut Assembler, instruction: &rle_ast::Instruction) {
+    use rle_ast::Instruction::*;
 
     match *instruction {
         Op((OpCode::Right, count)) => {
