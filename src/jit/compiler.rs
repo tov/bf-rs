@@ -66,11 +66,16 @@ macro_rules! check_pos_offset {
     ($asm:ident, $offset:expr) => {{
         dynasm!($asm
             ; mov rax, QWORD $offset as i64
-            ; mov rcx, mem_limit
-            ; sub rcx, pointer
-            ; cmp rcx, rax
-            ; jle ->overflow
         );
+
+        if cfg!(not(feature = "omit_bounds_checks")) {
+            dynasm!($asm
+                ; mov rcx, mem_limit
+                ; sub rcx, pointer
+                ; cmp rcx, rax
+                ; jle -> overflow
+            );
+        }
     }}
 }
 
@@ -78,11 +83,16 @@ macro_rules! check_neg_offset {
     ($asm:ident, $offset:expr) => {{
         dynasm!($asm
             ; mov rax, QWORD $offset as i64
-            ; mov rcx, pointer
-            ; sub rcx, mem_start
-            ; cmp rcx, rax
-            ; jl ->underflow
         );
+
+        if cfg!(not(feature = "omit_bounds_checks")) {
+            dynasm!($asm
+                ; mov rcx, pointer
+                ; sub rcx, mem_start
+                ; cmp rcx, rax
+                ; jl ->underflow
+            );
+        }
     }}
 }
 

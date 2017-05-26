@@ -5,6 +5,7 @@ authors = ["Jesse A. Tov <jesse.tov@gmail.com>"]
 
 [features]
 jit = ["dynasmrt", "dynasm"]
+omit_bounds_checks = []
 
 [dependencies]
 clap = "2.24"
