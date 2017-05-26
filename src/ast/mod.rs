@@ -23,12 +23,6 @@ pub fn mk_in()    -> Instruction { Instruction::Op(OpCode::In) }
 pub fn mk_out()   -> Instruction { Instruction::Op(OpCode::Out) }
 
 /// Takes a vector of instructions and makes them into a loop.
-///
-/// Equivalent to
-///
-/// ```ignore
-/// Instruction::Loop(instructions.into_boxed_slice())
-/// ```
 pub fn mk_loop(instructions: Vec<Instruction>) -> Instruction {
     Instruction::Loop(instructions.into_boxed_slice())
 }

@@ -25,12 +25,6 @@ pub fn mk_in(count: Count)    -> Instruction { Instruction::Op((OpCode::In, coun
 pub fn mk_out(count: Count)   -> Instruction { Instruction::Op((OpCode::Out, count)) }
 
 /// Takes a vector of instructions and makes them into a loop.
-///
-/// Equivalent to
-///
-/// ```ignore
-/// Instruction::Loop(instructions.into_boxed_slice())
-/// ```
 pub fn mk_loop(instructions: Vec<Instruction>) -> Instruction {
     Instruction::Loop(instructions.into_boxed_slice())
 }
