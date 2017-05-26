@@ -4,18 +4,9 @@ hard: test
 CRATE = bf
 REPO  = bf-rs
 
-build:
-	clear
-	cargo build
-	make doc
-
 doc:
-	rustup run nightly cargo doc --no-deps -p bf --features=jit
+	rustup run nightly cargo doc --no-deps -p $(CRATE) --features=jit
 	echo "<meta http-equiv='refresh' content='0;url=$(CRATE)/'>" > target/doc/index.html
-
-test:
-	clear
-	cargo test
 
 upload-doc:
 	make doc
