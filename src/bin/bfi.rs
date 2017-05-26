@@ -11,6 +11,8 @@ use bf::ast;
 use bf::rle_ast;
 use bf::flat;
 use bf::peephole;
+
+#[cfg(feature = "jit")]
 use bf::jit;
 
 use bf::traits::Interpretable;
@@ -30,6 +32,7 @@ enum Pass {
     Rle,
     Flat,
     Peep,
+    #[cfg(feature = "jit")]
     Jit,
 }
 
@@ -62,6 +65,7 @@ fn main() {
             interpret(&*program, &options);
         }
 
+        #[cfg(feature = "jit")]
         Pass::Jit => {
             let program = rle_ast::compile(&program);
             let program = jit::compile(&program);
@@ -104,7 +108,8 @@ fn get_options() -> Options {
     } else if matches.is_present("peep") {
         result.compiler_pass = Pass::Peep;
     } else if matches.is_present("jit") {
-        result.compiler_pass = Pass::Jit;
+        #[cfg(feature = "jit")]
+        let _ = result.compiler_pass = Pass::Jit;
     }
 
     if let Some(exprs) = matches.values_of("expr") {
@@ -126,7 +131,7 @@ fn get_options() -> Options {
 }
 
 fn build_clap_app() -> App<'static, 'static> {
-    App::new("bfi")
+    let app = App::new("bfi")
         .version(VERSION)
         .author("Jesse A. Tov <jesse.tov@gmail.com>")
         .about("A Brainfuck interpreter")
@@ -164,11 +169,16 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("peep")
             .long("peep")
             .help("Interpret the peephole optimized bytecode (broken?)")
-            .conflicts_with_all(&["ast", "rle", "flat", "jit"]))
+            .conflicts_with_all(&["ast", "rle", "flat", "jit"]));
+
+    #[cfg(feature = "jit")]
+    let app = app
         .arg(Arg::with_name("jit")
             .long("jit")
             .help("Use native X-64 JIT")
-            .conflicts_with_all(&["ast", "rle", "flat", "peep"]))
+            .conflicts_with_all(&["ast", "rle", "flat", "peep"]));
+
+    app
 }
 
 fn error_exit(code: i32, msg: String) -> ! {
