@@ -13,7 +13,7 @@ pub struct Program {
 #[cfg(test)]
 mod tests {
     use test_helpers::*;
-    use result::{BfResult, Error};
+    use common::{BfResult, Error};
 
     #[test]
     fn move_right_once() {

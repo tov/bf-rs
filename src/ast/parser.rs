@@ -1,5 +1,5 @@
 use super::*;
-use result::{BfResult, Error};
+use common::{BfResult, Error};
 
 pub fn parse_program(input: &[u8]) -> BfResult<Box<Program>> {
     let (program, rest) = parse_instructions(input)?;

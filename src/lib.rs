@@ -4,8 +4,7 @@
 #[cfg(feature = "jit")]
 extern crate dynasmrt;
 
-pub mod result;
-pub mod op_code;
+pub mod common;
 pub mod state;
 pub mod traits;
 

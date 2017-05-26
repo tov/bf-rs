@@ -1,5 +1,5 @@
 use super::*;
-use op_code::Command;
+use common::Command;
 use rle;
 
 pub struct Compiler {

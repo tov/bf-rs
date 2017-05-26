@@ -1,6 +1,6 @@
 use std::str;
 
-use result::BfResult;
+use common::BfResult;
 use traits::Interpretable;
 
 pub const FACTOR_SRC: &'static [u8] = include_bytes!("../bf/factor.bf");

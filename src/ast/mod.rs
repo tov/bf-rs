@@ -3,7 +3,7 @@ mod interpreter;
 
 pub use self::parser::parse_program;
 
-use op_code::Command;
+use common::Command;
 
 /// A BF program is a sequence of instructions.
 pub type Program = [Instruction];

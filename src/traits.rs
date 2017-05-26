@@ -1,6 +1,6 @@
 use std::io::{Cursor, Read, Write, stdin, stdout};
 
-use result::BfResult;
+use common::BfResult;
 use state::State;
 
 /// Program forms which can be interpreted.

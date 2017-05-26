@@ -1,7 +1,7 @@
 use std::io::{Read, Write};
 
 use state::State;
-use result::BfResult;
+use common::BfResult;
 use traits::Interpretable;
 use super::*;
 

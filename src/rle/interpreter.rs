@@ -1,7 +1,7 @@
 use std::io::{Read, Write};
 
 use state::State;
-use result::BfResult;
+use common::BfResult;
 use traits::Interpretable;
 use super::*;
 
@@ -32,21 +32,21 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
     where R: Read, W: Write
 {
     match *instruction {
-        Instruction::Op((OpCode::Left, count)) => state.left(count)?,
-        Instruction::Op((OpCode::Right, count)) => state.right(count)?,
-        Instruction::Op((OpCode::Up, count)) => state.up(count as u8),
-        Instruction::Op((OpCode::Down, count)) => state.down(count as u8),
-        Instruction::Op((OpCode::In, count)) => {
+        Instruction::Op((Command::Left, count)) => state.left(count)?,
+        Instruction::Op((Command::Right, count)) => state.right(count)?,
+        Instruction::Op((Command::Up, count)) => state.up(count as u8),
+        Instruction::Op((Command::Down, count)) => state.down(count as u8),
+        Instruction::Op((Command::In, count)) => {
             for _ in 0 .. count {
                 state.read(input);
             }
         }
-        Instruction::Op((OpCode::Out, count)) => {
+        Instruction::Op((Command::Out, count)) => {
             for _ in 0 .. count {
                 state.write(output);
             }
         }
-        Instruction::Op((OpCode::Begin, _)) | Instruction::Op((OpCode::End, _)) =>
+        Instruction::Op((Command::Begin, _)) | Instruction::Op((Command::End, _)) =>
             panic!("Invalid opcode"),
         Instruction::Loop(ref program) => {
             while state.load() != 0  {

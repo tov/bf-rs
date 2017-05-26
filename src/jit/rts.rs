@@ -2,7 +2,7 @@ use std::io::{Read, Write};
 use std::mem;
 
 use super::*;
-use result::{BfResult, Error};
+use common::{BfResult, Error};
 use state::State;
 use traits::Interpretable;
 

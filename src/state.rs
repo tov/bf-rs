@@ -2,7 +2,7 @@ use std::io::{Read, Write};
 use std::mem;
 use std::num::Wrapping;
 
-use result::{BfResult, Error};
+use common::{BfResult, Error};
 
 /// The default number of 8-bit memory cells, as used by
 /// [`State::new`](struct.State.html#method.new).

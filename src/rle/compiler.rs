@@ -4,7 +4,7 @@ use ::ast;
 /// Represents the state of an RLE compiler from `ast::Instruction` to `Instruction`.
 pub struct Compiler {
     instructions: Vec<Instruction>,
-    buffer: (OpCode, usize),
+    buffer: (Command, usize),
 }
 
 impl Compiler {
@@ -12,7 +12,7 @@ impl Compiler {
     pub fn new() -> Self {
         Compiler {
             instructions: Vec::new(),
-            buffer: (OpCode::Right, 0),
+            buffer: (Command::Right, 0),
         }
     }
 
@@ -35,11 +35,11 @@ impl Compiler {
     fn push_op(&mut self) {
         if self.buffer.1 > 0 {
             self.instructions.push(Instruction::Op(self.buffer));
-            self.buffer = (OpCode::Right, 0);
+            self.buffer = (Command::Right, 0);
         }
     }
 
-    fn issue_op(&mut self, op_code: OpCode) {
+    fn issue_op(&mut self, op_code: Command) {
         if op_code == self.buffer.0 {
             self.buffer.1 += 1;
         } else {
