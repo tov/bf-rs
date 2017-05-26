@@ -5,7 +5,7 @@ authors = ["Jesse A. Tov <jesse.tov@gmail.com>"]
 
 [features]
 
-# Enables native x64 JIT
+# Enables native x64 JIT; requires nightly Rust
 jit = ["dynasmrt", "dynasm"]
 
 # Omits memory bounds checks from emitted code
