@@ -32,13 +32,13 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
     where R: Read, W: Write
 {
     match *instruction {
-        Instruction::Op(OpCode::Left) => state.left(1)?,
-        Instruction::Op(OpCode::Right) => state.right(1)?,
-        Instruction::Op(OpCode::Up) => state.up(1),
-        Instruction::Op(OpCode::Down) => state.down(1),
-        Instruction::Op(OpCode::In) => state.read(input),
-        Instruction::Op(OpCode::Out) => state.write(output),
-        Instruction::Op(OpCode::Begin) | Instruction::Op(OpCode::End) =>
+        Instruction::Op(Command::Left) => state.left(1)?,
+        Instruction::Op(Command::Right) => state.right(1)?,
+        Instruction::Op(Command::Up) => state.up(1),
+        Instruction::Op(Command::Down) => state.down(1),
+        Instruction::Op(Command::In) => state.read(input),
+        Instruction::Op(Command::Out) => state.write(output),
+        Instruction::Op(Command::Begin) | Instruction::Op(Command::End) =>
             panic!("Invalid opcode"),
         Instruction::Loop(ref program) => {
             while state.load() != 0  {

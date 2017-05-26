@@ -3,7 +3,7 @@ mod interpreter;
 
 pub use self::parser::parse_program;
 
-use op_code::OpCode;
+use op_code::Command;
 
 /// A BF program is a sequence of instructions.
 pub type Program = [Instruction];
@@ -11,16 +11,16 @@ pub type Program = [Instruction];
 /// A BF instruction.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Instruction {
-    Op(OpCode),
+    Op(Command),
     Loop(Box<Program>),
 }
 
-pub fn mk_left()  -> Instruction { Instruction::Op(OpCode::Left) }
-pub fn mk_right() -> Instruction { Instruction::Op(OpCode::Right) }
-pub fn mk_up()    -> Instruction { Instruction::Op(OpCode::Up) }
-pub fn mk_down()  -> Instruction { Instruction::Op(OpCode::Down) }
-pub fn mk_in()    -> Instruction { Instruction::Op(OpCode::In) }
-pub fn mk_out()   -> Instruction { Instruction::Op(OpCode::Out) }
+pub fn mk_left()  -> Instruction { Instruction::Op(Command::Left) }
+pub fn mk_right() -> Instruction { Instruction::Op(Command::Right) }
+pub fn mk_up()    -> Instruction { Instruction::Op(Command::Up) }
+pub fn mk_down()  -> Instruction { Instruction::Op(Command::Down) }
+pub fn mk_in()    -> Instruction { Instruction::Op(Command::In) }
+pub fn mk_out()   -> Instruction { Instruction::Op(Command::Out) }
 
 /// Takes a vector of instructions and makes them into a loop.
 pub fn mk_loop(instructions: Vec<Instruction>) -> Instruction {

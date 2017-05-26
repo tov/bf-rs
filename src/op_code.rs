@@ -1,6 +1,6 @@
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(u8)]
-pub enum OpCode {
+pub enum Command {
     Left,
     Right,
     Up,

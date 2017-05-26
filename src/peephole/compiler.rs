@@ -1,5 +1,5 @@
 use super::*;
-use op_code::OpCode;
+use op_code::Command;
 use rle;
 
 pub struct Compiler {
@@ -18,29 +18,29 @@ impl Compiler {
 
         for instruction in src {
             match *instruction {
-                Op((OpCode::Right, count)) =>
+                Op((Command::Right, count)) =>
                     self.push(Instruction::Right(count)),
-                Op((OpCode::Left, count)) =>
+                Op((Command::Left, count)) =>
                     self.push(Instruction::Left(count)),
-                Op((OpCode::Up, count)) => {
+                Op((Command::Up, count)) => {
                     let amount = (count % 256) as u8;
                     self.push(Instruction::Change(amount));
                 }
-                Op((OpCode::Down, count)) => {
+                Op((Command::Down, count)) => {
                     let amount = (256 - count % 256) as u8;
                     self.push(Instruction::Change(amount));
                 }
-                Op((OpCode::In, count)) => {
+                Op((Command::In, count)) => {
                     for _ in 0 .. count {
                         self.push(Instruction::In);
                     }
                 }
-                Op((OpCode::Out, count)) => {
+                Op((Command::Out, count)) => {
                     for _ in 0 .. count {
                         self.push(Instruction::Out);
                     }
                 }
-                Op((OpCode::Begin, _)) | Op((OpCode::End, _)) =>
+                Op((Command::Begin, _)) | Op((Command::End, _)) =>
                     panic!("bad opcode"),
 
                 Loop(ref body) => {
