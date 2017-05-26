@@ -8,7 +8,7 @@ homepage = "https://github.com/tov/bf-rs"
 documentation = "http://tov.github.io/bf-rs/"
 readme = "README.md"
 license = "MIT"
-keywords = ["brainfuck", "interpreters", "jit"]
+keywords = ["brainfuck", "interpreters", "jit", "x64"]
 
 [features]
 
