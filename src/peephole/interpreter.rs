@@ -48,14 +48,18 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
 
             Instruction::OffsetAddRight(offset) => {
                 let value = state.load();
-                state.store(0);
-                state.up_pos_offset(offset, value)?;
+                if value != 0 {
+                    state.store(0);
+                    state.up_pos_offset(offset, value)?;
+                }
             }
 
             Instruction::OffsetAddLeft(offset) => {
                 let value = state.load();
-                state.store(0);
-                state.up_neg_offset(offset, value)?;
+                if value != 0 {
+                    state.store(0);
+                    state.up_neg_offset(offset, value)?;
+                }
             }
 
             Instruction::FindZeroRight(skip) => {
