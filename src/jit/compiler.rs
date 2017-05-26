@@ -11,7 +11,7 @@ dynasm!(asm
     ; .alias rts, r15
 );
 
-pub fn compile(program: &peephole::Program) -> Program {
+pub fn compile(program: &peephole::Program, checked: bool) -> Program {
     let mut asm = dynasmrt::x64::Assembler::new();
     let start = asm.offset();
 
@@ -27,7 +27,7 @@ pub fn compile(program: &peephole::Program) -> Program {
         ; mov rts, r8
     );
 
-    compile_sequence(&mut asm, program, true);
+    compile_sequence(&mut asm, program, checked);
 
     dynasm!(asm
         ; mov rax, rts::OKAY as i32

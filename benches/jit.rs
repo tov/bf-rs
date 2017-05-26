@@ -22,7 +22,7 @@ mod jit_only {
         b.iter(|| {
             let program = rle::compile(&program);
             let program = peephole::compile(&program);
-            jit::compile(&program)
+            jit::compile(&program, true)
         });
     }
 
@@ -31,7 +31,19 @@ mod jit_only {
         let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
         let program = rle::compile(&program);
         let program = peephole::compile(&program);
-        let program = jit::compile(&program);
+        let program = jit::compile(&program, true);
+
+        b.iter(|| {
+            program.interpret_memory(None, b"1000000\n").unwrap()
+        });
+    }
+
+    #[bench]
+    fn interpret_factor_million_unchecked(b: &mut Bencher) {
+        let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
+        let program = rle::compile(&program);
+        let program = peephole::compile(&program);
+        let program = jit::compile(&program, false);
 
         b.iter(|| {
             program.interpret_memory(None, b"1000000\n").unwrap()

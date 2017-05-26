@@ -70,7 +70,7 @@ fn main() {
         Pass::Jit => {
             let program = rle::compile(&program);
             let program = peephole::compile(&program);
-            let program = jit::compile(&program);
+            let program = jit::compile(&program, true);
             interpret(&program, &options);
         }
     }

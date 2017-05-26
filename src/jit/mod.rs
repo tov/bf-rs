@@ -57,7 +57,7 @@ mod tests {
         let program = ::ast::parse_program(program).unwrap();
         let program = ::rle::compile(&program);
         let program = ::peephole::compile(&program);
-        let program = ::jit::compile(&program);
+        let program = ::jit::compile(&program, true);
         assert_interpret_result(&program, input.as_bytes(), output.map(|s| s.as_bytes()));
     }
 }
