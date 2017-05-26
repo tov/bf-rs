@@ -1,10 +1,14 @@
 [package]
 name = "bf"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Jesse A. Tov <jesse.tov@gmail.com>"]
 
 [features]
+
+# Enables native x64 JIT
 jit = ["dynasmrt", "dynasm"]
+
+# Omits memory bounds checks from emitted code
 omit_bounds_checks = []
 
 [dependencies]
