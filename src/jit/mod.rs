@@ -1,3 +1,14 @@
+//! Just-in-time compiles Brainfuck AST to x64 machine code (`--features jit`, nightly only)
+//!
+//! This uses the [`dynasm`](https://crates.io/search?q=dynasm) crate to generate x86-64
+//! machine code from peephole-optimized AST. This is currently the fastest implementation,
+//! but it is available only on nightly Rust because `dynasm` uses a plugin.
+//!
+//! To go even faster, pass the `--unchecked` flag to the `bfi` interpreter to disable
+//! memory bounds checking in the generated code. Note that this runs Brainfuck in
+//! unsafe mode, which means that programs that move the pointer outside the allocated
+//! memory will access and possibly overwrite arbitrary memory locations.
+
 mod compiler;
 mod rts;
 
