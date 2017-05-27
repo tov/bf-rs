@@ -1,0 +1,22 @@
+language: rust
+sudo: false
+
+matrix:
+  include:
+    - rust: stable
+    - rust: beta
+    - rust: nightly
+      env:
+        - BENCH=yes
+        - FEATURES=jit
+  allow_failures:
+    - rust: nightly
+
+script:
+  - cargo build --verbose --features "$FEATURES"
+  - cargo test --verbose --features "$FEATURES"
+  - [ -n "$BENCH" ] && cargo bench --verbose --features "$FEATURES"
+
+notifications:
+  email:
+    on_success: never
