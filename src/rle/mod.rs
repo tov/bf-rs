@@ -36,7 +36,7 @@ pub enum Instruction {
     ///
     /// # Invariants
     ///
-    /// Cannot be `Begin` or `End`.
+    /// The `Command` cannot be `Begin` or `End`.
     Cmd(Command, Count),
     /// A loop surrounding a sequence of instructions.
     Loop(Box<[Instruction]>),
