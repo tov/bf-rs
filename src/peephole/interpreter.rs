@@ -38,7 +38,7 @@ fn interpret_instruction<R, W>(instructions: &Statement, state: &mut State,
 
         Instr(Right(count)) => state.right(count as usize)?,
 
-        Instr(Change(amount)) => state.up(amount),
+        Instr(Add(amount)) => state.up(amount),
 
         Instr(In) => state.read(input),
 

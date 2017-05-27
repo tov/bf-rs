@@ -125,7 +125,7 @@ impl Compiler {
                 );
             }
 
-            Instr(Change(count)) => {
+            Instr(Add(count)) => {
                 dynasm!(self.asm
                     ; add [pointer], BYTE count as i8
                 );

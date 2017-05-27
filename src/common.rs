@@ -87,7 +87,7 @@ pub enum Instruction {
     /// Increase the pointer by the specified offset.
     Right(Count),
     /// Increase the current byte value by the specified offset.
-    Change(u8),
+    Add(u8),
     /// Read a byte of input.
     In,
     /// Write a byte of output.

@@ -26,7 +26,7 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
         match instructions[pc] {
             Left(count) => state.left(count)?,
             Right(count) => state.right(count)?,
-            Change(count) => state.up(count),
+            Add(count) => state.up(count),
             In => state.read(input),
             Out => state.write(output),
 

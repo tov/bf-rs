@@ -39,11 +39,11 @@ impl Compiler {
                     self.push(Obj::Left(count)),
                 Cmd(Up, count) => {
                     let amount = (count % 256) as u8;
-                    self.push(Obj::Change(amount));
+                    self.push(Obj::Add(amount));
                 }
                 Cmd(Down, count) => {
                     let amount = (256 - count % 256) as u8;
-                    self.push(Obj::Change(amount));
+                    self.push(Obj::Add(amount));
                 }
                 Cmd(In, count) => {
                     for _ in 0 .. count {
@@ -91,7 +91,7 @@ pub fn set_zero_peephole(body: &[Statement]) -> Option<common::Instruction> {
     use common::Instruction::*;
 
     if body.len() == 1 &&
-        body[0] == Instr(Change(1)) {
+        body[0] == Instr(Add(1)) {
         Some(SetZero)
     } else {
         None
@@ -121,12 +121,12 @@ pub fn offset_add_peephole(body: &[Statement]) -> Option<common::Instruction> {
 
     if body.len() == 4 {
         match (&body[0], &body[1], &body[2], &body[3]) {
-            (&Instr(Change(255)), &Instr(Right(count_l)), &Instr(Change(1)), &Instr(Left(count_r)))
+            (&Instr(Add(255)), &Instr(Right(count_l)), &Instr(Add(1)), &Instr(Left(count_r)))
             if count_l == count_r => {
                 Some(OffsetAddRight(count_l))
             }
 
-            (&Instr(Change(255)), &Instr(Left(count_l)), &Instr(Change(1)), &Instr(Right(count_r)))
+            (&Instr(Add(255)), &Instr(Left(count_l)), &Instr(Add(1)), &Instr(Right(count_r)))
             if count_l == count_r => {
                 Some(OffsetAddLeft(count_l))
             }
