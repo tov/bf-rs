@@ -14,13 +14,13 @@ mod interpreter;
 mod compiler;
 
 pub use self::compiler::compile;
+pub use rle::Count;
 
 /// At this level, a program is a rose tree of instructions.
 ///
 /// All instructions are leaves except for the `Loop` instruction, which contains a boxed `Program`.
 pub type Program = [Instruction];
 
-pub use rle::Count;
 
 /// Instructions as output by the peephole optimizer.
 #[derive(Clone, Debug, Eq, PartialEq)]

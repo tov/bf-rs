@@ -15,11 +15,10 @@ mod compiler;
 mod interpreter;
 
 pub use self::compiler::compile;
+pub use peephole::Count;
 
 /// A program is a flat sequence of instructions.
 pub type Program = [Instruction];
-
-pub use peephole::Count;
 
 /// Instructions as output by the bytecode flattener.
 ///
