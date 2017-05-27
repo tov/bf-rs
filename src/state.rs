@@ -3,6 +3,7 @@
 //! Useful for creating initial states for testing, and also the interface used by the
 //! interpreters to access the state.
 
+use std::default::Default;
 use std::io::{Read, Write};
 use std::mem;
 use std::num::Wrapping;
@@ -144,6 +145,12 @@ impl State {
     pub fn as_mut_ptr(&mut self) -> *mut u8 {
         // Assumes that Wrapping<u8> == u8:
         unsafe { mem::transmute(self.memory.as_mut_ptr()) }
+    }
+}
+
+impl Default for State {
+    fn default() -> Self {
+        State::new()
     }
 }
 

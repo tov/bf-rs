@@ -17,7 +17,7 @@ pub trait Interpretable {
     fn interpret<R: Read, W: Write>(
         &self, size: Option<usize>, input: R, output: W) -> BfResult<()>
     {
-        let state = size.map(State::with_capacity).unwrap_or_else(|| State::new());
+        let state = size.map(State::with_capacity).unwrap_or_else(State::new);
         self.interpret_state(state, input, output)
     }
 

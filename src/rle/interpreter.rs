@@ -53,7 +53,7 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
             panic!("Invalid opcode"),
         Loop(ref program) => {
             while state.load() != 0  {
-                interpret(&program, state, input, output)?;
+                interpret(program, state, input, output)?;
             }
         }
     }

@@ -39,6 +39,9 @@
 #![cfg_attr(feature = "jit", feature(plugin))]
 #![cfg_attr(feature = "jit", plugin(dynasm))]
 
+#![cfg_attr(feature="clippy", feature(plugin))]
+#![cfg_attr(feature="clippy", plugin(clippy))]
+
 #[cfg(feature = "jit")]
 extern crate dynasmrt;
 

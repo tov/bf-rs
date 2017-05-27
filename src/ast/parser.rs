@@ -46,7 +46,7 @@ fn parse_instruction<'a>(mut input: &'a [u8]) -> Parser<Option<Instruction>> {
                         loop {
                             match input.split_first() {
                                 Some((&b']', next_input)) =>
-                                    return Ok((Some((Instruction::Loop(program))), next_input)),
+                                    return Ok((Some(Instruction::Loop(program)), next_input)),
                                 Some((_, next_input)) =>
                                     input = next_input,
                                 None =>

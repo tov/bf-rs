@@ -1,8 +1,11 @@
-default: build
-hard: test
+default: clippy
+hard: doc
 
 CRATE = bf
 REPO  = bf-rs
+
+clippy:
+	rustup run nightly cargo build --features=clippy\ jit
 
 doc:
 	rustup run nightly cargo doc --no-deps -p $(CRATE) --features=jit

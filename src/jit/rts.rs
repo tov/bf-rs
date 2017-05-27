@@ -40,13 +40,13 @@ pub struct RtsState<'a> {
 ///
 /// # Parameters
 ///
-/// `<'a>': the lifetime of the channel references in the run-time system state.
+/// `<'a>` – the lifetime of the channel references in the run-time system state.
 ///
-/// `memory`: the address of the beginning of memory (also where the pointer starts).
+/// `memory` – the address of the beginning of memory (also where the pointer starts).
 ///
-/// `memory_size`: the amount of memory allocated, defaults to 30_000 bytes.
+/// `memory_size` – the amount of memory allocated, defaults to 30,000 bytes.
 ///
-/// `rts_state`: the state that the run-time system needs to do I/O.
+/// `rts_state` – the state that the run-time system needs to do I/O.
 type EntryFunction<'a> = extern "win64" fn(memory: *mut u8,
                                            memory_size: u64,
                                            rts_state: *mut RtsState<'a>) -> u64;
