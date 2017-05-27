@@ -66,6 +66,10 @@
 <span id="21">21</span>
 <span id="22">22</span>
 <span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Brainfuck bytecode, flat instead of an abstract syntax tree.</span>
 <span class="doccomment">//!</span>
@@ -79,6 +83,10 @@
 <span class="doccomment">//! run-length encoding for some instructions, with moving and arithmetic</span>
 <span class="doccomment">//! commands taking the count as a parameter. It also includes the</span>
 <span class="doccomment">//! instructions produced by the peephole optimizer.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Flattening is not necessary for interpretation, but it might</span>
+<span class="doccomment">//! perform better because of the cache. So far, it appears</span>
+<span class="doccomment">//! to perform worse than the peephole-optimized AST.</span>
 
 <span class="kw">use</span> <span class="ident">common</span>;
 
