@@ -32,13 +32,13 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
 
             JumpZero(address) => {
                 if state.load() == 0 {
-                    pc = address;
+                    pc = address as usize;
                 }
             }
 
             JumpNotZero(address) => {
                 if state.load() != 0 {
-                    pc = address;
+                    pc = address as usize;
                 }
             }
 

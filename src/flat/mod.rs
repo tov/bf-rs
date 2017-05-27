@@ -19,6 +19,8 @@ pub use self::compiler::compile;
 /// A program is a flat sequence of instructions.
 pub type Program = [Instruction];
 
+pub use peephole::Count;
+
 /// Instructions as output by the bytecode flattener.
 ///
 /// Unlike in the earlier passes, the loop instructions
@@ -33,9 +35,9 @@ pub type Program = [Instruction];
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Instruction {
     /// Decrease the pointer by the specified offset.
-    Left(usize),
+    Left(Count),
     /// Increase the pointer by the specified offset.
-    Right(usize),
+    Right(Count),
     /// Increase the current byte value by the specified offset.
     Change(u8),
     /// Read a byte of input.
@@ -43,9 +45,9 @@ pub enum Instruction {
     /// Write a byte of output.
     Out,
     /// Begin a loop, jumping to the end if the current byte value.
-    JumpZero(usize),
+    JumpZero(Count),
     /// End a loop if the current byte value is 0; otherwise repeat the loop.
-    JumpNotZero(usize),
+    JumpNotZero(Count),
     /// Set the current byte value to 0.
     ///
     /// Equivalent to the concrete Braincode loop `[-]`.
@@ -54,19 +56,19 @@ pub enum Instruction {
     /// pointer.
     ///
     /// `OffsetAddRight(5)` is equivalent to the concrete Brainfuck loop `[->>>>>+<<<<<]`.
-    OffsetAddRight(usize),
+    OffsetAddRight(Count),
     /// Add the byte at the pointer to the byte at the specified offset and zero the byte at the
     /// pointer.
     ///
     /// `OffsetAddRight(5)` is equivalent to the concrete Brainfuck loop `[-<<<<<+>>>>>]`.
-    OffsetAddLeft(usize),
-    /// Finds the nearest zero to the left that appears offset by a multiple of the given `usize`.
+    OffsetAddLeft(Count),
+    /// Finds the nearest zero to the left that appears offset by a multiple of the given `Count`.
     ///
     /// `FindZeroRight(3)` is equivalent to the concrete Brainfuck loop `[>>>]`.
-    FindZeroRight(usize),
-    /// Finds the nearest zero to the right that appears offset by a multiple of the given `usize`.
+    FindZeroRight(Count),
+    /// Finds the nearest zero to the right that appears offset by a multiple of the given `Count`.
     ///
     /// `FindZeroLeft(3)` is equivalent to the concrete Brainfuck loop `[<<<]`.
-    FindZeroLeft(usize),
+    FindZeroLeft(Count),
 }
 

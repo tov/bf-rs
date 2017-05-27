@@ -31,9 +31,9 @@ fn interpret_instruction<R, W>(instructions: &Instruction, state: &mut State,
     where R: Read, W: Write
 {
     match *instructions {
-        Instruction::Left(count) => state.left(count)?,
+        Instruction::Left(count) => state.left(count as usize)?,
 
-        Instruction::Right(count) => state.right(count)?,
+        Instruction::Right(count) => state.right(count as usize)?,
 
         Instruction::Change(amount) => state.up(amount),
 
@@ -47,7 +47,7 @@ fn interpret_instruction<R, W>(instructions: &Instruction, state: &mut State,
             let value = state.load();
             if value != 0 {
                 state.store(0);
-                state.up_pos_offset(offset, value)?;
+                state.up_pos_offset(offset as usize, value)?;
             }
         }
 
@@ -55,19 +55,19 @@ fn interpret_instruction<R, W>(instructions: &Instruction, state: &mut State,
             let value = state.load();
             if value != 0 {
                 state.store(0);
-                state.up_neg_offset(offset, value)?;
+                state.up_neg_offset(offset as usize, value)?;
             }
         }
 
         Instruction::FindZeroRight(skip) => {
             while state.load() != 0 {
-                state.right(skip)?;
+                state.right(skip as usize)?;
             }
         }
 
         Instruction::FindZeroLeft(skip) => {
             while state.load() != 0 {
-                state.left(skip)?;
+                state.left(skip as usize)?;
             }
         }
 

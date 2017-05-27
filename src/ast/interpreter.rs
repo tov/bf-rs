@@ -35,8 +35,8 @@ fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
     use super::Command::*;
 
     match *instruction {
-        Cmd(Left) => state.left(1)?,
-        Cmd(Right) => state.right(1)?,
+        Cmd(Left) => state.left(1usize)?,
+        Cmd(Right) => state.right(1usize)?,
         Cmd(Up) => state.up(1),
         Cmd(Down) => state.down(1),
         Cmd(In) => state.read(input),

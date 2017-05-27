@@ -2,7 +2,7 @@ use dynasmrt::x64::Assembler;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use super::*;
-use peephole;
+use peephole::{self, Count};
 
 dynasm!(asm
     ; .alias pointer, r12
@@ -187,7 +187,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction,
     }
 }
 
-fn load_pos_offset(asm: &mut Assembler, offset: usize, checked: bool) {
+fn load_pos_offset(asm: &mut Assembler, offset: Count, checked: bool) {
     dynasm!(asm
         ; mov rax, QWORD offset as i64
     );
@@ -202,7 +202,7 @@ fn load_pos_offset(asm: &mut Assembler, offset: usize, checked: bool) {
     }
 }
 
-fn load_neg_offset(asm: &mut Assembler, offset: usize, checked: bool) {
+fn load_neg_offset(asm: &mut Assembler, offset: Count, checked: bool) {
     dynasm!(asm
         ; mov rax, QWORD offset as i64
     );

@@ -9,6 +9,7 @@ use std::mem;
 use std::num::Wrapping;
 
 use common::{BfResult, Error};
+use traits::IntoUsize;
 
 /// (`== 30_000`) The default number of 8-bit memory cells, as used by
 /// [`State::new`](struct.State.html#method.new).
@@ -42,7 +43,7 @@ impl State {
     ///
     /// Return `Err` if pointer would go below 0.
     #[inline]
-    pub fn left(&mut self, count: usize) -> BfResult<()> {
+    pub fn left<C: IntoUsize>(&mut self, count: C) -> BfResult<()> {
         self.pointer = self.neg_offset(count)?;
         Ok(())
     }
@@ -53,13 +54,14 @@ impl State {
     ///
     /// Return `Err` if pointer would go past the end of the memory.
     #[inline]
-    pub fn right(&mut self, count: usize) -> BfResult<()> {
+    pub fn right<C: IntoUsize>(&mut self, count: C) -> BfResult<()> {
         self.pointer = self.pos_offset(count)?;
         Ok(())
     }
 
     #[inline]
-    fn pos_offset(&self, offset: usize) -> BfResult<usize> {
+    fn pos_offset<C: IntoUsize>(&self, offset: C) -> BfResult<usize> {
+        let offset = offset.into_usize();
         if self.pointer + offset < self.memory.len() {
             Ok(self.pointer + offset)
         } else {
@@ -68,7 +70,8 @@ impl State {
     }
 
     #[inline]
-    fn neg_offset(&self, offset: usize) -> BfResult<usize> {
+    fn neg_offset<C: IntoUsize>(&self, offset: C) -> BfResult<usize> {
+        let offset = offset.into_usize();
         if self.pointer >= offset {
             Ok(self.pointer - offset)
         } else {
@@ -106,7 +109,7 @@ impl State {
 
     /// Adds the given value at the given positive offset from the pointer.
     #[inline]
-    pub fn up_pos_offset(&mut self, offset: usize, value: u8) -> BfResult<()> {
+    pub fn up_pos_offset<C: IntoUsize>(&mut self, offset: C, value: u8) -> BfResult<()> {
         let address = self.pos_offset(offset)?;
         self.memory[address] += Wrapping(value);
         Ok(())
@@ -114,7 +117,7 @@ impl State {
 
     /// Adds the given value at the given negative offset from the pointer.
     #[inline]
-    pub fn up_neg_offset(&mut self, offset: usize, value: u8) -> BfResult<()> {
+    pub fn up_neg_offset<C: IntoUsize>(&mut self, offset: C, value: u8) -> BfResult<()> {
         let address = self.neg_offset(offset)?;
         self.memory[address] += Wrapping(value);
         Ok(())
@@ -163,7 +166,7 @@ mod tests {
         let mut actual = make(&[0, 0, 0], 0);
         let expected = make(&[0, 0, 0], 1);
 
-        actual.right(1).unwrap();
+        actual.right(1usize).unwrap();
 
         assert_eq!(actual, expected);
     }
@@ -173,8 +176,8 @@ mod tests {
         let mut actual = make(&[0, 0, 0], 0);
         let expected = make(&[0, 0, 0], 0);
 
-        actual.right(1).unwrap();
-        actual.left(1).unwrap();
+        actual.right(1usize).unwrap();
+        actual.left(1usize).unwrap();
 
         assert_eq!(actual, expected);
     }
@@ -205,7 +208,7 @@ mod tests {
         let mut actual = make(&[0, 0, 0], 0);
         actual.store(5);
         assert_eq!(actual, make(&[5, 0, 0], 0));
-        actual.right(1).unwrap();
+        actual.right(1usize).unwrap();
         actual.store(8);
         assert_eq!(actual, make(&[5, 8, 0], 1));
     }
@@ -217,13 +220,13 @@ mod tests {
         assert_eq!(actual, make(&[1, 0, 0], 0));
         actual.up(1);
         assert_eq!(actual, make(&[2, 0, 0], 0));
-        actual.right(1).unwrap();
+        actual.right(1usize).unwrap();
         assert_eq!(actual, make(&[2, 0, 0], 1));
         actual.down(1);
         assert_eq!(actual, make(&[2, 255, 0], 1));
         actual.down(1);
         assert_eq!(actual, make(&[2, 254, 0], 1));
-        actual.right(1).unwrap();
+        actual.right(1usize).unwrap();
         assert_eq!(actual, make(&[2, 254, 0], 2));
         actual.store(77);
         assert_eq!(actual, make(&[2, 254, 77], 2));
@@ -232,8 +235,8 @@ mod tests {
     #[test]
     fn right_to_right_edge_is_okay() {
         let mut actual = make(&[0, 0, 0], 0);
-        actual.right(1).unwrap();
-        actual.right(1).unwrap();
+        actual.right(1usize).unwrap();
+        actual.right(1usize).unwrap();
         assert_eq!(actual, make(&[0, 0, 0], 2));
     }
 
@@ -241,16 +244,16 @@ mod tests {
     #[should_panic]
     fn right_past_edge_is_error() {
         let mut actual = make(&[0, 0, 0], 0);
-        actual.right(1).unwrap();
-        actual.right(1).unwrap();
-        actual.right(1).unwrap();
+        actual.right(1usize).unwrap();
+        actual.right(1usize).unwrap();
+        actual.right(1usize).unwrap();
     }
 
     #[test]
     #[should_panic]
     fn move_left_is_error() {
         let mut machine = make(&[0, 0, 0], 0);
-        machine.left(1).unwrap();
+        machine.left(1usize).unwrap();
     }
 
     fn make(memory: &[u8], pointer: usize) -> State {

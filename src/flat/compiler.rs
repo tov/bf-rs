@@ -1,5 +1,6 @@
 use super::*;
 use peephole;
+use rle::usize_to_count;
 
 /// Compiles peephole-optimized AST to a flat bytecode program.
 pub fn compile(src: &[peephole::Instruction]) -> Box<Program> {
@@ -41,8 +42,8 @@ impl Compiler {
                     self.issue(Obj::JumpZero(0));
                     self.compile(body);
                     let end_pc = self.instructions.len();
-                    self.issue(Obj::JumpNotZero(begin_pc));
-                    self.instructions[begin_pc] = Obj::JumpZero(end_pc);
+                    self.issue(Obj::JumpNotZero(usize_to_count(begin_pc)));
+                    self.instructions[begin_pc] = Obj::JumpZero(usize_to_count(end_pc));
                 }
             }
         }

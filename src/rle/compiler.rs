@@ -12,7 +12,7 @@ pub fn compile(program: &[ast::Instruction]) -> Box<Program> {
 pub struct Compiler {
     instructions: Vec<Instruction>,
     last_command: Command,
-    last_repeat: usize,
+    last_repeat: Count,
 }
 
 impl Compiler {

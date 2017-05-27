@@ -20,13 +20,15 @@ pub use self::compiler::compile;
 /// All instructions are leaves except for the `Loop` instruction, which contains a boxed `Program`.
 pub type Program = [Instruction];
 
+pub use rle::Count;
+
 /// Instructions as output by the peephole optimizer.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Instruction {
     /// Decrease the pointer by the specified offset.
-    Left(usize),
+    Left(Count),
     /// Increase the pointer by the specified offset.
-    Right(usize),
+    Right(Count),
     /// Increase the current byte value by the specified offset.
     ///
     /// Because arithmetic is modulo 256, this implements subtraction as well as addition.
@@ -43,20 +45,20 @@ pub enum Instruction {
     /// pointer.
     ///
     /// `OffsetAddRight(5)` is equivalent to the concrete Brainfuck loop `[->>>>>+<<<<<]`.
-    OffsetAddRight(usize),
+    OffsetAddRight(Count),
     /// Add the byte at the pointer to the byte at the specified offset and zero the byte at the
     /// pointer.
     ///
     /// `OffsetAddRight(5)` is equivalent to the concrete Brainfuck loop `[-<<<<<+>>>>>]`.
-    OffsetAddLeft(usize),
+    OffsetAddLeft(Count),
     /// Finds the nearest zero to the left that appears offset by a multiple of the given `usize`.
     ///
     /// `FindZeroRight(3)` is equivalent to the concrete Brainfuck loop `[>>>]`.
-    FindZeroRight(usize),
+    FindZeroRight(Count),
     /// Finds the nearest zero to the right that appears offset by a multiple of the given `usize`.
     ///
     /// `FindZeroLeft(3)` is equivalent to the concrete Brainfuck loop `[<<<]`.
-    FindZeroLeft(usize),
+    FindZeroLeft(Count),
     /// A loop.
     Loop(Box<[Instruction]>),
 }

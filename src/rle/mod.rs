@@ -18,7 +18,7 @@ use common::Command;
 pub type Program = [Instruction];
 
 /// The number of times to repeat a command.
-pub type Count = usize;
+pub type Count = u16;
 
 /// A run-length encoded BF instruction.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -33,3 +33,9 @@ pub enum Instruction {
     Loop(Box<[Instruction]>),
 }
 
+/// Converts a `usize` to a `Count`, panicking if the `usize` is out of range.
+pub fn usize_to_count(count: usize) -> Count {
+    let result: Count = count as Count;
+    assert_eq!(result as usize, count);
+    result
+}
