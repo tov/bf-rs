@@ -80,12 +80,6 @@ pub type Count = u32;
 /// Unlike in the earlier passes, the loop instructions
 /// do not include a boxed slice of instructions as a
 /// subtree. Note that this type is `Copy`.
-///
-/// This is not necessary for interpretation, but it might
-/// perform better because of the cache. So far, it appears
-/// to perform worse than the peephole-optimized AST, but
-/// I’m going to try making the operations fit in a word
-/// instead of two to see if that goes faster.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Instruction {
     /// Decrease the pointer by the specified offset.

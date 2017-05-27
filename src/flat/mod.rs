@@ -10,6 +10,10 @@
 //! run-length encoding for some instructions, with moving and arithmetic
 //! commands taking the count as a parameter. It also includes the
 //! instructions produced by the peephole optimizer.
+//!
+//! Flattening is not necessary for interpretation, but it might
+//! perform better because of the cache. So far, it appears
+//! to perform worse than the peephole-optimized AST.
 
 use common;
 
