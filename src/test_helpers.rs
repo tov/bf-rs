@@ -5,10 +5,10 @@ use std::str;
 use common::BfResult;
 use traits::Interpretable;
 
-/// Source of the factoring program from [`../bf/factor.bf`].
+/// Source of the factoring program from `../bf/factor.bf`.
 pub const FACTOR_SRC: &'static [u8] = include_bytes!("../bf/factor.bf");
 
-/// Source of a hello program.
+/// Source of a “hello world” program.
 pub const HELLO_WORLD_SRC: &'static [u8] =
     b"++++++[>++++++++++++<-]>.\
       >++++++++++[>++++++++++<-]>+.\
