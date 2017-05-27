@@ -2,7 +2,7 @@
 //!
 //! ```
 //! USAGE:
-//! bfi [FLAGS] [OPTIONS] [--] [INPUT]...
+//! bfi [FLAGS] [OPTIONS] [--] [FILE]...
 //!
 //! FLAGS:
 //! --ast          Interpret the unoptimized AST
@@ -19,7 +19,7 @@
 //! -s, --size <SIZE>       Memory size in bytes (default 30,000)
 //!
 //! ARGS:
-//! <INPUT>...    The source file(s) to interpret
+//! <FILE>...    The source file(s) to interpret
 //! ```
 //!
 //! See [the library crate documentation](../bf/index.html) for more.
@@ -156,7 +156,7 @@ fn get_options() -> Options {
         for e in exprs {
             result.program_text.extend(e.as_bytes());
         }
-    } else if let Some(files) = matches.values_of("INPUT") {
+    } else if let Some(files) = matches.values_of("FILE") {
         for f in files {
             let mut file = File::open(f)
                 .unwrap_or_else(|e| error_exit(1, format!("{}: {}", e, f)));
@@ -182,8 +182,8 @@ fn build_clap_app() -> App<'static, 'static> {
             .help("BF code to execute")
             .multiple(true)
             .takes_value(true)
-            .conflicts_with("INPUT"))
-        .arg(Arg::with_name("INPUT")
+            .conflicts_with("FILE"))
+        .arg(Arg::with_name("FILE")
             .help("The source file(s) to interpret")
             .multiple(true)
             .conflicts_with("expr")

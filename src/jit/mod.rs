@@ -4,7 +4,7 @@
 //! machine code from peephole-optimized AST. This is currently the fastest implementation,
 //! but it is available only on nightly Rust because `dynasm` uses a plugin.
 //!
-//! In the `bfi` interpreter, this pass is enabled by the `--jit` flag.
+//! In the `bfi` interpreter, this pass is enabled by default if compiled in.
 //! To go even faster, pass the `--unchecked` flag to the `bfi` interpreter to disable
 //! memory bounds checking in the generated code. Note that this runs Brainfuck in
 //! unsafe mode, which means that programs that move the pointer outside the allocated
