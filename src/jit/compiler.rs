@@ -284,6 +284,10 @@ impl Compiler {
     }
 }
 
+/// The abstract interpreter tracks an abstraction of the pointer position.
+///
+/// In particular, it tracks the minimum distances from each end of memory. This can be used to
+/// prove some bounds checks unnecessary.
 #[derive(Debug, Clone)]
 struct AbstractInterpreter {
     /// The minimum distance from the bottom of memory.
@@ -293,6 +297,7 @@ struct AbstractInterpreter {
 }
 
 impl AbstractInterpreter {
+    /// In the initial state, we know nothing.
     fn new() -> Self {
         AbstractInterpreter {
             low_mark: 0,
@@ -300,6 +305,9 @@ impl AbstractInterpreter {
         }
     }
 
+    /// Moves the pointer the given distance to the left.
+    ///
+    /// Returns whether we can prove that this move will not underflow.
     fn left(&mut self, count: Count) -> bool {
         let count = count as usize;
 
@@ -313,6 +321,9 @@ impl AbstractInterpreter {
         }
     }
 
+    /// Moves the pointer the given distance to the right.
+    ///
+    /// Returns whether we can prove that this move will not overflow.
     fn right(&mut self, count: Count) -> bool {
         let count = count as usize;
 
@@ -326,14 +337,23 @@ impl AbstractInterpreter {
         }
     }
 
+    /// Resets the left mark.
+    ///
+    /// This is used when we may move an arbitrary distance to the left.
     fn reset_left(&mut self) {
         self.low_mark = 0;
     }
 
+    /// Resets the right mark.
+    ///
+    /// This is used when we may move an arbitrary distance to the right.
     fn reset_right(&mut self) {
         self.high_mark = 0;
     }
 
+    /// Resets both marks.
+    ///
+    /// This is used when we enter and leave a loop.
     fn reset(&mut self) {
         self.reset_left();
         self.reset_right();
