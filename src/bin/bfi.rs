@@ -8,8 +8,8 @@
 //! --ast          Interpret the unoptimized AST
 //! --flat         Flatten to bytecode (implies --peep)
 //! -h, --help         Prints help information
-//! --jit          JIT to native x64 (implies --peep)
-//! --peep         Peephole optimize (default, implies --rle)
+//! --jit          JIT to native x64 (default, implies --peep)
+//! --peep         Peephole optimize (implies --rle)
 //! --rle          Run-length encode the AST
 //! -u, --unchecked    Omit memory bounds checks in JIT
 //! -V, --version      Prints version information
