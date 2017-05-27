@@ -43,7 +43,7 @@ use bf::jit;
 
 use bf::traits::Interpretable;
 
-const VERSION: &'static str = "0.2.5";
+const VERSION: &'static str = "0.2.6";
 
 #[derive(Debug, Clone)]
 struct Options {

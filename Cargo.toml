@@ -1,6 +1,6 @@
 [package]
 name = "bf"
-version = "0.2.5"
+version = "0.2.6"
 authors = ["Jesse A. Tov <jesse.tov@gmail.com>"]
 description = "An optimizing Brainfuck implementation framework"
 repository = "https://github.com/tov/bf-rs"
