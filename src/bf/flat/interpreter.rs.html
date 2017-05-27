@@ -178,7 +178,7 @@
         <span class="kw">match</span> <span class="ident">instructions</span>[<span class="ident">pc</span>] {
             <span class="ident">Left</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">left</span>(<span class="ident">count</span>)<span class="question-mark">?</span>,
             <span class="ident">Right</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">right</span>(<span class="ident">count</span>)<span class="question-mark">?</span>,
-            <span class="ident">Change</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">up</span>(<span class="ident">count</span>),
+            <span class="ident">Add</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">up</span>(<span class="ident">count</span>),
             <span class="ident">In</span> <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">read</span>(<span class="ident">input</span>),
             <span class="ident">Out</span> <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">write</span>(<span class="ident">output</span>),
 

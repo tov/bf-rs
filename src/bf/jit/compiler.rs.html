@@ -384,6 +384,26 @@
 <span id="339">339</span>
 <span id="340">340</span>
 <span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::<span class="ident">x64</span>::<span class="ident">Assembler</span>;
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::{<span class="ident">DynasmApi</span>, <span class="ident">DynasmLabelApi</span>};
@@ -512,7 +532,7 @@
                 );
             }
 
-            <span class="ident">Instr</span>(<span class="ident">Change</span>(<span class="ident">count</span>)) <span class="op">=&gt;</span> {
+            <span class="ident">Instr</span>(<span class="ident">Add</span>(<span class="ident">count</span>)) <span class="op">=&gt;</span> {
                 <span class="macro">dynasm</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">asm</span>
                     ; <span class="ident">add</span> [<span class="ident">pointer</span>], <span class="ident">BYTE</span> <span class="ident">count</span> <span class="kw">as</span> <span class="ident">i8</span>
                 );
@@ -671,6 +691,10 @@
     }
 }
 
+<span class="doccomment">/// The abstract interpreter tracks an abstraction of the pointer position.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// In particular, it tracks the minimum distances from each end of memory. This can be used to</span>
+<span class="doccomment">/// prove some bounds checks unnecessary.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">struct</span> <span class="ident">AbstractInterpreter</span> {
     <span class="doccomment">/// The minimum distance from the bottom of memory.</span>
@@ -680,6 +704,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AbstractInterpreter</span> {
+    <span class="doccomment">/// In the initial state, we know nothing.</span>
     <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">AbstractInterpreter</span> {
             <span class="ident">low_mark</span>: <span class="number">0</span>,
@@ -687,6 +712,9 @@
         }
     }
 
+    <span class="doccomment">/// Moves the pointer the given distance to the left.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns whether we can prove that this move will not underflow.</span>
     <span class="kw">fn</span> <span class="ident">left</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">Count</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>;
 
@@ -700,6 +728,9 @@
         }
     }
 
+    <span class="doccomment">/// Moves the pointer the given distance to the right.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns whether we can prove that this move will not overflow.</span>
     <span class="kw">fn</span> <span class="ident">right</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">Count</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>;
 
@@ -713,14 +744,23 @@
         }
     }
 
+    <span class="doccomment">/// Resets the left mark.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is used when we may move an arbitrary distance to the left.</span>
     <span class="kw">fn</span> <span class="ident">reset_left</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">low_mark</span> <span class="op">=</span> <span class="number">0</span>;
     }
 
+    <span class="doccomment">/// Resets the right mark.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is used when we may move an arbitrary distance to the right.</span>
     <span class="kw">fn</span> <span class="ident">reset_right</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">high_mark</span> <span class="op">=</span> <span class="number">0</span>;
     }
 
+    <span class="doccomment">/// Resets both marks.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is used when we enter and leave a loop.</span>
     <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">reset_left</span>();
         <span class="self">self</span>.<span class="ident">reset_right</span>();
