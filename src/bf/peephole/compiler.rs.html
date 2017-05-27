@@ -176,22 +176,28 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rle</span>;
 
-
 <span class="doccomment">/// Peephole-optimizes run-length encoded AST.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// See [`Instruction`](struct.Instruction.html) for descriptions of the peepholes.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">rle</span>::<span class="ident">Instruction</span>]) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Program</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">rle</span>::<span class="ident">Statement</span>]) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Program</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">compiler</span> <span class="op">=</span> <span class="ident">Compiler</span>::<span class="ident">new</span>();
     <span class="ident">compiler</span>.<span class="ident">compile</span>(<span class="ident">src</span>);
     <span class="ident">compiler</span>.<span class="ident">into_program</span>()
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Compiler</span> {
-    <span class="ident">instructions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Instruction</span><span class="op">&gt;</span>,
+    <span class="ident">instructions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&gt;</span>,
 }
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">or_else</span> {
@@ -206,32 +212,33 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">rle</span>::<span class="ident">Instruction</span>]) {
-        <span class="kw">use</span> <span class="ident">rle</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">rle</span>::<span class="ident">Statement</span>]) {
+        <span class="kw">use</span> <span class="ident">rle</span>::<span class="ident">Statement</span>::<span class="kw-2">*</span>;
         <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Command</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Instruction</span> <span class="kw">as</span> <span class="ident">Obj</span>;
 
         <span class="kw">for</span> <span class="ident">instruction</span> <span class="kw">in</span> <span class="ident">src</span> {
             <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">instruction</span> {
                 <span class="ident">Cmd</span>(<span class="ident">Right</span>, <span class="ident">count</span>) <span class="op">=&gt;</span>
-                    <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Instruction</span>::<span class="ident">Right</span>(<span class="ident">count</span>)),
+                    <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Obj</span>::<span class="ident">Right</span>(<span class="ident">count</span>)),
                 <span class="ident">Cmd</span>(<span class="ident">Left</span>, <span class="ident">count</span>) <span class="op">=&gt;</span>
-                    <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Instruction</span>::<span class="ident">Left</span>(<span class="ident">count</span>)),
+                    <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Obj</span>::<span class="ident">Left</span>(<span class="ident">count</span>)),
                 <span class="ident">Cmd</span>(<span class="ident">Up</span>, <span class="ident">count</span>) <span class="op">=&gt;</span> {
                     <span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> (<span class="ident">count</span> <span class="op">%</span> <span class="number">256</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-                    <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Instruction</span>::<span class="ident">Change</span>(<span class="ident">amount</span>));
+                    <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Obj</span>::<span class="ident">Change</span>(<span class="ident">amount</span>));
                 }
                 <span class="ident">Cmd</span>(<span class="ident">Down</span>, <span class="ident">count</span>) <span class="op">=&gt;</span> {
                     <span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> (<span class="number">256</span> <span class="op">-</span> <span class="ident">count</span> <span class="op">%</span> <span class="number">256</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-                    <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Instruction</span>::<span class="ident">Change</span>(<span class="ident">amount</span>));
+                    <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Obj</span>::<span class="ident">Change</span>(<span class="ident">amount</span>));
                 }
                 <span class="ident">Cmd</span>(<span class="ident">In</span>, <span class="ident">count</span>) <span class="op">=&gt;</span> {
                     <span class="kw">for</span> _ <span class="kw">in</span> <span class="number">0</span> .. <span class="ident">count</span> {
-                        <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Instruction</span>::<span class="ident">In</span>);
+                        <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Obj</span>::<span class="ident">In</span>);
                     }
                 }
                 <span class="ident">Cmd</span>(<span class="ident">Out</span>, <span class="ident">count</span>) <span class="op">=&gt;</span> {
                     <span class="kw">for</span> _ <span class="kw">in</span> <span class="number">0</span> .. <span class="ident">count</span> {
-                        <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Instruction</span>::<span class="ident">Out</span>);
+                        <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Obj</span>::<span class="ident">Out</span>);
                     }
                 }
                 <span class="ident">Cmd</span>(<span class="ident">Begin</span>, _) <span class="op">|</span> <span class="ident">Cmd</span>(<span class="ident">End</span>, _) <span class="op">=&gt;</span>
@@ -249,7 +256,7 @@
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">instr</span>) <span class="op">=</span> <span class="ident">peephole</span> {
                         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">instr</span>);
                     } <span class="kw">else</span> {
-                        <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">Instruction</span>::<span class="ident">Loop</span>(<span class="ident">body</span>))
+                        <span class="self">self</span>.<span class="ident">instructions</span>.<span class="ident">push</span>(<span class="ident">Statement</span>::<span class="ident">Loop</span>(<span class="ident">body</span>))
                     }
                 }
             }
@@ -260,27 +267,33 @@
         <span class="self">self</span>.<span class="ident">instructions</span>.<span class="ident">into_boxed_slice</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">instr</span>: <span class="ident">Instruction</span>) {
-        <span class="self">self</span>.<span class="ident">instructions</span>.<span class="ident">push</span>(<span class="ident">instr</span>);
+    <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">instr</span>: <span class="ident">common</span>::<span class="ident">Instruction</span>) {
+        <span class="self">self</span>.<span class="ident">instructions</span>.<span class="ident">push</span>(<span class="ident">Statement</span>::<span class="ident">Instr</span>(<span class="ident">instr</span>));
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_zero_peephole</span>(<span class="ident">body</span>: <span class="kw-2">&amp;</span>[<span class="ident">Instruction</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instruction</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_zero_peephole</span>(<span class="ident">body</span>: <span class="kw-2">&amp;</span>[<span class="ident">Statement</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">common</span>::<span class="ident">Instruction</span><span class="op">&gt;</span> {
+    <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Statement</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+
     <span class="kw">if</span> <span class="ident">body</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span>
-        <span class="ident">body</span>[<span class="number">0</span>] <span class="op">==</span> <span class="ident">Instruction</span>::<span class="ident">Change</span>(<span class="number">1</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">Instruction</span>::<span class="ident">SetZero</span>)
+        <span class="ident">body</span>[<span class="number">0</span>] <span class="op">==</span> <span class="ident">Instr</span>(<span class="ident">Change</span>(<span class="number">1</span>)) {
+        <span class="prelude-val">Some</span>(<span class="ident">SetZero</span>)
     } <span class="kw">else</span> {
         <span class="prelude-val">None</span>
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_zero_peephole</span>(<span class="ident">body</span>: <span class="kw-2">&amp;</span>[<span class="ident">Instruction</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instruction</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_zero_peephole</span>(<span class="ident">body</span>: <span class="kw-2">&amp;</span>[<span class="ident">Statement</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">common</span>::<span class="ident">Instruction</span><span class="op">&gt;</span> {
+    <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Statement</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+
     <span class="kw">if</span> <span class="ident">body</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
         <span class="kw">match</span> <span class="ident">body</span>[<span class="number">0</span>] {
-            <span class="ident">Instruction</span>::<span class="ident">Right</span>(<span class="ident">count</span>) <span class="op">=&gt;</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Instruction</span>::<span class="ident">FindZeroRight</span>(<span class="ident">count</span>)),
-            <span class="ident">Instruction</span>::<span class="ident">Left</span>(<span class="ident">count</span>) <span class="op">=&gt;</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Instruction</span>::<span class="ident">FindZeroLeft</span>(<span class="ident">count</span>)),
+            <span class="ident">Instr</span>(<span class="ident">Right</span>(<span class="ident">count</span>)) <span class="op">=&gt;</span>
+                <span class="prelude-val">Some</span>(<span class="ident">FindZeroRight</span>(<span class="ident">count</span>)),
+            <span class="ident">Instr</span>(<span class="ident">Left</span>(<span class="ident">count</span>)) <span class="op">=&gt;</span>
+                <span class="prelude-val">Some</span>(<span class="ident">FindZeroLeft</span>(<span class="ident">count</span>)),
             _ <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
         }
     } <span class="kw">else</span> {
@@ -288,19 +301,20 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">offset_add_peephole</span>(<span class="ident">body</span>: <span class="kw-2">&amp;</span>[<span class="ident">Instruction</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instruction</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">offset_add_peephole</span>(<span class="ident">body</span>: <span class="kw-2">&amp;</span>[<span class="ident">Statement</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">common</span>::<span class="ident">Instruction</span><span class="op">&gt;</span> {
+    <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Statement</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
 
     <span class="kw">if</span> <span class="ident">body</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">4</span> {
         <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">body</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">body</span>[<span class="number">1</span>], <span class="kw-2">&amp;</span><span class="ident">body</span>[<span class="number">2</span>], <span class="kw-2">&amp;</span><span class="ident">body</span>[<span class="number">3</span>]) {
-            (<span class="kw-2">&amp;</span><span class="ident">Change</span>(<span class="number">255</span>), <span class="kw-2">&amp;</span><span class="ident">Right</span>(<span class="ident">count_l</span>), <span class="kw-2">&amp;</span><span class="ident">Change</span>(<span class="number">1</span>), <span class="kw-2">&amp;</span><span class="ident">Left</span>(<span class="ident">count_r</span>))
+            (<span class="kw-2">&amp;</span><span class="ident">Instr</span>(<span class="ident">Change</span>(<span class="number">255</span>)), <span class="kw-2">&amp;</span><span class="ident">Instr</span>(<span class="ident">Right</span>(<span class="ident">count_l</span>)), <span class="kw-2">&amp;</span><span class="ident">Instr</span>(<span class="ident">Change</span>(<span class="number">1</span>)), <span class="kw-2">&amp;</span><span class="ident">Instr</span>(<span class="ident">Left</span>(<span class="ident">count_r</span>)))
             <span class="kw">if</span> <span class="ident">count_l</span> <span class="op">==</span> <span class="ident">count_r</span> <span class="op">=&gt;</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">Instruction</span>::<span class="ident">OffsetAddRight</span>(<span class="ident">count_l</span>))
+                <span class="prelude-val">Some</span>(<span class="ident">OffsetAddRight</span>(<span class="ident">count_l</span>))
             }
 
-            (<span class="kw-2">&amp;</span><span class="ident">Change</span>(<span class="number">255</span>), <span class="kw-2">&amp;</span><span class="ident">Left</span>(<span class="ident">count_l</span>), <span class="kw-2">&amp;</span><span class="ident">Change</span>(<span class="number">1</span>), <span class="kw-2">&amp;</span><span class="ident">Right</span>(<span class="ident">count_r</span>))
+            (<span class="kw-2">&amp;</span><span class="ident">Instr</span>(<span class="ident">Change</span>(<span class="number">255</span>)), <span class="kw-2">&amp;</span><span class="ident">Instr</span>(<span class="ident">Left</span>(<span class="ident">count_l</span>)), <span class="kw-2">&amp;</span><span class="ident">Instr</span>(<span class="ident">Change</span>(<span class="number">1</span>)), <span class="kw-2">&amp;</span><span class="ident">Instr</span>(<span class="ident">Right</span>(<span class="ident">count_r</span>)))
             <span class="kw">if</span> <span class="ident">count_l</span> <span class="op">==</span> <span class="ident">count_r</span> <span class="op">=&gt;</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">Instruction</span>::<span class="ident">OffsetAddLeft</span>(<span class="ident">count_l</span>))
+                <span class="prelude-val">Some</span>(<span class="ident">OffsetAddLeft</span>(<span class="ident">count_l</span>))
             }
 
             _ <span class="op">=&gt;</span> <span class="prelude-val">None</span>,

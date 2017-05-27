@@ -273,12 +273,18 @@
 <span id="228">228</span>
 <span id="229">229</span>
 <span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::<span class="ident">x64</span>::<span class="ident">Assembler</span>;
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::{<span class="ident">DynasmApi</span>, <span class="ident">DynasmLabelApi</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">peephole</span>::{<span class="self">self</span>, <span class="ident">Count</span>};
+<span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Count</span>;
+<span class="kw">use</span> <span class="ident">peephole</span>;
 
 <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
     ; .<span class="ident">alias</span> <span class="ident">pointer</span>, <span class="ident">r12</span>
@@ -335,37 +341,38 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">compile_sequence</span>(<span class="ident">asm</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Assembler</span>, <span class="ident">program</span>: <span class="kw-2">&amp;</span>[<span class="ident">peephole</span>::<span class="ident">Instruction</span>], <span class="ident">checked</span>: <span class="ident">bool</span>) {
+<span class="kw">fn</span> <span class="ident">compile_sequence</span>(<span class="ident">asm</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Assembler</span>, <span class="ident">program</span>: <span class="kw-2">&amp;</span>[<span class="ident">peephole</span>::<span class="ident">Statement</span>], <span class="ident">checked</span>: <span class="ident">bool</span>) {
     <span class="kw">for</span> <span class="ident">instruction</span> <span class="kw">in</span> <span class="ident">program</span> {
         <span class="ident">compile_instruction</span>(<span class="ident">asm</span>, <span class="ident">instruction</span>, <span class="ident">checked</span>);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">compile_instruction</span>(<span class="ident">asm</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Assembler</span>, <span class="ident">instruction</span>: <span class="kw-2">&amp;</span><span class="ident">peephole</span>::<span class="ident">Instruction</span>, <span class="ident">checked</span>: <span class="ident">bool</span>) {
-    <span class="kw">use</span> <span class="ident">peephole</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+<span class="kw">fn</span> <span class="ident">compile_instruction</span>(<span class="ident">asm</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Assembler</span>, <span class="ident">instruction</span>: <span class="kw-2">&amp;</span><span class="ident">peephole</span>::<span class="ident">Statement</span>, <span class="ident">checked</span>: <span class="ident">bool</span>) {
+    <span class="kw">use</span> <span class="ident">peephole</span>::<span class="ident">Statement</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
 
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">instruction</span> {
-        <span class="ident">Right</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> {
+        <span class="ident">Instr</span>(<span class="ident">Right</span>(<span class="ident">count</span>)) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
                 ;; <span class="ident">load_pos_offset</span>(<span class="ident">asm</span>, <span class="ident">count</span>, <span class="ident">checked</span>)
                 ; <span class="ident">add</span> <span class="ident">pointer</span>, <span class="ident">rax</span>
             );
         }
 
-        <span class="ident">Left</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> {
+        <span class="ident">Instr</span>(<span class="ident">Left</span>(<span class="ident">count</span>)) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
                 ;; <span class="ident">load_neg_offset</span>(<span class="ident">asm</span>, <span class="ident">count</span>, <span class="ident">checked</span>)
                 ; <span class="ident">sub</span> <span class="ident">pointer</span>, <span class="ident">rax</span>
             );
         }
 
-        <span class="ident">Change</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> {
+        <span class="ident">Instr</span>(<span class="ident">Change</span>(<span class="ident">count</span>)) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
                 ; <span class="ident">add</span> [<span class="ident">pointer</span>], <span class="ident">BYTE</span> <span class="ident">count</span> <span class="kw">as</span> <span class="ident">i8</span>
             );
         }
 
-        <span class="ident">In</span> <span class="op">=&gt;</span> {
+        <span class="ident">Instr</span>(<span class="ident">In</span>) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
                 ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">QWORD</span> <span class="ident">rts</span>::<span class="ident">RtsState</span>::<span class="ident">read</span> <span class="kw">as</span> _
                 ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rts</span>
@@ -376,7 +383,7 @@
             );
         }
 
-        <span class="ident">Out</span> <span class="op">=&gt;</span> {
+        <span class="ident">Instr</span>(<span class="ident">Out</span>) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
                 ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">QWORD</span> <span class="ident">rts</span>::<span class="ident">RtsState</span>::<span class="ident">write</span> <span class="kw">as</span> _
                 ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rts</span>
@@ -388,13 +395,13 @@
             );
         }
 
-        <span class="ident">SetZero</span> <span class="op">=&gt;</span> {
+        <span class="ident">Instr</span>(<span class="ident">SetZero</span>) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
                 ; <span class="ident">mov</span> <span class="ident">BYTE</span> [<span class="ident">pointer</span>], <span class="number">0</span>
             )
         }
 
-        <span class="ident">FindZeroRight</span>(<span class="ident">skip</span>) <span class="op">=&gt;</span> {
+        <span class="ident">Instr</span>(<span class="ident">FindZeroRight</span>(<span class="ident">skip</span>)) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
                 ; <span class="ident">jmp</span> <span class="op">&gt;</span><span class="ident">end_loop</span>
                 ; <span class="ident">begin_loop</span>:
@@ -406,7 +413,7 @@
             )
         }
 
-        <span class="ident">FindZeroLeft</span>(<span class="ident">skip</span>) <span class="op">=&gt;</span> {
+        <span class="ident">Instr</span>(<span class="ident">FindZeroLeft</span>(<span class="ident">skip</span>)) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
                 ; <span class="ident">jmp</span> <span class="op">&gt;</span><span class="ident">end_loop</span>
                 ; <span class="ident">begin_loop</span>:
@@ -418,7 +425,7 @@
             )
         }
 
-        <span class="ident">OffsetAddRight</span>(<span class="ident">offset</span>) <span class="op">=&gt;</span> {
+        <span class="ident">Instr</span>(<span class="ident">OffsetAddRight</span>(<span class="ident">offset</span>)) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
                 ; <span class="ident">cmp</span> <span class="ident">BYTE</span> [<span class="ident">pointer</span>], <span class="number">0</span>
                 ; <span class="ident">jz</span> <span class="op">&gt;</span><span class="ident">skip</span>
@@ -430,7 +437,7 @@
             );
         }
 
-        <span class="ident">OffsetAddLeft</span>(<span class="ident">offset</span>) <span class="op">=&gt;</span> {
+        <span class="ident">Instr</span>(<span class="ident">OffsetAddLeft</span>(<span class="ident">offset</span>)) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
                 ; <span class="ident">cmp</span> <span class="ident">BYTE</span> [<span class="ident">pointer</span>], <span class="number">0</span>
                 ; <span class="ident">jz</span> <span class="op">&gt;</span><span class="ident">skip</span>
@@ -442,6 +449,9 @@
                 ; <span class="ident">skip</span>:
             );
         }
+
+        <span class="ident">Instr</span>(<span class="ident">JumpZero</span>(_)) <span class="op">|</span> <span class="ident">Instr</span>(<span class="ident">JumpNotZero</span>(_)) <span class="op">=&gt;</span>
+            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unexpected jump instruction&quot;</span>),
 
         <span class="ident">Loop</span>(<span class="kw-2">ref</span> <span class="ident">body</span>) <span class="op">=&gt;</span> {
             <span class="kw">let</span> <span class="ident">begin_label</span> <span class="op">=</span> <span class="ident">asm</span>.<span class="ident">new_dynamic_label</span>();

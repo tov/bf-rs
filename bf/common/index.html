@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/common.rs.html#1-60' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/bf/common.rs.html#1-131' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Definitions common to multiple passes.</p>
 
 <p>This includes error handling and the basic definition of Brainfuck commands.</p>
@@ -67,6 +67,13 @@
                            <td class='docblock-short'>
                                 <p>The static and dynamic errors that can happen in Brainfuck.</p>
                            </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Instruction.html"
+                                  title='enum bf::common::Instruction'>Instruction</a></td>
+                           <td class='docblock-short'>
+                                <p>Instructions as output by the bytecode flattener.</p>
+                           </td>
                        </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -74,6 +81,13 @@
                                   title='type bf::common::BfResult'>BfResult</a></td>
                            <td class='docblock-short'>
                                 <p>The result type for Brainfuck operations that can fail.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="type" href="type.Count.html"
+                                  title='type bf::common::Count'>Count</a></td>
+                           <td class='docblock-short'>
+                                <p>The number of times to repeat a command when run-length encoded.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>

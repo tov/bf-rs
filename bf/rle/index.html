@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/rle/mod.rs.html#1-43' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/bf/rle/mod.rs.html#1-31' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Run-length encodes Brainfuck commands.</p>
 
 <p>In <code>bfi</code> by default, this pass runs after parsing and before peephole optimization. To run
@@ -60,8 +60,8 @@ of the same command with a run-length encoded instruction.</p>
 </div><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Instruction.html"
-                                  title='enum bf::rle::Instruction'>Instruction</a></td>
+                           <td><a class="enum" href="enum.Statement.html"
+                                  title='enum bf::rle::Statement'>Statement</a></td>
                            <td class='docblock-short'>
                                 <p>A run-length encoded BF instruction.</p>
                            </td>
@@ -76,17 +76,10 @@ of the same command with a run-length encoded instruction.</p>
                        </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class="type" href="type.Count.html"
-                                  title='type bf::rle::Count'>Count</a></td>
-                           <td class='docblock-short'>
-                                <p>The number of times to repeat a command.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="type" href="type.Program.html"
                                   title='type bf::rle::Program'>Program</a></td>
                            <td class='docblock-short'>
-                                <p>A BF program is a rose tree of instructions.</p>
+                                <p>A run-length encoded BF program is a rose tree of run-length encoded statements.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>

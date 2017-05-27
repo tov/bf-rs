@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Instruction","A run-length encoded BF instruction."]],"fn":[["compile","Compiles an unoptimized `ast` program to a run-length encoded program."]],"type":[["Count","The number of times to repeat a command."],["Program","A BF program is a rose tree of instructions."]]});
+initSidebarItems({"enum":[["Statement","A run-length encoded BF instruction."]],"fn":[["compile","Compiles an unoptimized `ast` program to a run-length encoded program."]],"type":[["Program","A run-length encoded BF program is a rose tree of run-length encoded statements."]]});

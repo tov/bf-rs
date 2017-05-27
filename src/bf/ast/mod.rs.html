@@ -95,21 +95,21 @@
 
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Command</span>;
 
-<span class="doccomment">/// A BF program is represented as an array of instructions. The array will</span>
+<span class="doccomment">/// A BF program is represented as a slice of statements. The slice will</span>
 <span class="doccomment">/// typically be boxed.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Program</span> <span class="op">=</span> [<span class="ident">Instruction</span>];
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Program</span> <span class="op">=</span> [<span class="ident">Statement</span>];
 
-<span class="doccomment">/// An unoptimized BF instruction.</span>
+<span class="doccomment">/// An unoptimized BF statement.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Instruction</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Statement</span> {
     <span class="doccomment">/// A non-loop command.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Invariants</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Cannot be `Begin` or `End`.</span>
+    <span class="doccomment">/// The `Command` cannot be `Begin` or `End`.</span>
     <span class="ident">Cmd</span>(<span class="ident">Command</span>),
     <span class="doccomment">/// A loop surrounding a sequence of instructions.</span>
-    <span class="ident">Loop</span>(<span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Instruction</span>]<span class="op">&gt;</span>),
+    <span class="ident">Loop</span>(<span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Statement</span>]<span class="op">&gt;</span>),
 }
 
 </pre>

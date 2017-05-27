@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `flat` mod in crate `bf`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, flat">
+    <meta name="description" content="API documentation for the Rust `Count` type in crate `bf`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Count">
 
-    <title>bf::flat - Rust</title>
+    <title>bf::common::Count - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc mod">
+<body class="rustdoc type">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'>Module flat</p><div class="block items"><ul><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'><a href='../index.html'>bf</a></p><script>window.sidebarCurrent = {name: 'flat', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>common</a></p><script>window.sidebarCurrent = {name: 'Count', ty: 'type', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,40 +44,13 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>bf</a>::<wbr><a class="mod" href=''>flat</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Type Definition <a href='../index.html'>bf</a>::<wbr><a href='index.html'>common</a>::<wbr><a class="type" href=''>Count</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/flat/mod.rs.html#1-22' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>Brainfuck bytecode, flat instead of an abstract syntax tree.</p>
-
-<p>This is closer to</p>
-
-<p>Previous passes represent the Brainfuck program as an <a href="../ast.index.html">abstract syntax
-tree</a>, with
-child trees for loops. This pass transforms the program to a flat array of
-<a href="enum.Instruction.html"><code>Instruction</code></a>s, where loop operations take the
-address to possibly jump to as a parameter. This representation includes
-run-length encoding for some instructions, with moving and arithmetic
-commands taking the count as a parameter. It also includes the
-instructions produced by the peephole optimizer.</p>
-</div><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.compile.html"
-                                  title='fn bf::flat::compile'>compile</a></td>
-                           <td class='docblock-short'>
-                                <p>Compiles peephole-optimized AST to a flat bytecode program.</p>
-                           </td>
-                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="type" href="type.Program.html"
-                                  title='type bf::flat::Program'>Program</a></td>
-                           <td class='docblock-short'>
-                                <p>A program is a flat sequence of instructions.</p>
-                           </td>
-                       </tr></table></section>
+               </span><a class='srclink' href='../../src/bf/common.rs.html#64' title='goto source code'>[src]</a></span></h1>
+<pre class='rust typedef'>type Count = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>;</pre><div class='docblock'><p>The number of times to repeat a command when run-length encoded.</p>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
