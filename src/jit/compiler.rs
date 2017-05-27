@@ -21,10 +21,16 @@ pub fn compile(program: &peephole::Program, checked: bool) -> Program {
     compiler.into_program()
 }
 
+/// The compiler state.
 struct Compiler {
+    /// The underlying assembler.
     asm: Assembler,
+    /// The offset of the starting instruction for the object function.
     start: dynasmrt::AssemblyOffset,
+    /// Whether we are emitting bounds checks.
     checked: bool,
+    /// Abstract interpreter for bounds checking analysis.
+    interpreter: AbstractInterpreter,
 }
 
 impl Compiler {
@@ -36,6 +42,7 @@ impl Compiler {
             asm: asm,
             start: start,
             checked: checked,
+            interpreter: AbstractInterpreter::new(),
         };
 
         result.emit_prologue();
@@ -101,15 +108,19 @@ impl Compiler {
 
         match *stm {
             Instr(Right(count)) => {
+                let proved = self.interpreter.right(count);
+
                 dynasm!(self.asm
-                    ;; self.load_pos_offset(count)
+                    ;; self.load_pos_offset(count, proved)
                     ; add pointer, rax
                 );
             }
 
             Instr(Left(count)) => {
+                let proved = self.interpreter.left(count);
+
                 dynasm!(self.asm
-                    ;; self.load_neg_offset(count)
+                    ;; self.load_neg_offset(count, proved)
                     ; sub pointer, rax
                 );
             }
@@ -150,10 +161,12 @@ impl Compiler {
             }
 
             Instr(FindZeroRight(skip)) => {
+                self.interpreter.reset_right();
+
                 dynasm!(self.asm
                     ; jmp >end_loop
                     ; begin_loop:
-                    ;; self.load_pos_offset(skip)
+                    ;; self.load_pos_offset(skip, false)
                     ; add pointer, rax
                     ; end_loop:
                     ; cmp BYTE [pointer], 0
@@ -162,10 +175,12 @@ impl Compiler {
             }
 
             Instr(FindZeroLeft(skip)) => {
+                self.interpreter.reset_left();
+
                 dynasm!(self.asm
                     ; jmp >end_loop
                     ; begin_loop:
-                    ;; self.load_neg_offset(skip)
+                    ;; self.load_neg_offset(skip, false)
                     ; sub pointer, rax
                     ; end_loop:
                     ; cmp BYTE [pointer], 0
@@ -174,10 +189,13 @@ impl Compiler {
             }
 
             Instr(OffsetAddRight(offset)) => {
+                let proved = self.interpreter.right(offset);
+                self.interpreter.left(offset);
+
                 dynasm!(self.asm
                     ; cmp BYTE [pointer], 0
                     ; jz >skip
-                    ;; self.load_pos_offset(offset)
+                    ;; self.load_pos_offset(offset, proved)
                     ; mov cl, BYTE [pointer]
                     ; mov BYTE [pointer], 0
                     ; add BYTE [pointer + rax], cl
@@ -186,10 +204,13 @@ impl Compiler {
             }
 
             Instr(OffsetAddLeft(offset)) => {
+                let proved = self.interpreter.left(offset);
+                self.interpreter.right(offset);
+
                 dynasm!(self.asm
                     ; cmp BYTE [pointer], 0
                     ; jz >skip
-                    ;; self.load_neg_offset(offset)
+                    ;; self.load_neg_offset(offset, proved)
                     ; mov cl, BYTE [pointer]
                     ; mov BYTE [pointer], 0
                     ; neg rax
@@ -205,6 +226,8 @@ impl Compiler {
                 let begin_label = self.asm.new_dynamic_label();
                 let end_label   = self.asm.new_dynamic_label();
 
+                self.interpreter.reset();
+
                 dynasm!(self.asm
                     ; jmp =>end_label
                     ; =>begin_label
@@ -213,6 +236,8 @@ impl Compiler {
                     ; cmp BYTE [pointer], 0
                     ; jnz =>begin_label
                 );
+
+                self.interpreter.reset();
             }
         }
     }
@@ -231,10 +256,10 @@ impl Compiler {
     }
 
     #[inline]
-    fn load_pos_offset(&mut self, offset: Count) {
+    fn load_pos_offset(&mut self, offset: Count, proved: bool) {
         self.load_offset(offset);
 
-        if self.checked {
+        if self.checked && !proved {
             dynasm!(self.asm
                 ; mov rcx, mem_limit
                 ; sub rcx, pointer
@@ -245,10 +270,10 @@ impl Compiler {
     }
 
     #[inline]
-    fn load_neg_offset(&mut self, offset: Count) {
+    fn load_neg_offset(&mut self, offset: Count, proved: bool) {
         self.load_offset(offset);
 
-        if self.checked {
+        if self.checked && !proved {
             dynasm!(self.asm
                 ; mov rcx, pointer
                 ; sub rcx, mem_start
@@ -256,5 +281,61 @@ impl Compiler {
                 ; jl ->underflow
             );
         }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct AbstractInterpreter {
+    /// The minimum distance from the bottom of memory.
+    low_mark: usize,
+    /// The minimum distance from the top of memory.
+    high_mark: usize,
+}
+
+impl AbstractInterpreter {
+    fn new() -> Self {
+        AbstractInterpreter {
+            low_mark: 0,
+            high_mark: 0,
+        }
+    }
+
+    fn left(&mut self, count: Count) -> bool {
+        let count = count as usize;
+
+        self.high_mark += count;
+        if count <= self.low_mark {
+            self.low_mark -= count;
+            true
+        } else {
+            self.low_mark = 0;
+            false
+        }
+    }
+
+    fn right(&mut self, count: Count) -> bool {
+        let count = count as usize;
+
+        self.low_mark += count;
+        if count <= self.high_mark {
+            self.high_mark -= count;
+            true
+        } else {
+            self.high_mark = 0;
+            false
+        }
+    }
+
+    fn reset_left(&mut self) {
+        self.low_mark = 0;
+    }
+
+    fn reset_right(&mut self) {
+        self.high_mark = 0;
+    }
+
+    fn reset(&mut self) {
+        self.reset_left();
+        self.reset_right();
     }
 }
