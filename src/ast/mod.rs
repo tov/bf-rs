@@ -1,6 +1,9 @@
 //! Parsing and interpretation for unoptimized Brainfuck abstract syntax trees.
 //!
-//! In this modules, BF programs are represented by the [`Program`](type.Program.html)
+//! In `bfi` by default, this pass runs before run-length encoding and peephole optimization. To
+//! run the unoptimized AST directly and skip all optimization, pass `--ast` flag.
+//!
+//! In this module, BF programs are represented by the [`Program`](type.Program.html)
 //! type, which is an array of [`Instruction`](enum.Instruction.html)s. `Instruction`s
 //! correspond directly to Brainfuck commands, except that loops are represented as subtrees
 //! rather than with begin and end markers.

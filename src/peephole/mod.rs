@@ -1,6 +1,10 @@
 //! The peephole optimizer, which replaces common loop forms with single (non-Brainfuck)
 //! instructions.
 //!
+//! In `bfi`, this is the default final pass if the JIT was not enabled at compile time
+//! (with `--features=jit`). If the JIT is present, the peephole optimizer can be selected as
+//! the final path with the `--peep` flag.
+//!
 //! For example, we detect the pattern `[-]`, which decrements the current byte until it reaches
 //! zero, and replaces it with the [`SetZero`](../../src/bf/peephole/mod.rs.html#21-22)
 //! instruction. See the [`Instruction`](enum.Instruction.html) enum for a list of the

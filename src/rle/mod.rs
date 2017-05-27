@@ -1,5 +1,9 @@
 //! Run-length encodes Brainfuck commands.
 //!
+//! In `bfi` by default, this pass runs after parsing and before peephole optimization. To run
+//! the output from run-length encoding directly and skip peephole optimization, pass the `--rle`
+//! flag.
+//!
 //! This module takes an [unoptimized Brainfuck AST](../ast/index.html) and replaces repeated runs
 //! of the same command with a run-length encoded instruction.
 
