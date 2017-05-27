@@ -113,10 +113,10 @@ fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
         .unwrap_or_else(|e| error_exit(3, format!("runtime error: {}.", e)))
 }
 
-#[cfg(feature="jit")]
+#[cfg(feature = "jit")]
 const DEFAULT_PASS: Pass = Pass::Jit;
 
-#[cfg(not(feature="jit"))]
+#[cfg(not(feature = "jit"))]
 const DEFAULT_PASS: Pass = Pass::Peep;
 
 fn get_options() -> Options {
