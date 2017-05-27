@@ -2,7 +2,7 @@ use super::*;
 use peephole;
 
 /// Compiles peephole-optimized AST to a flat bytecode program.
-pub fn compile(src: &[peephole::Instruction]) -> Box<Program> {
+pub fn compile(src: &[peephole::Statement]) -> Box<Program> {
     let mut compiler = Compiler::new();
     compiler.compile(src);
     compiler.into_program()
@@ -19,8 +19,8 @@ impl Compiler {
         }
     }
 
-    pub fn compile(&mut self, src: &[peephole::Instruction]) {
-        use peephole::Instruction as Src;
+    pub fn compile(&mut self, src: &[peephole::Statement]) {
+        use peephole::Statement as Src;
         use super::Instruction as Obj;
 
         for instruction in src {

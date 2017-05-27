@@ -15,13 +15,13 @@ pub use self::parser::parse_program;
 
 use common::Command;
 
-/// A BF program is represented as an array of instructions. The array will
+/// A BF program is represented as a slice of statements. The slice will
 /// typically be boxed.
-pub type Program = [Instruction];
+pub type Program = [Statement];
 
-/// An unoptimized BF instruction.
+/// An unoptimized BF statement.
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub enum Instruction {
+pub enum Statement {
     /// A non-loop command.
     ///
     /// # Invariants
@@ -29,6 +29,6 @@ pub enum Instruction {
     /// The `Command` cannot be `Begin` or `End`.
     Cmd(Command),
     /// A loop surrounding a sequence of instructions.
-    Loop(Box<[Instruction]>),
+    Loop(Box<[Statement]>),
 }
 

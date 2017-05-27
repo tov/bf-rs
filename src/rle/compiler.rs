@@ -2,7 +2,7 @@ use super::*;
 use ast;
 
 /// Compiles an unoptimized [`ast`](../ast/index.html) program to a run-length encoded program.
-pub fn compile(program: &[ast::Instruction]) -> Box<Program> {
+pub fn compile(program: &[ast::Statement]) -> Box<Program> {
     let mut compiler = Compiler::new();
     compiler.compile(program);
     compiler.into_program()
@@ -26,11 +26,11 @@ impl Compiler {
     }
 
     /// Compiles the given sequence of instructions.
-    pub fn compile(&mut self, program: &[ast::Instruction]) {
+    pub fn compile(&mut self, program: &[ast::Statement]) {
         for instruction in program {
             match *instruction {
-                ast::Instruction::Cmd(op_code) => self.issue_op(op_code),
-                ast::Instruction::Loop(ref body) => self.issue_loop(compile(body)),
+                ast::Statement::Cmd(op_code) => self.issue_op(op_code),
+                ast::Statement::Loop(ref body) => self.issue_loop(compile(body)),
             }
         }
     }
@@ -74,7 +74,7 @@ impl Compiler {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ast::Instruction as Src;
+    use ast::Statement as Src;
     use super::Instruction as Obj;
     use super::Command::*;
 
@@ -102,7 +102,7 @@ mod tests {
 
     }
 
-    fn assert_compile(src: &[ast::Instruction], expected: &[Instruction]) {
+    fn assert_compile(src: &[ast::Statement], expected: &[Instruction]) {
         let actual = compile(src);
         assert_eq!(&*actual, expected);
     }

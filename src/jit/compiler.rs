@@ -59,14 +59,14 @@ pub fn compile(program: &peephole::Program, checked: bool) -> Program {
     }
 }
 
-fn compile_sequence(asm: &mut Assembler, program: &[peephole::Instruction], checked: bool) {
+fn compile_sequence(asm: &mut Assembler, program: &[peephole::Statement], checked: bool) {
     for instruction in program {
         compile_instruction(asm, instruction, checked);
     }
 }
 
-fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction, checked: bool) {
-    use peephole::Instruction::*;
+fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Statement, checked: bool) {
+    use peephole::Statement::*;
     use flat::Instruction::*;
 
     match *instruction {

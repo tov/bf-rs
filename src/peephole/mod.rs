@@ -18,14 +18,14 @@ mod compiler;
 pub use self::compiler::compile;
 pub use rle::Count;
 
-/// At this level, a program is a rose tree of instructions.
+/// At this level, a program is a rose tree of statements.
 ///
 /// All instructions are leaves except for the `Loop` instruction, which contains a boxed `Program`.
-pub type Program = [Instruction];
+pub type Program = [Statement];
 
 /// Instructions as output by the peephole optimizer.
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub enum Instruction {
+pub enum Statement {
     /// A bytecode instruction, which does not contain any loops.
     ///
     /// # Invariants
@@ -33,5 +33,5 @@ pub enum Instruction {
     /// Should not contain a `JumpZero` or `JumpNotZero` instruction.
     Flat(flat::Instruction),
     /// A loop.
-    Loop(Box<[Instruction]>),
+    Loop(Box<[Statement]>),
 }

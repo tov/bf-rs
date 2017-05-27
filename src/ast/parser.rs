@@ -22,10 +22,10 @@ pub fn parse_program(input: &[u8]) -> BfResult<Box<Program>> {
 /// remaining input. A failed parse returns `Err`.
 type Parser<'a, R> = BfResult<(R, &'a [u8])>;
 
-fn parse_instruction<'a>(mut input: &'a [u8]) -> Parser<Option<Instruction>> {
+fn parse_instruction<'a>(mut input: &'a [u8]) -> Parser<Option<Statement>> {
     use common::Command::*;
 
-    let ok = |cmd, inp: &'a [u8]| Ok((Some(Instruction::Cmd(cmd)), inp));
+    let ok = |cmd, inp: &'a [u8]| Ok((Some(Statement::Cmd(cmd)), inp));
 
     loop {
         if let Some((&c, next_input)) = input.split_first() {
@@ -46,7 +46,7 @@ fn parse_instruction<'a>(mut input: &'a [u8]) -> Parser<Option<Instruction>> {
                         loop {
                             match input.split_first() {
                                 Some((&b']', next_input)) =>
-                                    return Ok((Some(Instruction::Loop(program)), next_input)),
+                                    return Ok((Some(Statement::Loop(program)), next_input)),
                                 Some((_, next_input)) =>
                                     input = next_input,
                                 None =>
@@ -93,7 +93,7 @@ fn parse_instructions(mut input: &[u8]) -> Parser<Box<Program>> {
 mod tests {
     use super::*;
     use common::Command::*;
-    use super::Instruction::*;
+    use super::Statement::*;
 
     #[test]
     fn single_byte_instructions_parse() {
@@ -165,7 +165,7 @@ mod tests {
         assert_parse_error(".[.].]", Error::UnmatchedEnd);
     }
 
-    fn assert_parse(input: &str, program: &[Instruction]) {
+    fn assert_parse(input: &str, program: &[Statement]) {
         assert_eq!(parse_program(input.as_bytes()), Ok(program.to_vec().into_boxed_slice()));
     }
 
@@ -173,7 +173,7 @@ mod tests {
         assert_eq!(parse_program(input.as_bytes()), Err(message));
     }
 
-    fn mk_loop(instructions: Vec<Instruction>) -> Instruction {
-        Instruction::Loop(instructions.into_boxed_slice())
+    fn mk_loop(instructions: Vec<Statement>) -> Statement {
+        Statement::Loop(instructions.into_boxed_slice())
     }
 }

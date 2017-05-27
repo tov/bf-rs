@@ -13,9 +13,9 @@ impl Interpretable for Program {
     }
 }
 
-fn interpret<R, W>(instructions: &[Instruction], state: &mut State,
-                            input: &mut R, output: &mut W)
-                            -> BfResult<()>
+fn interpret<R, W>(instructions: &[Statement], state: &mut State,
+                   input: &mut R, output: &mut W)
+                   -> BfResult<()>
     where R: Read, W: Write
 {
     for instruction in instructions {
@@ -25,12 +25,12 @@ fn interpret<R, W>(instructions: &[Instruction], state: &mut State,
     Ok(())
 }
 
-fn interpret_instruction<R, W>(instructions: &Instruction, state: &mut State,
+fn interpret_instruction<R, W>(instructions: &Statement, state: &mut State,
                                input: &mut R, output: &mut W)
                                -> BfResult<()>
     where R: Read, W: Write
 {
-    use super::Instruction::*;
+    use super::Statement::*;
     use flat::Instruction::*;
 
     match *instructions {

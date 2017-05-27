@@ -12,7 +12,7 @@ pub fn compile(src: &[rle::Instruction]) -> Box<Program> {
 }
 
 pub struct Compiler {
-    instructions: Vec<Instruction>,
+    instructions: Vec<Statement>,
 }
 
 macro_rules! or_else {
@@ -71,7 +71,7 @@ impl Compiler {
                     if let Some(instr) = peephole {
                         self.push(instr);
                     } else {
-                        self.instructions.push(Instruction::Loop(body))
+                        self.instructions.push(Statement::Loop(body))
                     }
                 }
             }
@@ -83,12 +83,12 @@ impl Compiler {
     }
 
     fn push(&mut self, instr: flat::Instruction) {
-        self.instructions.push(Instruction::Flat(instr));
+        self.instructions.push(Statement::Flat(instr));
     }
 }
 
-pub fn set_zero_peephole(body: &[Instruction]) -> Option<flat::Instruction> {
-    use self::Instruction::*;
+pub fn set_zero_peephole(body: &[Statement]) -> Option<flat::Instruction> {
+    use self::Statement::*;
     use flat::Instruction::*;
 
     if body.len() == 1 &&
@@ -99,8 +99,8 @@ pub fn set_zero_peephole(body: &[Instruction]) -> Option<flat::Instruction> {
     }
 }
 
-pub fn find_zero_peephole(body: &[Instruction]) -> Option<flat::Instruction> {
-    use self::Instruction::*;
+pub fn find_zero_peephole(body: &[Statement]) -> Option<flat::Instruction> {
+    use self::Statement::*;
     use flat::Instruction::*;
 
     if body.len() == 1 {
@@ -116,8 +116,8 @@ pub fn find_zero_peephole(body: &[Instruction]) -> Option<flat::Instruction> {
     }
 }
 
-pub fn offset_add_peephole(body: &[Instruction]) -> Option<flat::Instruction> {
-    use self::Instruction::*;
+pub fn offset_add_peephole(body: &[Statement]) -> Option<flat::Instruction> {
+    use self::Statement::*;
     use flat::Instruction::*;
 
     if body.len() == 4 {

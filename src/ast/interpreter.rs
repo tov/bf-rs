@@ -26,12 +26,12 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
 }
 
 #[inline]
-fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
+fn interpret_instruction<R, W>(instruction: &Statement, state: &mut State,
                                input: &mut R, output: &mut W)
                                -> BfResult<()>
     where R: Read, W: Write
 {
-    use super::Instruction::*;
+    use super::Statement::*;
     use super::Command::*;
 
     match *instruction {
@@ -58,7 +58,7 @@ mod tests {
     use test_helpers::*;
     use super::*;
     use common::Command::*;
-    use super::Instruction::*;
+    use super::Statement::*;
 
     #[test]
     fn assert_no_output() {
@@ -112,7 +112,7 @@ mod tests {
         assert_interpret(&*program, input.as_bytes(), output.as_bytes());
     }
 
-    fn mk_loop(instructions: Vec<Instruction>) -> Instruction {
-        Instruction::Loop(instructions.into_boxed_slice())
+    fn mk_loop(instructions: Vec<Statement>) -> Statement {
+        Statement::Loop(instructions.into_boxed_slice())
     }
 }
