@@ -187,10 +187,29 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction,
     }
 }
 
+#[inline]
+fn load_offset(asm: &mut Assembler, offset: Count) {
+    if offset as i8 as Count == offset {
+        dynasm!(asm
+            ; mov rax, BYTE offset as i32
+        );
+    } else if offset as i16 as Count == offset {
+        dynasm!(asm
+            ; mov rax, WORD offset as i32
+        );
+    } else if offset as i32 as Count == offset {
+        dynasm!(asm
+            ; mov rax, DWORD offset as i32
+        );
+    } else {
+        dynasm!(asm
+            ; mov rax, QWORD offset as i64
+        );
+    }
+}
+
 fn load_pos_offset(asm: &mut Assembler, offset: Count, checked: bool) {
-    dynasm!(asm
-        ; mov rax, QWORD offset as i64
-    );
+    load_offset(asm, offset);
 
     if checked {
         dynasm!(asm
@@ -203,9 +222,7 @@ fn load_pos_offset(asm: &mut Assembler, offset: Count, checked: bool) {
 }
 
 fn load_neg_offset(asm: &mut Assembler, offset: Count, checked: bool) {
-    dynasm!(asm
-        ; mov rax, QWORD offset as i64
-    );
+    load_offset(asm, offset);
 
     if checked {
         dynasm!(asm
