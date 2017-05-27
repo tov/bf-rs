@@ -189,15 +189,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction,
 
 #[inline]
 fn load_offset(asm: &mut Assembler, offset: Count) {
-    if offset as i8 as Count == offset {
-        dynasm!(asm
-            ; mov rax, BYTE offset as i32
-        );
-    } else if offset as i16 as Count == offset {
-        dynasm!(asm
-            ; mov rax, WORD offset as i32
-        );
-    } else if offset as i32 as Count == offset {
+    if offset as i32 as Count == offset {
         dynasm!(asm
             ; mov rax, DWORD offset as i32
         );
