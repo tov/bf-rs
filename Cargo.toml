@@ -10,6 +10,9 @@ readme = "README.md"
 license = "MIT"
 keywords = ["brainfuck", "interpreters", "compilers", "jit", "x64"]
 
+[badges]
+travis-ci = { repository = "tov/bf-rs" }
+
 [features]
 
 # Enables native x64 JIT; requires nightly Rust
