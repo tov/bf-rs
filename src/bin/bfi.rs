@@ -113,11 +113,17 @@ fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
         .unwrap_or_else(|e| error_exit(3, format!("Runtime error: {}.", e)))
 }
 
+#[cfg(feature="jit")]
+const DEFAULT_PASS: Pass = Pass::Jit;
+
+#[cfg(not(feature="jit"))]
+const DEFAULT_PASS: Pass = Pass::Peep;
+
 fn get_options() -> Options {
     let mut result = Options {
         program_text:  Vec::new(),
         memory_size:   None,
-        compiler_pass: Pass::Peep,
+        compiler_pass: DEFAULT_PASS,
         unchecked:     false,
     };
 
@@ -197,7 +203,8 @@ fn build_clap_app() -> App<'static, 'static> {
             .help("Run-length encode the AST"))
         .arg(Arg::with_name("peep")
             .long("peep")
-            .help("Peephole optimize (default, implies --rle)"))
+            .help(if cfg!(feature = "jit") {"Peephole optimize (implies --rle)"}
+                  else {"Peephole optimize (default, implies --rle)"}))
         .arg(Arg::with_name("flat")
             .long("flat")
             .help("Flatten to bytecode (implies --peep)")
@@ -207,7 +214,7 @@ fn build_clap_app() -> App<'static, 'static> {
     let app = app
         .arg(Arg::with_name("jit")
             .long("jit")
-            .help("JIT to native x64 (implies --peep)")
+            .help("JIT to native x64 (default, implies --peep)")
             .conflicts_with("flat"))
         .arg(Arg::with_name("unchecked")
             .short("u")
