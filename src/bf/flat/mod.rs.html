@@ -115,6 +115,7 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Brainfuck bytecode, flat instead of an abstract syntax tree.</span>
 <span class="doccomment">//!</span>
@@ -133,6 +134,7 @@
 <span class="kw">mod</span> <span class="ident">interpreter</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">compiler</span>::<span class="ident">compile</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">peephole</span>::<span class="ident">Count</span>;
 
 <span class="doccomment">/// A program is a flat sequence of instructions.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Program</span> <span class="op">=</span> [<span class="ident">Instruction</span>];
@@ -151,9 +153,9 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Instruction</span> {
     <span class="doccomment">/// Decrease the pointer by the specified offset.</span>
-    <span class="ident">Left</span>(<span class="ident">usize</span>),
+    <span class="ident">Left</span>(<span class="ident">Count</span>),
     <span class="doccomment">/// Increase the pointer by the specified offset.</span>
-    <span class="ident">Right</span>(<span class="ident">usize</span>),
+    <span class="ident">Right</span>(<span class="ident">Count</span>),
     <span class="doccomment">/// Increase the current byte value by the specified offset.</span>
     <span class="ident">Change</span>(<span class="ident">u8</span>),
     <span class="doccomment">/// Read a byte of input.</span>
@@ -161,9 +163,9 @@
     <span class="doccomment">/// Write a byte of output.</span>
     <span class="ident">Out</span>,
     <span class="doccomment">/// Begin a loop, jumping to the end if the current byte value.</span>
-    <span class="ident">JumpZero</span>(<span class="ident">usize</span>),
+    <span class="ident">JumpZero</span>(<span class="ident">Count</span>),
     <span class="doccomment">/// End a loop if the current byte value is 0; otherwise repeat the loop.</span>
-    <span class="ident">JumpNotZero</span>(<span class="ident">usize</span>),
+    <span class="ident">JumpNotZero</span>(<span class="ident">Count</span>),
     <span class="doccomment">/// Set the current byte value to 0.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Equivalent to the concrete Braincode loop `[-]`.</span>
@@ -172,20 +174,20 @@
     <span class="doccomment">/// pointer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `OffsetAddRight(5)` is equivalent to the concrete Brainfuck loop `[-&gt;&gt;&gt;&gt;&gt;+&lt;&lt;&lt;&lt;&lt;]`.</span>
-    <span class="ident">OffsetAddRight</span>(<span class="ident">usize</span>),
+    <span class="ident">OffsetAddRight</span>(<span class="ident">Count</span>),
     <span class="doccomment">/// Add the byte at the pointer to the byte at the specified offset and zero the byte at the</span>
     <span class="doccomment">/// pointer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `OffsetAddRight(5)` is equivalent to the concrete Brainfuck loop `[-&lt;&lt;&lt;&lt;&lt;+&gt;&gt;&gt;&gt;&gt;]`.</span>
-    <span class="ident">OffsetAddLeft</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Finds the nearest zero to the left that appears offset by a multiple of the given `usize`.</span>
+    <span class="ident">OffsetAddLeft</span>(<span class="ident">Count</span>),
+    <span class="doccomment">/// Finds the nearest zero to the left that appears offset by a multiple of the given `Count`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `FindZeroRight(3)` is equivalent to the concrete Brainfuck loop `[&gt;&gt;&gt;]`.</span>
-    <span class="ident">FindZeroRight</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Finds the nearest zero to the right that appears offset by a multiple of the given `usize`.</span>
+    <span class="ident">FindZeroRight</span>(<span class="ident">Count</span>),
+    <span class="doccomment">/// Finds the nearest zero to the right that appears offset by a multiple of the given `Count`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `FindZeroLeft(3)` is equivalent to the concrete Brainfuck loop `[&lt;&lt;&lt;]`.</span>
-    <span class="ident">FindZeroLeft</span>(<span class="ident">usize</span>),
+    <span class="ident">FindZeroLeft</span>(<span class="ident">Count</span>),
 }
 
 </pre>

@@ -184,9 +184,9 @@
     <span class="kw">where</span> <span class="ident">R</span>: <span class="ident">Read</span>, <span class="ident">W</span>: <span class="ident">Write</span>
 {
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">instructions</span> {
-        <span class="ident">Instruction</span>::<span class="ident">Left</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">left</span>(<span class="ident">count</span>)<span class="question-mark">?</span>,
+        <span class="ident">Instruction</span>::<span class="ident">Left</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">left</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>)<span class="question-mark">?</span>,
 
-        <span class="ident">Instruction</span>::<span class="ident">Right</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">right</span>(<span class="ident">count</span>)<span class="question-mark">?</span>,
+        <span class="ident">Instruction</span>::<span class="ident">Right</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">right</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>)<span class="question-mark">?</span>,
 
         <span class="ident">Instruction</span>::<span class="ident">Change</span>(<span class="ident">amount</span>) <span class="op">=&gt;</span> <span class="ident">state</span>.<span class="ident">up</span>(<span class="ident">amount</span>),
 
@@ -200,7 +200,7 @@
             <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">load</span>();
             <span class="kw">if</span> <span class="ident">value</span> <span class="op">!=</span> <span class="number">0</span> {
                 <span class="ident">state</span>.<span class="ident">store</span>(<span class="number">0</span>);
-                <span class="ident">state</span>.<span class="ident">up_pos_offset</span>(<span class="ident">offset</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+                <span class="ident">state</span>.<span class="ident">up_pos_offset</span>(<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
             }
         }
 
@@ -208,19 +208,19 @@
             <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">load</span>();
             <span class="kw">if</span> <span class="ident">value</span> <span class="op">!=</span> <span class="number">0</span> {
                 <span class="ident">state</span>.<span class="ident">store</span>(<span class="number">0</span>);
-                <span class="ident">state</span>.<span class="ident">up_neg_offset</span>(<span class="ident">offset</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+                <span class="ident">state</span>.<span class="ident">up_neg_offset</span>(<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
             }
         }
 
         <span class="ident">Instruction</span>::<span class="ident">FindZeroRight</span>(<span class="ident">skip</span>) <span class="op">=&gt;</span> {
             <span class="kw">while</span> <span class="ident">state</span>.<span class="ident">load</span>() <span class="op">!=</span> <span class="number">0</span> {
-                <span class="ident">state</span>.<span class="ident">right</span>(<span class="ident">skip</span>)<span class="question-mark">?</span>;
+                <span class="ident">state</span>.<span class="ident">right</span>(<span class="ident">skip</span> <span class="kw">as</span> <span class="ident">usize</span>)<span class="question-mark">?</span>;
             }
         }
 
         <span class="ident">Instruction</span>::<span class="ident">FindZeroLeft</span>(<span class="ident">skip</span>) <span class="op">=&gt;</span> {
             <span class="kw">while</span> <span class="ident">state</span>.<span class="ident">load</span>() <span class="op">!=</span> <span class="number">0</span> {
-                <span class="ident">state</span>.<span class="ident">left</span>(<span class="ident">skip</span>)<span class="question-mark">?</span>;
+                <span class="ident">state</span>.<span class="ident">left</span>(<span class="ident">skip</span> <span class="kw">as</span> <span class="ident">usize</span>)<span class="question-mark">?</span>;
             }
         }
 

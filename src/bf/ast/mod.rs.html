@@ -74,10 +74,16 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Parsing and interpretation for unoptimized Brainfuck abstract syntax trees.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! In this modules, BF programs are represented by the [`Program`](type.Program.html)</span>
+<span class="doccomment">//! In `bfi` by default, this pass runs before run-length encoding and peephole optimization. To</span>
+<span class="doccomment">//! run the unoptimized AST directly and skip all optimization, pass `--ast` flag.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! In this module, BF programs are represented by the [`Program`](type.Program.html)</span>
 <span class="doccomment">//! type, which is an array of [`Instruction`](enum.Instruction.html)s. `Instruction`s</span>
 <span class="doccomment">//! correspond directly to Brainfuck commands, except that loops are represented as subtrees</span>
 <span class="doccomment">//! rather than with begin and end markers.</span>

@@ -267,12 +267,18 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::<span class="ident">x64</span>::<span class="ident">Assembler</span>;
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::{<span class="ident">DynasmApi</span>, <span class="ident">DynasmLabelApi</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">peephole</span>;
+<span class="kw">use</span> <span class="ident">peephole</span>::{<span class="self">self</span>, <span class="ident">Count</span>};
 
 <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
     ; .<span class="ident">alias</span> <span class="ident">pointer</span>, <span class="ident">r12</span>
@@ -355,7 +361,7 @@
 
         <span class="ident">Change</span>(<span class="ident">count</span>) <span class="op">=&gt;</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
-                ; <span class="ident">add</span> [<span class="ident">pointer</span>], <span class="ident">BYTE</span> <span class="ident">u8_to_i8</span>(<span class="ident">count</span>)
+                ; <span class="ident">add</span> [<span class="ident">pointer</span>], <span class="ident">BYTE</span> <span class="ident">count</span> <span class="kw">as</span> <span class="ident">i8</span>
             );
         }
 
@@ -457,10 +463,22 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">load_pos_offset</span>(<span class="ident">asm</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Assembler</span>, <span class="ident">offset</span>: <span class="ident">usize</span>, <span class="ident">checked</span>: <span class="ident">bool</span>) {
-    <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
-        ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">QWORD</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">i64</span>
-    );
+<span class="attribute">#[<span class="ident">inline</span>]</span>
+<span class="kw">fn</span> <span class="ident">load_offset</span>(<span class="ident">asm</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Assembler</span>, <span class="ident">offset</span>: <span class="ident">Count</span>) {
+    <span class="kw">if</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="kw">as</span> <span class="ident">Count</span> <span class="op">==</span> <span class="ident">offset</span> {
+        <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
+            ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">DWORD</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">i32</span>
+        );
+    } <span class="kw">else</span> {
+        <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
+            ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">QWORD</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">i64</span>
+        );
+    }
+}
+
+<span class="attribute">#[<span class="ident">inline</span>]</span>
+<span class="kw">fn</span> <span class="ident">load_pos_offset</span>(<span class="ident">asm</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Assembler</span>, <span class="ident">offset</span>: <span class="ident">Count</span>, <span class="ident">checked</span>: <span class="ident">bool</span>) {
+    <span class="ident">load_offset</span>(<span class="ident">asm</span>, <span class="ident">offset</span>);
 
     <span class="kw">if</span> <span class="ident">checked</span> {
         <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
@@ -472,10 +490,9 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">load_neg_offset</span>(<span class="ident">asm</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Assembler</span>, <span class="ident">offset</span>: <span class="ident">usize</span>, <span class="ident">checked</span>: <span class="ident">bool</span>) {
-    <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
-        ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">QWORD</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">i64</span>
-    );
+<span class="attribute">#[<span class="ident">inline</span>]</span>
+<span class="kw">fn</span> <span class="ident">load_neg_offset</span>(<span class="ident">asm</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Assembler</span>, <span class="ident">offset</span>: <span class="ident">Count</span>, <span class="ident">checked</span>: <span class="ident">bool</span>) {
+    <span class="ident">load_offset</span>(<span class="ident">asm</span>, <span class="ident">offset</span>);
 
     <span class="kw">if</span> <span class="ident">checked</span> {
         <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
@@ -487,11 +504,6 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">u8_to_i8</span>(<span class="ident">n</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">i8</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">%</span> <span class="number">256</span>;
-    <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">127</span> { <span class="ident">n</span> <span class="op">-=</span> <span class="number">256</span> };
-    <span class="ident">n</span> <span class="kw">as</span> <span class="ident">i8</span>
-}
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

@@ -184,13 +184,13 @@
 
             <span class="ident">JumpZero</span>(<span class="ident">address</span>) <span class="op">=&gt;</span> {
                 <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">load</span>() <span class="op">==</span> <span class="number">0</span> {
-                    <span class="ident">pc</span> <span class="op">=</span> <span class="ident">address</span>;
+                    <span class="ident">pc</span> <span class="op">=</span> <span class="ident">address</span> <span class="kw">as</span> <span class="ident">usize</span>;
                 }
             }
 
             <span class="ident">JumpNotZero</span>(<span class="ident">address</span>) <span class="op">=&gt;</span> {
                 <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">load</span>() <span class="op">!=</span> <span class="number">0</span> {
-                    <span class="ident">pc</span> <span class="op">=</span> <span class="ident">address</span>;
+                    <span class="ident">pc</span> <span class="op">=</span> <span class="ident">address</span> <span class="kw">as</span> <span class="ident">usize</span>;
                 }
             }
 

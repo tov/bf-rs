@@ -48,10 +48,13 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/ast/mod.rs.html#1-30' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/bf/ast/mod.rs.html#1-33' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Parsing and interpretation for unoptimized Brainfuck abstract syntax trees.</p>
 
-<p>In this modules, BF programs are represented by the <a href="type.Program.html"><code>Program</code></a>
+<p>In <code>bfi</code> by default, this pass runs before run-length encoding and peephole optimization. To
+run the unoptimized AST directly and skip all optimization, pass <code>--ast</code> flag.</p>
+
+<p>In this module, BF programs are represented by the <a href="type.Program.html"><code>Program</code></a>
 type, which is an array of <a href="enum.Instruction.html"><code>Instruction</code></a>s. <code>Instruction</code>s
 correspond directly to Brainfuck commands, except that loops are represented as subtrees
 rather than with begin and end markers.</p>

@@ -48,8 +48,12 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/rle/mod.rs.html#1-30' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/bf/rle/mod.rs.html#1-43' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Run-length encodes Brainfuck commands.</p>
+
+<p>In <code>bfi</code> by default, this pass runs after parsing and before peephole optimization. To run
+the output from run-length encoding directly and skip peephole optimization, pass the <code>--rle</code>
+flag.</p>
 
 <p>This module takes an <a href="../ast/index.html">unoptimized Brainfuck AST</a> and replaces repeated runs
 of the same command with a run-length encoded instruction.</p>

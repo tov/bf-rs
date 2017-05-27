@@ -178,13 +178,13 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Parameters</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `&lt;&#39;a&gt;&#39;: the lifetime of the channel references in the run-time system state.</span>
+<span class="doccomment">/// `&lt;&#39;a&gt;` – the lifetime of the channel references in the run-time system state.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `memory`: the address of the beginning of memory (also where the pointer starts).</span>
+<span class="doccomment">/// `memory` – the address of the beginning of memory (also where the pointer starts).</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `memory_size`: the amount of memory allocated, defaults to 30_000 bytes.</span>
+<span class="doccomment">/// `memory_size` – the amount of memory allocated, defaults to 30,000 bytes.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `rts_state`: the state that the run-time system needs to do I/O.</span>
+<span class="doccomment">/// `rts_state` – the state that the run-time system needs to do I/O.</span>
 <span class="kw">type</span> <span class="ident">EntryFunction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">extern</span> <span class="string">&quot;win64&quot;</span> <span class="kw">fn</span>(<span class="ident">memory</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>,
                                            <span class="ident">memory_size</span>: <span class="ident">u64</span>,
                                            <span class="ident">rts_state</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">RtsState</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>;

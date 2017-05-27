@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `jit` mod in crate `bf`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, jit">
+    <meta name="description" content="API documentation for the Rust `IntoUsize` trait in crate `bf`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, IntoUsize">
 
-    <title>bf::jit - Rust</title>
+    <title>bf::traits::IntoUsize - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc mod">
+<body class="rustdoc trait">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'>Module jit</p><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../index.html'>bf</a></p><script>window.sidebarCurrent = {name: 'jit', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'>Trait IntoUsize</p><div class="block items"><ul><li><a href="#required-methods">Required Methods</a></li><li><a href="#implementors">Implementors</a></li></ul></div><p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>traits</a></p><script>window.sidebarCurrent = {name: 'IntoUsize', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,39 +44,28 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>bf</a>::<wbr><a class="mod" href=''>jit</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>bf</a>::<wbr><a href='index.html'>traits</a>::<wbr><a class="trait" href=''>IntoUsize</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/jit/mod.rs.html#1-82' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>Just-in-time compiles Brainfuck AST to x64 machine code (<code>--features jit</code>, nightly only)</p>
-
-<p>This uses the <a href="https://crates.io/search?q=dynasm"><code>dynasm</code></a> crate to generate x86-64
-machine code from peephole-optimized AST. This is currently the fastest implementation,
-but it is available only on nightly Rust because <code>dynasm</code> uses a plugin.</p>
-
-<p>In the <code>bfi</code> interpreter, this pass is enabled by default if compiled in.
-To go even faster, pass the <code>--unchecked</code> flag to the <code>bfi</code> interpreter to disable
-memory bounds checking in the generated code. Note that this runs Brainfuck in
-unsafe mode, which means that programs that move the pointer outside the allocated
-memory will access and possibly overwrite arbitrary memory locations.</p>
-</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Program.html"
-                                  title='struct bf::jit::Program'>Program</a></td>
-                           <td class='docblock-short'>
-                                <p>The representation of a JIT-compiled program.</p>
-                           </td>
-                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.compile.html"
-                                  title='fn bf::jit::compile'>compile</a></td>
-                           <td class='docblock-short'>
-                                <p>Compiles peephole-optimized AST to x64 machine code.</p>
-                           </td>
-                       </tr></table></section>
+               </span><a class='srclink' href='../../src/bf/traits.rs.html#40-42' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait IntoUsize {
+    fn <a href='#tymethod.into_usize' class='fnname'>into_usize</a>(self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>;
+}</pre><div class='docblock'><p>For converting smaller numeric types into <code>usize</code>.</p>
+</div>
+            <h2 id='required-methods'>Required Methods</h2>
+            <div class='methods'>
+        <h3 id='tymethod.into_usize' class='method'><span id='into_usize.v' class='invisible'><code>fn <a href='#tymethod.into_usize' class='fnname'>into_usize</a>(self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span></h3></div>
+        <h2 id='implementors'>Implementors</h2>
+        <ul class='item-list' id='implementors-list'>
+    <li><code>impl IntoUsize for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></li>
+<li><code>impl IntoUsize for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a></code></li>
+<li><code>impl IntoUsize for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a></code></li>
+<li><code>impl IntoUsize for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a></code></li>
+<li><code>impl IntoUsize for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code></li>
+</ul><script type="text/javascript" async
+                         src="../../implementors/bf/traits/trait.IntoUsize.js">
+                 </script></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

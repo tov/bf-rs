@@ -48,29 +48,29 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/bfi/bfi.rs.html#1-223' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/bfi/bfi.rs.html#1-237' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>The Brainfuck interpreter executable.</p>
 
 <pre class="rust rust-example-rendered">
 <span class="ident">USAGE</span>:
-<span class="ident">bfi</span> [<span class="ident">FLAGS</span>] [<span class="ident">OPTIONS</span>] [<span class="op">-</span><span class="op">-</span>] [<span class="ident">INPUT</span>]...
+    <span class="ident">bfi</span> [<span class="ident">FLAGS</span>] [<span class="ident">OPTIONS</span>] [<span class="op">-</span><span class="op">-</span>] [<span class="ident">FILE</span>]...
 
 <span class="ident">FLAGS</span>:
-<span class="op">-</span><span class="op">-</span><span class="ident">ast</span>          <span class="ident">Interpret</span> <span class="ident">the</span> <span class="ident">unoptimized</span> <span class="ident">AST</span>
-<span class="op">-</span><span class="op">-</span><span class="ident">flat</span>         <span class="ident">Flatten</span> <span class="ident">to</span> <span class="ident">bytecode</span> (<span class="ident">implies</span> <span class="op">-</span><span class="op">-</span><span class="ident">peep</span>)
-<span class="op">-</span><span class="ident">h</span>, <span class="op">-</span><span class="op">-</span><span class="ident">help</span>         <span class="ident">Prints</span> <span class="ident">help</span> <span class="ident">information</span>
-<span class="op">-</span><span class="op">-</span><span class="ident">jit</span>          <span class="ident">JIT</span> <span class="ident">to</span> <span class="ident">native</span> <span class="ident">x64</span> (<span class="ident">implies</span> <span class="op">-</span><span class="op">-</span><span class="ident">peep</span>)
-<span class="op">-</span><span class="op">-</span><span class="ident">peep</span>         <span class="ident">Peephole</span> <span class="ident">optimize</span> (<span class="ident">default</span>, <span class="ident">implies</span> <span class="op">-</span><span class="op">-</span><span class="ident">rle</span>)
-<span class="op">-</span><span class="op">-</span><span class="ident">rle</span>          <span class="ident">Run</span><span class="op">-</span><span class="ident">length</span> <span class="ident">encode</span> <span class="ident">the</span> <span class="ident">AST</span>
-<span class="op">-</span><span class="ident">u</span>, <span class="op">-</span><span class="op">-</span><span class="ident">unchecked</span>    <span class="ident">Omit</span> <span class="ident">memory</span> <span class="ident">bounds</span> <span class="ident">checks</span> <span class="kw">in</span> <span class="ident">JIT</span>
-<span class="op">-</span><span class="ident">V</span>, <span class="op">-</span><span class="op">-</span><span class="ident">version</span>      <span class="ident">Prints</span> <span class="ident">version</span> <span class="ident">information</span>
+        <span class="op">-</span><span class="op">-</span><span class="ident">ast</span>          <span class="ident">Interpret</span> <span class="ident">the</span> <span class="ident">unoptimized</span> <span class="ident">AST</span>
+        <span class="op">-</span><span class="op">-</span><span class="ident">flat</span>         <span class="ident">Flatten</span> <span class="ident">AST</span> <span class="ident">to</span> <span class="ident">bytecode</span>
+    <span class="op">-</span><span class="ident">h</span>, <span class="op">-</span><span class="op">-</span><span class="ident">help</span>         <span class="ident">Prints</span> <span class="ident">help</span> <span class="ident">information</span>
+        <span class="op">-</span><span class="op">-</span><span class="ident">jit</span>          <span class="ident">JIT</span> <span class="ident">to</span> <span class="ident">native</span> <span class="ident">x64</span> (<span class="ident">default</span>)
+        <span class="op">-</span><span class="op">-</span><span class="ident">peep</span>         <span class="ident">Interpret</span> <span class="ident">the</span> <span class="ident">peephole</span><span class="op">-</span><span class="ident">optimized</span> <span class="ident">AST</span>
+        <span class="op">-</span><span class="op">-</span><span class="ident">rle</span>          <span class="ident">Interpret</span> <span class="ident">the</span> <span class="ident">run</span><span class="op">-</span><span class="ident">length</span> <span class="ident">encoded</span> <span class="ident">the</span> <span class="ident">AST</span>
+    <span class="op">-</span><span class="ident">u</span>, <span class="op">-</span><span class="op">-</span><span class="ident">unchecked</span>    <span class="ident">Omit</span> <span class="ident">memory</span> <span class="ident">bounds</span> <span class="ident">checks</span> <span class="kw">in</span> <span class="ident">JIT</span>
+    <span class="op">-</span><span class="ident">V</span>, <span class="op">-</span><span class="op">-</span><span class="ident">version</span>      <span class="ident">Prints</span> <span class="ident">version</span> <span class="ident">information</span>
 
 <span class="ident">OPTIONS</span>:
-<span class="op">-</span><span class="ident">e</span>, <span class="op">-</span><span class="op">-</span><span class="ident">expr</span> <span class="op">&lt;</span><span class="ident">CODE</span><span class="op">&gt;</span>...    <span class="ident">BF</span> <span class="ident">code</span> <span class="ident">to</span> <span class="ident">execute</span>
-<span class="op">-</span><span class="ident">s</span>, <span class="op">-</span><span class="op">-</span><span class="ident">size</span> <span class="op">&lt;</span><span class="ident">SIZE</span><span class="op">&gt;</span>       <span class="ident">Memory</span> <span class="ident">size</span> <span class="kw">in</span> <span class="ident">bytes</span> (<span class="ident">default</span> <span class="number">30</span>,<span class="number">000</span>)
+    <span class="op">-</span><span class="ident">e</span>, <span class="op">-</span><span class="op">-</span><span class="ident">expr</span> <span class="op">&lt;</span><span class="ident">CODE</span><span class="op">&gt;</span>...    <span class="ident">BF</span> <span class="ident">code</span> <span class="ident">to</span> <span class="ident">execute</span>
+    <span class="op">-</span><span class="ident">s</span>, <span class="op">-</span><span class="op">-</span><span class="ident">size</span> <span class="op">&lt;</span><span class="ident">SIZE</span><span class="op">&gt;</span>       <span class="ident">Memory</span> <span class="ident">size</span> <span class="kw">in</span> <span class="ident">bytes</span> (<span class="ident">default</span> <span class="number">30</span>,<span class="number">000</span>)
 
 <span class="ident">ARGS</span>:
-<span class="op">&lt;</span><span class="ident">INPUT</span><span class="op">&gt;</span>...    <span class="ident">The</span> <span class="ident">source</span> <span class="ident">file</span>(<span class="ident">s</span>) <span class="ident">to</span> <span class="ident">interpret</span></pre>
+    <span class="op">&lt;</span><span class="ident">FILE</span><span class="op">&gt;</span>...    <span class="ident">The</span> <span class="ident">source</span> <span class="ident">file</span>(<span class="ident">s</span>) <span class="ident">to</span> <span class="ident">interpret</span></pre>
 
 <p>See <a href="../bf/index.html">the library crate documentation</a> for more.</p>
 </div></section>
