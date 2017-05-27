@@ -1,6 +1,8 @@
 use super::*;
 use peephole;
 
+use common::{Count, Instruction};
+
 /// Compiles peephole-optimized AST to a flat bytecode program.
 pub fn compile(src: &[peephole::Statement]) -> Box<Program> {
     let mut compiler = Compiler::new();
@@ -21,11 +23,11 @@ impl Compiler {
 
     pub fn compile(&mut self, src: &[peephole::Statement]) {
         use peephole::Statement as Src;
-        use super::Instruction as Obj;
+        use common::Instruction as Obj;
 
         for instruction in src {
             match *instruction {
-                Src::Flat(instruction) => self.issue(instruction),
+                Src::Instr(instruction) => self.issue(instruction),
                 Src::Loop(ref body) => {
                     let begin_pc = self.instructions.len();
                     self.issue(Obj::JumpZero(0));

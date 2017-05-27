@@ -18,7 +18,7 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
                        -> BfResult<()>
     where R: Read, W: Write
 {
-    use super::Instruction::*;
+    use common::Instruction::*;
 
     let mut pc = 0;
 

@@ -26,13 +26,13 @@ fn interpret<R, W>(instructions: &Program, state: &mut State,
 }
 
 #[inline]
-fn interpret_instruction<R, W>(instruction: &Instruction, state: &mut State,
+fn interpret_instruction<R, W>(instruction: &Statement, state: &mut State,
                                input: &mut R, output: &mut W)
                                -> BfResult<()>
     where R: Read, W: Write
 {
-    use self::Instruction::*;
-    use self::Command::*;
+    use self::Statement::*;
+    use common::Command::*;
 
     match *instruction {
         Cmd(Left, count) => state.left(count)?,

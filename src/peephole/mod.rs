@@ -10,13 +10,12 @@
 //! instruction. See the [`flat::Instruction`](../flat/enum.Instruction.html) enum for a list of
 //! the instructions produced by the [peephole compiler](fn.compile.html).
 
-use flat;
+use common;
 
 mod interpreter;
 mod compiler;
 
 pub use self::compiler::compile;
-pub use rle::Count;
 
 /// At this level, a program is a rose tree of statements.
 ///
@@ -31,7 +30,7 @@ pub enum Statement {
     /// # Invariants
     ///
     /// Should not contain a `JumpZero` or `JumpNotZero` instruction.
-    Flat(flat::Instruction),
+    Instr(common::Instruction),
     /// A loop.
     Loop(Box<[Statement]>),
 }

@@ -2,7 +2,8 @@ use dynasmrt::x64::Assembler;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use super::*;
-use peephole::{self, Count};
+use common::Count;
+use peephole;
 
 dynasm!(asm
     ; .alias pointer, r12
@@ -67,30 +68,30 @@ fn compile_sequence(asm: &mut Assembler, program: &[peephole::Statement], checke
 
 fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Statement, checked: bool) {
     use peephole::Statement::*;
-    use flat::Instruction::*;
+    use common::Instruction::*;
 
     match *instruction {
-        Flat(Right(count)) => {
+        Instr(Right(count)) => {
             dynasm!(asm
                 ;; load_pos_offset(asm, count, checked)
                 ; add pointer, rax
             );
         }
 
-        Flat(Left(count)) => {
+        Instr(Left(count)) => {
             dynasm!(asm
                 ;; load_neg_offset(asm, count, checked)
                 ; sub pointer, rax
             );
         }
 
-        Flat(Change(count)) => {
+        Instr(Change(count)) => {
             dynasm!(asm
                 ; add [pointer], BYTE count as i8
             );
         }
 
-        Flat(In) => {
+        Instr(In) => {
             dynasm!(asm
                 ; mov rax, QWORD rts::RtsState::read as _
                 ; mov rcx, rts
@@ -101,7 +102,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Statement, c
             );
         }
 
-        Flat(Out) => {
+        Instr(Out) => {
             dynasm!(asm
                 ; mov rax, QWORD rts::RtsState::write as _
                 ; mov rcx, rts
@@ -113,13 +114,13 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Statement, c
             );
         }
 
-        Flat(SetZero) => {
+        Instr(SetZero) => {
             dynasm!(asm
                 ; mov BYTE [pointer], 0
             )
         }
 
-        Flat(FindZeroRight(skip)) => {
+        Instr(FindZeroRight(skip)) => {
             dynasm!(asm
                 ; jmp >end_loop
                 ; begin_loop:
@@ -131,7 +132,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Statement, c
             )
         }
 
-        Flat(FindZeroLeft(skip)) => {
+        Instr(FindZeroLeft(skip)) => {
             dynasm!(asm
                 ; jmp >end_loop
                 ; begin_loop:
@@ -143,7 +144,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Statement, c
             )
         }
 
-        Flat(OffsetAddRight(offset)) => {
+        Instr(OffsetAddRight(offset)) => {
             dynasm!(asm
                 ; cmp BYTE [pointer], 0
                 ; jz >skip
@@ -155,7 +156,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Statement, c
             );
         }
 
-        Flat(OffsetAddLeft(offset)) => {
+        Instr(OffsetAddLeft(offset)) => {
             dynasm!(asm
                 ; cmp BYTE [pointer], 0
                 ; jz >skip
@@ -168,7 +169,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Statement, c
             );
         }
 
-        Flat(JumpZero(_)) | Flat(JumpNotZero(_)) =>
+        Instr(JumpZero(_)) | Instr(JumpNotZero(_)) =>
             panic!("unexpected jump instruction"),
 
         Loop(ref body) => {

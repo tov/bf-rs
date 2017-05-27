@@ -10,7 +10,7 @@ pub fn compile(program: &[ast::Statement]) -> Box<Program> {
 
 /// Represents the state of an RLE compiler from `ast::Instruction` to `Instruction`.
 pub struct Compiler {
-    instructions: Vec<Instruction>,
+    instructions: Vec<Statement>,
     last_command: Command,
     last_repeat: Count,
 }
@@ -43,7 +43,7 @@ impl Compiler {
 
     fn push_op(&mut self) {
         if self.last_repeat > 0 {
-            self.instructions.push(Instruction::Cmd(self.last_command, self.last_repeat));
+            self.instructions.push(Statement::Cmd(self.last_command, self.last_repeat));
             self.last_command = Command::Right;
             self.last_repeat = 0;
         }
@@ -66,7 +66,7 @@ impl Compiler {
 
     fn issue_loop(&mut self, body: Box<Program>) {
         self.push_op();
-        self.instructions.push(Instruction::Loop(body));
+        self.instructions.push(Statement::Loop(body));
     }
 }
 
@@ -75,7 +75,7 @@ impl Compiler {
 mod tests {
     use super::*;
     use ast::Statement as Src;
-    use super::Instruction as Obj;
+    use super::Statement as Obj;
     use super::Command::*;
 
     #[test]
@@ -102,7 +102,7 @@ mod tests {
 
     }
 
-    fn assert_compile(src: &[ast::Statement], expected: &[Instruction]) {
+    fn assert_compile(src: &[ast::Statement], expected: &[Statement]) {
         let actual = compile(src);
         assert_eq!(&*actual, expected);
     }
@@ -111,7 +111,7 @@ mod tests {
         Src::Loop(body.into_boxed_slice())
     }
 
-    fn mk_loop(body: Vec<Instruction>) -> Instruction {
+    fn mk_loop(body: Vec<Statement>) -> Statement {
         Obj::Loop(body.into_boxed_slice())
     }
 }

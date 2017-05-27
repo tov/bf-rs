@@ -31,22 +31,22 @@ fn interpret_instruction<R, W>(instructions: &Statement, state: &mut State,
     where R: Read, W: Write
 {
     use super::Statement::*;
-    use flat::Instruction::*;
+    use common::Instruction::*;
 
     match *instructions {
-        Flat(Left(count)) => state.left(count as usize)?,
+        Instr(Left(count)) => state.left(count as usize)?,
 
-        Flat(Right(count)) => state.right(count as usize)?,
+        Instr(Right(count)) => state.right(count as usize)?,
 
-        Flat(Change(amount)) => state.up(amount),
+        Instr(Change(amount)) => state.up(amount),
 
-        Flat(In) => state.read(input),
+        Instr(In) => state.read(input),
 
-        Flat(Out) => state.write(output),
+        Instr(Out) => state.write(output),
 
-        Flat(SetZero) => state.store(0),
+        Instr(SetZero) => state.store(0),
 
-        Flat(OffsetAddRight(offset)) => {
+        Instr(OffsetAddRight(offset)) => {
             let value = state.load();
             if value != 0 {
                 state.store(0);
@@ -54,7 +54,7 @@ fn interpret_instruction<R, W>(instructions: &Statement, state: &mut State,
             }
         }
 
-        Flat(OffsetAddLeft(offset)) => {
+        Instr(OffsetAddLeft(offset)) => {
             let value = state.load();
             if value != 0 {
                 state.store(0);
@@ -62,19 +62,19 @@ fn interpret_instruction<R, W>(instructions: &Statement, state: &mut State,
             }
         }
 
-        Flat(FindZeroRight(skip)) => {
+        Instr(FindZeroRight(skip)) => {
             while state.load() != 0 {
                 state.right(skip as usize)?;
             }
         }
 
-        Flat(FindZeroLeft(skip)) => {
+        Instr(FindZeroLeft(skip)) => {
             while state.load() != 0 {
                 state.left(skip as usize)?;
             }
         }
 
-        Flat(JumpZero(_)) | Flat(JumpNotZero(_)) =>
+        Instr(JumpZero(_)) | Instr(JumpNotZero(_)) =>
             panic!("unexpected jump instruction"),
 
         Loop(ref body) => {
