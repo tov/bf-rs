@@ -18,6 +18,12 @@ travis-ci = { repository = "tov/bf-rs" }
 # Enables native x64 JIT; requires nightly Rust
 jit = ["dynasmrt", "dynasm"]
 
+# Use `u32` for counts instead of usize.
+u32count = []
+
+# Use `u16` for counts instead of usize.
+u16count = []
+
 [dependencies]
 clap = "2.24"
 

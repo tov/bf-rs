@@ -17,8 +17,17 @@ use common::Command;
 /// A BF program is a rose tree of instructions.
 pub type Program = [Instruction];
 
+#[cfg(not(any(feature = "u16count", feature = "u32count")))]
+/// The number of times to repeat a command.
+pub type Count = usize;
+
+#[cfg(feature = "u16count")]
 /// The number of times to repeat a command.
 pub type Count = u16;
+
+#[cfg(feature = "u32count")]
+/// The number of times to repeat a command.
+pub type Count = u32;
 
 /// A run-length encoded BF instruction.
 #[derive(Clone, Debug, Eq, PartialEq)]
