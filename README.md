@@ -1,5 +1,9 @@
 # bf-rs: Brainfuck in Rust
 
+[![Build Status](https://travis-ci.org/tov/libffi-rs.svg?branch=master)](https://travis-ci.org/tov/bf-rs)
+[![Crates.io](https://img.shields.io/crates/v/libffi.svg?maxAge=2592000)](https://crates.io/crates/bf)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE-MIT)
+
 `bf-rs` is a optimizing Brainfuck interpreter and JIT compiler
 inspired by Eli Bendersky’s [series on JIT compilation].
 It includes a library crate `bf` that exports most of the functionality,
