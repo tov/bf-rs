@@ -2,24 +2,24 @@
 //!
 //! ```
 //! USAGE:
-//! bfi [FLAGS] [OPTIONS] [--] [FILE]...
+//!     bfi [FLAGS] [OPTIONS] [--] [FILE]...
 //!
 //! FLAGS:
-//! --ast          Interpret the unoptimized AST
-//! --flat         Flatten to bytecode (implies --peep)
-//! -h, --help         Prints help information
-//! --jit          JIT to native x64 (default, implies --peep)
-//! --peep         Peephole optimize (implies --rle)
-//! --rle          Run-length encode the AST
-//! -u, --unchecked    Omit memory bounds checks in JIT
-//! -V, --version      Prints version information
+//!         --ast          Interpret the unoptimized AST
+//!         --flat         Flatten AST to bytecode
+//!     -h, --help         Prints help information
+//!         --jit          JIT to native x64 (default)
+//!         --peep         Interpret the peephole-optimized AST
+//!         --rle          Interpret the run-length encoded the AST
+//!     -u, --unchecked    Omit memory bounds checks in JIT
+//!     -V, --version      Prints version information
 //!
 //! OPTIONS:
-//! -e, --expr <CODE>...    BF code to execute
-//! -s, --size <SIZE>       Memory size in bytes (default 30,000)
+//!     -e, --expr <CODE>...    BF code to execute
+//!     -s, --size <SIZE>       Memory size in bytes (default 30,000)
 //!
 //! ARGS:
-//! <FILE>...    The source file(s) to interpret
+//!     <FILE>...    The source file(s) to interpret
 //! ```
 //!
 //! See [the library crate documentation](../bf/index.html) for more.
@@ -105,12 +105,12 @@ fn main() {
 
 fn parse(options: &Options) -> Box<ast::Program> {
     ast::parse_program(&options.program_text)
-        .unwrap_or_else(|e| error_exit(2, format!("Syntax error: {}.", e)))
+        .unwrap_or_else(|e| error_exit(2, format!("syntax error: {}.", e)))
 }
 
 fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
     program.interpret_stdin(options.memory_size)
-        .unwrap_or_else(|e| error_exit(3, format!("Runtime error: {}.", e)))
+        .unwrap_or_else(|e| error_exit(3, format!("runtime error: {}.", e)))
 }
 
 #[cfg(feature="jit")]
@@ -131,13 +131,15 @@ fn get_options() -> Options {
 
     if let Some(size) = matches.value_of("size") {
         let size = size.parse()
-            .unwrap_or_else(|e| error_exit(1, format!("Could not parse memory size: {}", e)));
+            .unwrap_or_else(|e|
+                error_exit(1, format!("error: could not parse memory size: {}.", e)));
+        if size == 0 {
+            error_exit(1, "error: memory size must be at least 1.".to_owned());
+        }
         result.memory_size = Some(size);
     }
 
-    if matches.is_present("ast") {
-        result.compiler_pass = Pass::Ast;
-    } else if matches.is_present("jit") {
+    if matches.is_present("jit") {
         #[cfg(feature = "jit")]
         let _ = result.compiler_pass = Pass::Jit;
     } else if matches.is_present("flat") {
@@ -146,6 +148,8 @@ fn get_options() -> Options {
         result.compiler_pass = Pass::Peep;
     } else if matches.is_present("rle") {
         result.compiler_pass = Pass::Rle;
+    } else if matches.is_present("ast") {
+        result.compiler_pass = Pass::Ast;
     }
 
     if matches.is_present("unchecked") {
@@ -159,12 +163,12 @@ fn get_options() -> Options {
     } else if let Some(files) = matches.values_of("FILE") {
         for f in files {
             let mut file = File::open(f)
-                .unwrap_or_else(|e| error_exit(1, format!("{}: {}", e, f)));
+                .unwrap_or_else(|e| error_exit(1, format!("{}: ‘{}’.", e, f)));
             file.read_to_end(&mut result.program_text)
-                .unwrap_or_else(|e| error_exit(1, format!("{}: {}", e, f)));
+                .unwrap_or_else(|e| error_exit(1, format!("{}: ‘{}’.", e, f)));
         }
     } else {
-        error_exit(1, "No program given.".to_owned());
+        error_exit(1, "error: no program given.".to_owned());
     }
 
     result
@@ -200,32 +204,35 @@ fn build_clap_app() -> App<'static, 'static> {
             .conflicts_with_all(&["rle", "peep", "flat", "jit"]))
         .arg(Arg::with_name("rle")
             .long("rle")
-            .help("Run-length encode the AST"))
+            .help("Interpret the run-length encoded the AST")
+            .conflicts_with_all(&["ast", "peep", "flat", "jit"]))
         .arg(Arg::with_name("peep")
             .long("peep")
-            .help(if cfg!(feature = "jit") {"Peephole optimize (implies --rle)"}
-                  else {"Peephole optimize (default, implies --rle)"}))
+            .help(if cfg!(feature = "jit") {"Interpret the peephole-optimized AST"}
+                  else {"Interpret the peephole-optimized AST (default)"})
+            .conflicts_with_all(&["ast", "rle", "flat", "jit"]))
         .arg(Arg::with_name("flat")
             .long("flat")
-            .help("Flatten to bytecode (implies --peep)")
-            .conflicts_with("jit"));
+            .help("Flatten AST to bytecode")
+            .conflicts_with_all(&["ast", "rle", "peep", "jit"]));
 
     #[cfg(feature = "jit")]
     let app = app
         .arg(Arg::with_name("jit")
             .long("jit")
-            .help("JIT to native x64 (default, implies --peep)")
-            .conflicts_with("flat"))
+            .help("JIT to native x64 (default)")
+            .conflicts_with_all(&["ast", "rle", "peep", "flat"]))
         .arg(Arg::with_name("unchecked")
             .short("u")
             .long("unchecked")
-            .help("Omit memory bounds checks in JIT"));
+            .help("Omit memory bounds checks in JIT")
+            .conflicts_with_all(&["ast", "rle", "peep", "flat"]));
 
     app
 }
 
 fn error_exit(code: i32, msg: String) -> ! {
-    writeln!(io::stderr(), "{}", msg).unwrap();
+    writeln!(io::stderr(), "bfi: {}", msg).unwrap();
     exit(code)
 }
 
