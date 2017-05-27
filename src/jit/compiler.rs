@@ -85,7 +85,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction,
 
         Change(count) => {
             dynasm!(asm
-                ; add [pointer], BYTE u8_to_i8(count)
+                ; add [pointer], BYTE count as i8
             );
         }
 
@@ -226,8 +226,3 @@ fn load_neg_offset(asm: &mut Assembler, offset: Count, checked: bool) {
     }
 }
 
-fn u8_to_i8(n: u8) -> i8 {
-    let mut n = n as isize % 256;
-    if n > 127 { n -= 256 };
-    n as i8
-}
