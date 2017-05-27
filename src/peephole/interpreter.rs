@@ -30,20 +30,23 @@ fn interpret_instruction<R, W>(instructions: &Instruction, state: &mut State,
                                -> BfResult<()>
     where R: Read, W: Write
 {
+    use super::Instruction::*;
+    use flat::Instruction::*;
+
     match *instructions {
-        Instruction::Left(count) => state.left(count as usize)?,
+        Flat(Left(count)) => state.left(count as usize)?,
 
-        Instruction::Right(count) => state.right(count as usize)?,
+        Flat(Right(count)) => state.right(count as usize)?,
 
-        Instruction::Change(amount) => state.up(amount),
+        Flat(Change(amount)) => state.up(amount),
 
-        Instruction::In => state.read(input),
+        Flat(In) => state.read(input),
 
-        Instruction::Out => state.write(output),
+        Flat(Out) => state.write(output),
 
-        Instruction::SetZero => state.store(0),
+        Flat(SetZero) => state.store(0),
 
-        Instruction::OffsetAddRight(offset) => {
+        Flat(OffsetAddRight(offset)) => {
             let value = state.load();
             if value != 0 {
                 state.store(0);
@@ -51,7 +54,7 @@ fn interpret_instruction<R, W>(instructions: &Instruction, state: &mut State,
             }
         }
 
-        Instruction::OffsetAddLeft(offset) => {
+        Flat(OffsetAddLeft(offset)) => {
             let value = state.load();
             if value != 0 {
                 state.store(0);
@@ -59,19 +62,22 @@ fn interpret_instruction<R, W>(instructions: &Instruction, state: &mut State,
             }
         }
 
-        Instruction::FindZeroRight(skip) => {
+        Flat(FindZeroRight(skip)) => {
             while state.load() != 0 {
                 state.right(skip as usize)?;
             }
         }
 
-        Instruction::FindZeroLeft(skip) => {
+        Flat(FindZeroLeft(skip)) => {
             while state.load() != 0 {
                 state.left(skip as usize)?;
             }
         }
 
-        Instruction::Loop(ref body) => {
+        Flat(JumpZero(_)) | Flat(JumpNotZero(_)) =>
+            panic!("unexpected jump instruction"),
+
+        Loop(ref body) => {
             while state.load() != 0 {
                 interpret(body, state, input, output)?;
             }

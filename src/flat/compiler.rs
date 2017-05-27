@@ -25,17 +25,7 @@ impl Compiler {
 
         for instruction in src {
             match *instruction {
-                Src::Right(count) => self.issue(Obj::Right(count)),
-                Src::Left(count) => self.issue(Obj::Left(count)),
-                Src::Change(count) => self.issue(Obj::Change(count)),
-                Src::In => self.issue(Obj::In),
-                Src::Out => self.issue(Obj::Out),
-                Src::SetZero => self.issue(Obj::SetZero),
-                Src::OffsetAddRight(offset) => self.issue(Obj::OffsetAddRight(offset)),
-                Src::OffsetAddLeft(offset) => self.issue(Obj::OffsetAddLeft(offset)),
-                Src::FindZeroRight(offset) => self.issue(Obj::FindZeroRight(offset)),
-                Src::FindZeroLeft(offset) => self.issue(Obj::FindZeroLeft(offset)),
-
+                Src::Flat(instruction) => self.issue(instruction),
                 Src::Loop(ref body) => {
                     let begin_pc = self.instructions.len();
                     self.issue(Obj::JumpZero(0));

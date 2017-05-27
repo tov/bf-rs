@@ -30,29 +30,30 @@ impl Compiler {
     pub fn compile(&mut self, src: &[rle::Instruction]) {
         use rle::Instruction::*;
         use common::Command::*;
+        use flat::Instruction as Flat;
 
         for instruction in src {
             match *instruction {
                 Cmd(Right, count) =>
-                    self.push(Instruction::Right(count)),
+                    self.push(Flat::Right(count)),
                 Cmd(Left, count) =>
-                    self.push(Instruction::Left(count)),
+                    self.push(Flat::Left(count)),
                 Cmd(Up, count) => {
                     let amount = (count % 256) as u8;
-                    self.push(Instruction::Change(amount));
+                    self.push(Flat::Change(amount));
                 }
                 Cmd(Down, count) => {
                     let amount = (256 - count % 256) as u8;
-                    self.push(Instruction::Change(amount));
+                    self.push(Flat::Change(amount));
                 }
                 Cmd(In, count) => {
                     for _ in 0 .. count {
-                        self.push(Instruction::In);
+                        self.push(Flat::In);
                     }
                 }
                 Cmd(Out, count) => {
                     for _ in 0 .. count {
-                        self.push(Instruction::Out);
+                        self.push(Flat::Out);
                     }
                 }
                 Cmd(Begin, _) | Cmd(End, _) =>
@@ -70,7 +71,7 @@ impl Compiler {
                     if let Some(instr) = peephole {
                         self.push(instr);
                     } else {
-                        self.push(Instruction::Loop(body))
+                        self.instructions.push(Instruction::Loop(body))
                     }
                 }
             }
@@ -81,27 +82,33 @@ impl Compiler {
         self.instructions.into_boxed_slice()
     }
 
-    fn push(&mut self, instr: Instruction) {
-        self.instructions.push(instr);
+    fn push(&mut self, instr: flat::Instruction) {
+        self.instructions.push(Instruction::Flat(instr));
     }
 }
 
-pub fn set_zero_peephole(body: &[Instruction]) -> Option<Instruction> {
+pub fn set_zero_peephole(body: &[Instruction]) -> Option<flat::Instruction> {
+    use self::Instruction::*;
+    use flat::Instruction::*;
+
     if body.len() == 1 &&
-        body[0] == Instruction::Change(1) {
-        Some(Instruction::SetZero)
+        body[0] == Flat(Change(1)) {
+        Some(SetZero)
     } else {
         None
     }
 }
 
-pub fn find_zero_peephole(body: &[Instruction]) -> Option<Instruction> {
+pub fn find_zero_peephole(body: &[Instruction]) -> Option<flat::Instruction> {
+    use self::Instruction::*;
+    use flat::Instruction::*;
+
     if body.len() == 1 {
         match body[0] {
-            Instruction::Right(count) =>
-                Some(Instruction::FindZeroRight(count)),
-            Instruction::Left(count) =>
-                Some(Instruction::FindZeroLeft(count)),
+            Flat(Right(count)) =>
+                Some(FindZeroRight(count)),
+            Flat(Left(count)) =>
+                Some(FindZeroLeft(count)),
             _ => None,
         }
     } else {
@@ -109,19 +116,20 @@ pub fn find_zero_peephole(body: &[Instruction]) -> Option<Instruction> {
     }
 }
 
-pub fn offset_add_peephole(body: &[Instruction]) -> Option<Instruction> {
+pub fn offset_add_peephole(body: &[Instruction]) -> Option<flat::Instruction> {
     use self::Instruction::*;
+    use flat::Instruction::*;
 
     if body.len() == 4 {
         match (&body[0], &body[1], &body[2], &body[3]) {
-            (&Change(255), &Right(count_l), &Change(1), &Left(count_r))
+            (&Flat(Change(255)), &Flat(Right(count_l)), &Flat(Change(1)), &Flat(Left(count_r)))
             if count_l == count_r => {
-                Some(Instruction::OffsetAddRight(count_l))
+                Some(OffsetAddRight(count_l))
             }
 
-            (&Change(255), &Left(count_l), &Change(1), &Right(count_r))
+            (&Flat(Change(255)), &Flat(Left(count_l)), &Flat(Change(1)), &Flat(Right(count_r)))
             if count_l == count_r => {
-                Some(Instruction::OffsetAddLeft(count_l))
+                Some(OffsetAddLeft(count_l))
             }
 
             _ => None,

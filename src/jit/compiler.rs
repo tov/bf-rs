@@ -67,29 +67,30 @@ fn compile_sequence(asm: &mut Assembler, program: &[peephole::Instruction], chec
 
 fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction, checked: bool) {
     use peephole::Instruction::*;
+    use flat::Instruction::*;
 
     match *instruction {
-        Right(count) => {
+        Flat(Right(count)) => {
             dynasm!(asm
                 ;; load_pos_offset(asm, count, checked)
                 ; add pointer, rax
             );
         }
 
-        Left(count) => {
+        Flat(Left(count)) => {
             dynasm!(asm
                 ;; load_neg_offset(asm, count, checked)
                 ; sub pointer, rax
             );
         }
 
-        Change(count) => {
+        Flat(Change(count)) => {
             dynasm!(asm
                 ; add [pointer], BYTE count as i8
             );
         }
 
-        In => {
+        Flat(In) => {
             dynasm!(asm
                 ; mov rax, QWORD rts::RtsState::read as _
                 ; mov rcx, rts
@@ -100,7 +101,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction,
             );
         }
 
-        Out => {
+        Flat(Out) => {
             dynasm!(asm
                 ; mov rax, QWORD rts::RtsState::write as _
                 ; mov rcx, rts
@@ -112,13 +113,13 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction,
             );
         }
 
-        SetZero => {
+        Flat(SetZero) => {
             dynasm!(asm
                 ; mov BYTE [pointer], 0
             )
         }
 
-        FindZeroRight(skip) => {
+        Flat(FindZeroRight(skip)) => {
             dynasm!(asm
                 ; jmp >end_loop
                 ; begin_loop:
@@ -130,7 +131,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction,
             )
         }
 
-        FindZeroLeft(skip) => {
+        Flat(FindZeroLeft(skip)) => {
             dynasm!(asm
                 ; jmp >end_loop
                 ; begin_loop:
@@ -142,7 +143,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction,
             )
         }
 
-        OffsetAddRight(offset) => {
+        Flat(OffsetAddRight(offset)) => {
             dynasm!(asm
                 ; cmp BYTE [pointer], 0
                 ; jz >skip
@@ -154,7 +155,7 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction,
             );
         }
 
-        OffsetAddLeft(offset) => {
+        Flat(OffsetAddLeft(offset)) => {
             dynasm!(asm
                 ; cmp BYTE [pointer], 0
                 ; jz >skip
@@ -166,6 +167,9 @@ fn compile_instruction(asm: &mut Assembler, instruction: &peephole::Instruction,
                 ; skip:
             );
         }
+
+        Flat(JumpZero(_)) | Flat(JumpNotZero(_)) =>
+            panic!("unexpected jump instruction"),
 
         Loop(ref body) => {
             let begin_label = asm.new_dynamic_label();
