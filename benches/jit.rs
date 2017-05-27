@@ -27,7 +27,7 @@ mod jit_only {
     }
 
     #[bench]
-    fn interpret_factor_million(b: &mut Bencher) {
+    fn run_factor_million(b: &mut Bencher) {
         let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
         let program = rle::compile(&program);
         let program = peephole::compile(&program);
@@ -39,7 +39,7 @@ mod jit_only {
     }
 
     #[bench]
-    fn interpret_factor_million_unchecked(b: &mut Bencher) {
+    fn run_factor_million_unchecked(b: &mut Bencher) {
         let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
         let program = rle::compile(&program);
         let program = peephole::compile(&program);
