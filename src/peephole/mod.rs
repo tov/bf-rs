@@ -1,4 +1,4 @@
-//! The peephole optimizir, which replaces common loop forms with single (non-Brainfuck)
+//! The peephole optimizer, which replaces common loop forms with single (non-Brainfuck)
 //! instructions.
 //!
 //! For example, we detect the pattern `[-]`, which decrements the current byte until it reaches
