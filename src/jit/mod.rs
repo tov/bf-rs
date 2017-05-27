@@ -13,7 +13,7 @@
 mod compiler;
 mod rts;
 
-pub use self::compiler::*;
+pub use self::compiler::compile;
 
 use dynasmrt;
 
