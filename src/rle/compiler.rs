@@ -51,7 +51,12 @@ impl Compiler {
 
     fn issue_op(&mut self, cmd: Command) {
         if cmd == self.last_command {
-            self.last_repeat += 1;
+            if let Some(last_repeat) = self.last_repeat.checked_add(1) {
+                self.last_repeat = last_repeat;
+            } else {
+                self.push_op();
+                self.last_repeat = 1;
+            }
         } else {
             self.push_op();
             self.last_command = cmd;

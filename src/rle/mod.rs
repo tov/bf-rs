@@ -33,9 +33,3 @@ pub enum Instruction {
     Loop(Box<[Instruction]>),
 }
 
-/// Converts a `usize` to a `Count`, panicking if the `usize` is out of range.
-pub fn usize_to_count(count: usize) -> Count {
-    let result: Count = count as Count;
-    assert_eq!(result as usize, count);
-    result
-}

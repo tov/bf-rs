@@ -1,6 +1,5 @@
 use super::*;
 use peephole;
-use rle::usize_to_count;
 
 /// Compiles peephole-optimized AST to a flat bytecode program.
 pub fn compile(src: &[peephole::Instruction]) -> Box<Program> {
@@ -58,3 +57,9 @@ impl Compiler {
     }
 }
 
+/// Converts a `usize` to a `Count`, panicking if the `usize` is out of range.
+pub fn usize_to_count(count: usize) -> Count {
+    let result: Count = count as Count;
+    assert_eq!(result as usize, count);
+    result
+}
