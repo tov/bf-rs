@@ -200,6 +200,7 @@ fn load_offset(asm: &mut Assembler, offset: Count) {
     }
 }
 
+#[inline]
 fn load_pos_offset(asm: &mut Assembler, offset: Count, checked: bool) {
     load_offset(asm, offset);
 
@@ -213,6 +214,7 @@ fn load_pos_offset(asm: &mut Assembler, offset: Count, checked: bool) {
     }
 }
 
+#[inline]
 fn load_neg_offset(asm: &mut Assembler, offset: Count, checked: bool) {
     load_offset(asm, offset);
 
