@@ -17,7 +17,7 @@ dynasm!(asm
 ///
 /// Uses the `dynasmrt` assembler
 pub fn compile(program: &peephole::Program, checked: bool) -> Program {
-    let mut compiler = Compiler::new(checked);
+    let mut compiler = Compiler::new(program, checked);
     compiler.compile(program);
     compiler.into_program()
 }
@@ -35,7 +35,7 @@ struct Compiler {
 }
 
 impl Compiler {
-    fn new(checked: bool) -> Self {
+    fn new(program: &peephole::Program, checked: bool) -> Self {
         let asm = Assembler::new();
         let start = asm.offset();
 
@@ -43,7 +43,7 @@ impl Compiler {
             asm: asm,
             start: start,
             checked: checked,
-            interpreter: AbstractInterpreter::new(),
+            interpreter: AbstractInterpreter::new(program),
         };
 
         result.emit_prologue();

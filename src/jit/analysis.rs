@@ -1,4 +1,33 @@
+use std::collections::HashMap;
+
 use common::Count;
+use peephole::{Statement, Program};
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+/// The net movement of a loop.
+enum LoopBalance {
+    /// May move right but not left.
+    NoLeft,
+    /// May move left but not right.
+    NoRight,
+    /// No net movement.
+    Balanced,
+    /// Net movement may be either direction.
+    Unknown,
+}
+
+/// An index to a loop.
+///
+/// This is represented as the address of the first instruction of the loop.
+#[derive(Copy, Clone, Debug, Hash, PartialEq, Eq)]
+struct LoopIndex(usize);
+
+impl LoopIndex {
+    /// Gets the loop index from a boxed loop.
+    fn from_loop_body(body: &Box<[Statement]>) -> Self {
+        LoopIndex(&body[0] as *const Statement as usize)
+    }
+}
 
 /// The abstract interpreter tracks an abstraction of the pointer position.
 ///
@@ -10,14 +39,19 @@ pub struct AbstractInterpreter {
     left_mark: usize,
     /// The minimum distance from the top of memory.
     right_mark: usize,
+    /// The computed net movement for each loop.
+    loop_balances: HashMap<LoopIndex, LoopBalance>,
 }
 
 impl AbstractInterpreter {
-    /// In the initial state, we know nothing.
-    pub fn new() -> Self {
+    /// Initialize the interpreter with the body of the program.
+    ///
+    /// The interpreter initially analyzes the program for loop balances.
+    pub fn new(program: &Program) -> Self {
         AbstractInterpreter {
             left_mark: 0,
             right_mark: 0,
+            loop_balances: HashMap::new(),
         }
     }
 
