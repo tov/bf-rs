@@ -10,6 +10,7 @@
 //! unsafe mode, which means that programs that move the pointer outside the allocated
 //! memory will access and possibly overwrite arbitrary memory locations.
 
+mod analysis;
 mod compiler;
 mod rts;
 
