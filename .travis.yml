@@ -16,6 +16,7 @@ script:
   - cargo build --verbose --features "$FEATURES"
   - cargo test --verbose --features "$FEATURES"
   - ([ -z "$BENCH" ] || cargo bench --verbose --features "$FEATURES")
+  - ([ -z "$BENCH" ] || scripts/benchmark_mandelbrot.sh)
 
 notifications:
   email:
