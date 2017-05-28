@@ -70,6 +70,8 @@ pub struct AbstractInterpreter {
     left_mark: usize,
     /// The minimum distance from the top of memory.
     right_mark: usize,
+    /// The marks to restore when leaving a loop.
+    loop_stack: Vec<(usize, usize)>,
     /// The computed net movement for each loop.
     loop_balances: HashMap<LoopIndex, LoopBalance>,
 }
@@ -82,6 +84,7 @@ impl AbstractInterpreter {
         let mut result = AbstractInterpreter {
             left_mark: 0,
             right_mark: 0,
+            loop_stack: Vec::new(),
             loop_balances: HashMap::new(),
         };
 
@@ -187,6 +190,33 @@ impl AbstractInterpreter {
     /// This is used when we may move an arbitrary distance to the right.
     pub fn reset_right(&mut self) {
         self.right_mark = 0;
+    }
+
+    /// Updates the marks upon entering a loop.
+    pub fn enter_loop(&mut self, body: &Box<[Statement]>) {
+        if let Some(&balance) = self.loop_balances.get(&LoopIndex::from_loop_body(body)) {
+            if balance.is_balanced() {
+                // No change
+            } else if balance.is_right_only() {
+                self.reset_right();
+            } else if balance.is_left_only() {
+                self.reset_left();
+            } else {
+                self.reset();
+            }
+        } else {
+            self.reset();
+        }
+
+        self.loop_stack.push((self.left_mark, self.right_mark));
+    }
+
+    /// Updates the marks upon leaving a loop.
+    pub fn leave_loop(&mut self) {
+        let (left_mark, right_mark) = self.loop_stack.pop()
+            .expect("got exit_loop without matching enter_loop");
+        self.left_mark = left_mark;
+        self.right_mark = right_mark;
     }
 
     /// Resets both marks.
