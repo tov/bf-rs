@@ -22,3 +22,8 @@ script:
 notifications:
   email:
     on_success: never
+
+addons:
+  apt:
+    packages:
+      - llvm
