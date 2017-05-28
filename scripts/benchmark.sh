@@ -11,13 +11,13 @@ bench () {
     echo "$1" | sed 's/./-/g'
     shift
     echo "\$ $@ bf/mandelbrot.bf"
-    /usr/bin/time "$@" bf/mandelbrot.bf > /dev/null
+    time "$@" bf/mandelbrot.bf > /dev/null
     echo
     echo "\$ $@ bf/mandelbrot-quiet.bf"
-    /usr/bin/time "$@" bf/mandelbrot-quiet.bf > /dev/null
+    time "$@" bf/mandelbrot-quiet.bf > /dev/null
     echo
     echo "\$ echo $BIG_PRIME | $@ bf/factor.bf"
-    echo $BIG_PRIME | /usr/bin/time "$@" bf/factor.bf > /dev/null
+    echo $BIG_PRIME | time "$@" bf/factor.bf > /dev/null
     echo
 }
 
