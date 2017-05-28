@@ -74,18 +74,18 @@ impl LoopIndex {
 impl LoopBalanceMap {
     /// Initializes the map for the given program.
     pub fn new(program: &Program) -> Self {
-        let mut lbm = LoopBalanceMap(HashMap::new());
+        let mut result = LoopBalanceMap(HashMap::new());
 
         for statement in program {
             match *statement {
                 Statement::Instr(_) => (),
                 Statement::Loop(ref body) => {
-                    lbm.analyze_loop(body);
+                    result.analyze_loop(body);
                 }
             }
         }
 
-        lbm
+        result
     }
 
     /// Gets the balance of the given loop body.
