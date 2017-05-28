@@ -27,6 +27,17 @@ mod jit_only {
     }
 
     #[bench]
+    fn compile_factor_unchecked(b: &mut Bencher) {
+        let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
+
+        b.iter(|| {
+            let program = rle::compile(&program);
+            let program = peephole::compile(&program);
+            jit::compile(&program, false)
+        });
+    }
+
+    #[bench]
     fn run_factor_million(b: &mut Bencher) {
         let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
         let program = rle::compile(&program);
