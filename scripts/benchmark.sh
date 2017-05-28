@@ -6,18 +6,6 @@ make -C cpp
 
 rustup run nightly cargo build --release --features=jit
 
-if ! which bfc >/dev/null 2>&1; then
-    if [ -d /usr/local/opt/llvm/ ]; then
-        LLVM_SYS_40_PREFIX=/usr/local/opt/llvm/
-        export LLVM_SYS_40_PREFIX
-    else
-        LLVM_SYS_40_AUTOBUILD=YES
-        export LLVM_SYS_40_AUTOBUILD
-    fi
-
-    cargo install --git https://github.com/tov/bfc.git
-fi
-
 heading () {
     echo "$1"
     echo "$1" | sed 's/./-/g'
@@ -50,11 +38,5 @@ bench "bfi native JIT"                  target/release/bfi --jit
 bench "bfi native JIT (unchecked)"      target/release/bfi --jit -u
 bench "Bendersky's optinterp3"          cpp/optinterp3
 bench "Bendersky's optasmjit"           cpp/optasmjit
-bench "bfc compilation"                 bfc
-
-heading "bfc execution"
-time_cmd ""             ./mandelbrot
-time_cmd ""             ./mandelbrot-quiet
-time_cmd "$BIG_PRIME"   ./factor
 
 exit 0
