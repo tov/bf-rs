@@ -1,3 +1,6 @@
 *.o
 optinterp
 optinterp2
+optinterp3
+optasmjit
+asmjit/
