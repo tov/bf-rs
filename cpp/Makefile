@@ -1,4 +1,4 @@
-CXXFLAGS = -O3 --std=c++11
+CXXFLAGS = -O3 --std=c++14
 
 default: optinterp2 optinterp
 
