@@ -11,7 +11,7 @@ if ! which bfc >/dev/null 2>&1; then
         LLVM_SYS_40_PREFIX=/usr/local/opt/llvm/
         export LLVM_SYS_40_PREFIX
     else
-        LLVM_SYS_40_AUTOBUILD=1
+        LLVM_SYS_40_AUTOBUILD=YES
         export LLVM_SYS_40_AUTOBUILD
     fi
 
