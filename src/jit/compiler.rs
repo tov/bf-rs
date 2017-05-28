@@ -291,17 +291,17 @@ impl Compiler {
 #[derive(Debug, Clone)]
 struct AbstractInterpreter {
     /// The minimum distance from the bottom of memory.
-    low_mark: usize,
+    left_mark: usize,
     /// The minimum distance from the top of memory.
-    high_mark: usize,
+    right_mark: usize,
 }
 
 impl AbstractInterpreter {
     /// In the initial state, we know nothing.
     fn new() -> Self {
         AbstractInterpreter {
-            low_mark: 0,
-            high_mark: 0,
+            left_mark: 0,
+            right_mark: 0,
         }
     }
 
@@ -311,12 +311,12 @@ impl AbstractInterpreter {
     fn left(&mut self, count: Count) -> bool {
         let count = count as usize;
 
-        self.high_mark += count;
-        if count <= self.low_mark {
-            self.low_mark -= count;
+        self.right_mark += count;
+        if count <= self.left_mark {
+            self.left_mark -= count;
             true
         } else {
-            self.low_mark = 0;
+            self.left_mark = 0;
             false
         }
     }
@@ -327,12 +327,12 @@ impl AbstractInterpreter {
     fn right(&mut self, count: Count) -> bool {
         let count = count as usize;
 
-        self.low_mark += count;
-        if count <= self.high_mark {
-            self.high_mark -= count;
+        self.left_mark += count;
+        if count <= self.right_mark {
+            self.right_mark -= count;
             true
         } else {
-            self.high_mark = 0;
+            self.right_mark = 0;
             false
         }
     }
@@ -341,14 +341,14 @@ impl AbstractInterpreter {
     ///
     /// This is used when we may move an arbitrary distance to the left.
     fn reset_left(&mut self) {
-        self.low_mark = 0;
+        self.left_mark = 0;
     }
 
     /// Resets the right mark.
     ///
     /// This is used when we may move an arbitrary distance to the right.
     fn reset_right(&mut self) {
-        self.high_mark = 0;
+        self.right_mark = 0;
     }
 
     /// Resets both marks.
