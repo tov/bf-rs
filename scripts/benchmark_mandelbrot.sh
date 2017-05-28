@@ -2,7 +2,7 @@
 
 ( cd cpp; make )
 
-cargo build --release --features=jit
+rustup run nightly cargo build --release --features=jit
 
 time cpp/optinterp bf/mandelbrot.bf >/dev/null
 time cpp/optinterp2 bf/mandelbrot.bf >/dev/null
