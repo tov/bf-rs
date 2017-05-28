@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["OKAY","The object code terminated successfully."],["OVERFLOW","The pointer would have pointed above the allocated buffer had the program continued."],["UNDERFLOW","The pointer would have pointed below the allocated buffer had the program continued."]],"struct":[["RtsState","Minimal state for our minimal run-time system."]]});
