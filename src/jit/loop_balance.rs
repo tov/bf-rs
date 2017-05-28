@@ -94,6 +94,8 @@ impl LoopBalanceMap {
     }
 
     /// Performs the analysis for the given loop body and any sub-loops.
+    ///
+    /// Stores the result of the analysis in `self`.
     fn analyze_loop(&mut self, body: &LoopBody) -> LoopBalance {
         use peephole::Statement::*;
         use common::Instruction::*;
