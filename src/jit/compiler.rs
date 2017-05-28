@@ -2,7 +2,7 @@ use dynasmrt::x64::Assembler;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use super::*;
-use super::analysis::AbstractInterpreter;
+use super::analysis::{BoundsAnalysis, AbstractInterpreter};
 use common::Count;
 use peephole;
 
@@ -109,7 +109,7 @@ impl Compiler {
 
         match *stm {
             Instr(Right(count)) => {
-                let proved = self.interpreter.right(count);
+                let proved = self.interpreter.move_right(count);
 
                 dynasm!(self.asm
                     ;; self.load_pos_offset(count, proved)
@@ -118,7 +118,7 @@ impl Compiler {
             }
 
             Instr(Left(count)) => {
-                let proved = self.interpreter.left(count);
+                let proved = self.interpreter.move_left(count);
 
                 dynasm!(self.asm
                     ;; self.load_neg_offset(count, proved)
@@ -190,8 +190,8 @@ impl Compiler {
             }
 
             Instr(OffsetAddRight(offset)) => {
-                let proved = self.interpreter.right(offset);
-                self.interpreter.left(offset);
+                let proved = self.interpreter.move_right(offset);
+                self.interpreter.move_left(offset);
 
                 dynasm!(self.asm
                     ; cmp BYTE [pointer], 0
@@ -205,8 +205,8 @@ impl Compiler {
             }
 
             Instr(OffsetAddLeft(offset)) => {
-                let proved = self.interpreter.left(offset);
-                self.interpreter.right(offset);
+                let proved = self.interpreter.move_left(offset);
+                self.interpreter.move_right(offset);
 
                 dynasm!(self.asm
                     ; cmp BYTE [pointer], 0

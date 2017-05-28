@@ -3,6 +3,35 @@ use std::collections::HashMap;
 use common::Count;
 use peephole::{Statement, Program};
 
+/// Interface for bounds checking analysis.
+pub trait BoundsAnalysis {
+    /// Moves the pointer the given distance to the left.
+    ///
+    /// Returns whether we can prove that this move will not underflow.
+    fn move_left(&mut self, count: Count) -> bool;
+
+    /// Moves the pointer the given distance to the right.
+    ///
+    /// Returns whether we can prove that this move will not overflow.
+    fn move_right(&mut self, count: Count) -> bool;
+
+    /// Resets the left mark.
+    ///
+    /// This is used when we may move an arbitrary distance to the left.
+    fn reset_left(&mut self);
+
+    /// Resets the right mark.
+    ///
+    /// This is used when we may move an arbitrary distance to the right.
+    fn reset_right(&mut self);
+
+    /// Updates the marks upon entering a loop.
+    fn enter_loop(&mut self, body: &Box<[Statement]>);
+
+    /// Updates the marks upon leaving a loop.
+    fn leave_loop(&mut self);
+}
+
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 /// The net movement of a loop.
 enum LoopBalance {
@@ -119,15 +148,15 @@ impl AbstractInterpreter {
         for statement in statements {
             match *statement {
                 Instr(Right(count)) => net = match net {
-                    Exact(disp)         => Exact(disp + count as isize),
-                    RightOnly           => RightOnly,
-                    _                   => Unknown,
+                    Exact(disp) => Exact(disp + count as isize),
+                    RightOnly => RightOnly,
+                    _ => Unknown,
                 },
 
                 Instr(Left(count)) => net = match net {
-                    Exact(disp)         => Exact(disp - count as isize),
-                    LeftOnly            => LeftOnly,
-                    _                   => Unknown,
+                    Exact(disp) => Exact(disp - count as isize),
+                    LeftOnly => LeftOnly,
+                    _ => Unknown,
                 },
 
                 Instr(Add(_)) | Instr(In) | Instr(Out) => (),
@@ -138,22 +167,22 @@ impl AbstractInterpreter {
                 Instr(SetZero) | Instr(OffsetAddRight(_)) | Instr(OffsetAddLeft(_)) => (),
 
                 Instr(FindZeroRight(_)) =>
-                    net = if net.is_right_only() {RightOnly} else {Unknown},
+                    net = if net.is_right_only() { RightOnly } else { Unknown },
 
                 Instr(FindZeroLeft(_)) =>
-                    net = if net.is_left_only() {LeftOnly} else {Unknown},
+                    net = if net.is_left_only() { LeftOnly } else { Unknown },
 
                 Loop(ref body) => {
                     let index = LoopIndex::from_loop_body(body);
-                    let body  = self.analyze(body);
+                    let body = self.analyze(body);
 
                     self.loop_balances.insert(index, body);
 
                     net = match net {
-                        Exact(disp) if body.is_balanced()                   => Exact(disp),
-                        _ if net.is_right_only() && body.is_right_only()    => RightOnly,
-                        _ if net.is_left_only() && body.is_left_only()      => LeftOnly,
-                        _                                                   => Unknown,
+                        Exact(disp) if body.is_balanced() => Exact(disp),
+                        _ if net.is_right_only() && body.is_right_only() => RightOnly,
+                        _ if net.is_left_only() && body.is_left_only() => LeftOnly,
+                        _ => Unknown,
                     }
                 }
             }
@@ -162,10 +191,18 @@ impl AbstractInterpreter {
         net
     }
 
+    /// Resets both marks.
+    fn reset(&mut self) {
+        self.reset_left();
+        self.reset_right();
+    }
+}
+
+impl BoundsAnalysis for AbstractInterpreter {
     /// Moves the pointer the given distance to the left.
     ///
     /// Returns whether we can prove that this move will not underflow.
-    pub fn left(&mut self, count: Count) -> bool {
+    fn move_left(&mut self, count: Count) -> bool {
         let count = count as usize;
 
         self.right_mark += count;
@@ -181,7 +218,7 @@ impl AbstractInterpreter {
     /// Moves the pointer the given distance to the right.
     ///
     /// Returns whether we can prove that this move will not overflow.
-    pub fn right(&mut self, count: Count) -> bool {
+    fn move_right(&mut self, count: Count) -> bool {
         let count = count as usize;
 
         self.left_mark += count;
@@ -194,28 +231,22 @@ impl AbstractInterpreter {
         }
     }
 
-    /// Resets both marks.
-    fn reset(&mut self) {
-        self.reset_left();
-        self.reset_right();
-    }
-
     /// Resets the left mark.
     ///
     /// This is used when we may move an arbitrary distance to the left.
-    pub fn reset_left(&mut self) {
+    fn reset_left(&mut self) {
         self.left_mark = 0;
     }
 
     /// Resets the right mark.
     ///
     /// This is used when we may move an arbitrary distance to the right.
-    pub fn reset_right(&mut self) {
+    fn reset_right(&mut self) {
         self.right_mark = 0;
     }
 
     /// Updates the marks upon entering a loop.
-    pub fn enter_loop(&mut self, body: &Box<[Statement]>) {
+    fn enter_loop(&mut self, body: &Box<[Statement]>) {
         if let Some(&balance) = self.loop_balances.get(&LoopIndex::from_loop_body(body)) {
             if balance.is_balanced() {
                 // No change
@@ -234,7 +265,7 @@ impl AbstractInterpreter {
     }
 
     /// Updates the marks upon leaving a loop.
-    pub fn leave_loop(&mut self) {
+    fn leave_loop(&mut self) {
         let (left_mark, right_mark) = self.loop_stack.pop()
             .expect("got exit_loop without matching enter_loop");
         self.left_mark = left_mark;
