@@ -43,7 +43,7 @@ impl Compiler {
             asm: asm,
             start: start,
             checked: checked,
-            interpreter: AbstractInterpreter::new(program),
+            interpreter: AbstractInterpreter::new(program, checked),
         };
 
         result.emit_prologue();
@@ -227,7 +227,7 @@ impl Compiler {
                 let begin_label = self.asm.new_dynamic_label();
                 let end_label   = self.asm.new_dynamic_label();
 
-                self.interpreter.reset();
+                self.interpreter.enter_loop(body);
 
                 dynasm!(self.asm
                     ; jmp =>end_label
@@ -238,7 +238,7 @@ impl Compiler {
                     ; jnz =>begin_label
                 );
 
-                self.interpreter.reset();
+                self.interpreter.leave_loop();
             }
         }
     }

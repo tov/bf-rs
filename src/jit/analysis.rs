@@ -79,8 +79,10 @@ pub struct AbstractInterpreter {
 impl AbstractInterpreter {
     /// Initialize the interpreter with the body of the program.
     ///
-    /// The interpreter initially analyzes the program for loop balances.
-    pub fn new(program: &Program) -> Self {
+    /// The interpreter initially analyzes the program for loop balances, but only if we're doing
+    /// bounds checking in the first place. (There's no point in doing the analysis if we're not
+    /// going to use it.)
+    pub fn new(program: &Program, checked: bool) -> Self {
         let mut result = AbstractInterpreter {
             left_mark: 0,
             right_mark: 0,
@@ -88,9 +90,23 @@ impl AbstractInterpreter {
             loop_balances: HashMap::new(),
         };
 
-        result.analyze(program);
+        if checked {
+            result.analyze_program(program);
+        }
 
         result
+    }
+
+    fn analyze_program(&mut self, statements: &Program) {
+        for statement in statements {
+            match *statement {
+                Statement::Instr(_) => (),
+                Statement::Loop(ref body) => {
+                    let balance = self.analyze(&*body);
+                    self.loop_balances.insert(LoopIndex::from_loop_body(body), balance);
+                }
+            }
+        }
     }
 
     fn analyze(&mut self, statements: &[Statement]) -> LoopBalance {
@@ -178,6 +194,12 @@ impl AbstractInterpreter {
         }
     }
 
+    /// Resets both marks.
+    fn reset(&mut self) {
+        self.reset_left();
+        self.reset_right();
+    }
+
     /// Resets the left mark.
     ///
     /// This is used when we may move an arbitrary distance to the left.
@@ -217,13 +239,5 @@ impl AbstractInterpreter {
             .expect("got exit_loop without matching enter_loop");
         self.left_mark = left_mark;
         self.right_mark = right_mark;
-    }
-
-    /// Resets both marks.
-    ///
-    /// This is used when we enter and leave a loop.
-    pub fn reset(&mut self) {
-        self.reset_left();
-        self.reset_right();
     }
 }
