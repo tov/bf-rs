@@ -17,7 +17,7 @@ bench () {
     time "$@" bf/mandelbrot-quiet.bf > /dev/null
     echo
     echo "\$ echo $BIG_PRIME | $@ bf/factor.bf"
-    echo $BIG_PRIME | time "$@" bf/factor.bf > /dev/null
+    time echo $BIG_PRIME | "$@" bf/factor.bf > /dev/null
     echo
 }
 
