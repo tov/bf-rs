@@ -2,7 +2,7 @@ use dynasmrt::x64::Assembler;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use super::*;
-use super::analysis::{BoundsAnalysis, AbstractInterpreter};
+use super::analysis::{BoundsAnalysis, AbstractInterpreter, NoAnalysis};
 use common::Count;
 use peephole;
 
@@ -17,13 +17,19 @@ dynasm!(asm
 ///
 /// Uses the `dynasmrt` assembler
 pub fn compile(program: &peephole::Program, checked: bool) -> Program {
-    let mut compiler = Compiler::new(program, checked);
-    compiler.compile(program);
-    compiler.into_program()
+    if checked {
+        let mut compiler = Compiler::<AbstractInterpreter>::new(program, true);
+        compiler.compile(program);
+        compiler.into_program()
+    } else {
+        let mut compiler = Compiler::<NoAnalysis>::new(program, false);
+        compiler.compile(program);
+        compiler.into_program()
+    }
 }
 
 /// The compiler state.
-struct Compiler {
+struct Compiler<B: BoundsAnalysis> {
     /// The underlying assembler.
     asm: Assembler,
     /// The offset of the starting instruction for the object function.
@@ -31,10 +37,10 @@ struct Compiler {
     /// Whether we are emitting bounds checks.
     checked: bool,
     /// Abstract interpreter for bounds checking analysis.
-    interpreter: AbstractInterpreter,
+    interpreter: B,
 }
 
-impl Compiler {
+impl<B: BoundsAnalysis> Compiler<B> {
     fn new(program: &peephole::Program, checked: bool) -> Self {
         let asm = Assembler::new();
         let start = asm.offset();
@@ -43,7 +49,7 @@ impl Compiler {
             asm: asm,
             start: start,
             checked: checked,
-            interpreter: AbstractInterpreter::new(program, checked),
+            interpreter: B::new(program),
         };
 
         result.emit_prologue();
@@ -54,10 +60,8 @@ impl Compiler {
     fn into_program(mut self) -> Program {
         self.emit_epilogue();
 
-        let code = self.asm.finalize().unwrap();
-
         Program {
-            code: code,
+            code: self.asm.finalize().unwrap(),
             start: self.start,
         }
     }
@@ -68,11 +72,11 @@ impl Compiler {
             ; push r13
             ; push r14
             ; push r15
-            ; mov pointer, rcx
+            ; mov pointer, rcx      // first argument
             ; mov mem_start, rcx
             ; mov mem_limit, rcx
-            ; add mem_limit, rdx
-            ; mov rts, r8
+            ; add mem_limit, rdx    // second argument
+            ; mov rts, r8           // third argument
         );
     }
 
@@ -247,12 +251,12 @@ impl Compiler {
     fn load_offset(&mut self, offset: Count) {
         if offset as i32 as Count == offset {
             dynasm!(self.asm
-            ; mov rax, DWORD offset as i32
-        );
+                ; mov rax, DWORD offset as i32
+            );
         } else {
             dynasm!(self.asm
-            ; mov rax, QWORD offset as i64
-        );
+                ; mov rax, QWORD offset as i64
+            );
         }
     }
 
