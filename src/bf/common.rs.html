@@ -178,6 +178,7 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
+<span id="136">136</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Definitions common to multiple passes.</span>
 <span class="doccomment">//!</span>
@@ -244,7 +245,8 @@
 <span class="doccomment">/// The number of times to repeat a command when run-length encoded.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This can be changed to `u16` or `u32` by enabling the `u16count` or `u32count` features,</span>
-<span class="doccomment">/// respectively.</span>
+<span class="doccomment">/// respectively. Making `Count` smaller may make bytecode instructions to be smaller, which</span>
+<span class="doccomment">/// may enable more bytecode to fit in cache.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Count</span> <span class="op">=</span> <span class="ident">usize</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;u16count&quot;</span>)]</span>

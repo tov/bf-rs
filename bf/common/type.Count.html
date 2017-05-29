@@ -48,11 +48,12 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/common.rs.html#67' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/bf/common.rs.html#68' title='goto source code'>[src]</a></span></h1>
 <pre class='rust typedef'>type Count = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>;</pre><div class='docblock'><p>The number of times to repeat a command when run-length encoded.</p>
 
 <p>This can be changed to <code>u16</code> or <code>u32</code> by enabling the <code>u16count</code> or <code>u32count</code> features,
-respectively.</p>
+respectively. Making <code>Count</code> smaller may make bytecode instructions to be smaller, which
+may enable more bytecode to fit in cache.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
 
