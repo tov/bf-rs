@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Statement","Instructions as output by the peephole optimizer."]],"fn":[["compile","Peephole-optimizes run-length encoded AST."]],"type":[["Program","At this level, a program is a rose tree of statements."]]});
+initSidebarItems({"enum":[["Statement","Instructions as output by the peephole optimizer."]],"fn":[["compile","Peephole-optimizes run-length encoded AST."]],"trait":[["PeepholeCompilable","Program forms that can be compiled to the peephole AST."]],"type":[["Program","At this level, a program is a rose tree of statements."]]});

@@ -334,6 +334,30 @@
 <span id="289">289</span>
 <span id="290">290</span>
 <span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::<span class="ident">x64</span>::<span class="ident">Assembler</span>;
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::{<span class="ident">DynasmApi</span>, <span class="ident">DynasmLabelApi</span>};
@@ -342,6 +366,17 @@
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">analysis</span>::{<span class="ident">BoundsAnalysis</span>, <span class="ident">AbstractInterpreter</span>, <span class="ident">NoAnalysis</span>};
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Count</span>;
 <span class="kw">use</span> <span class="ident">peephole</span>;
+
+<span class="doccomment">/// Program forms that can be JIT compiled.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">JitCompilable</span>: <span class="ident">Sized</span> {
+    <span class="doccomment">/// Compile the given program into the peephole AST to prepare for JIT compilation.</span>
+    <span class="kw">fn</span> <span class="ident">into_peephole</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">peephole</span>::<span class="ident">Program</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// JIT compile the given program.</span>
+    <span class="kw">fn</span> <span class="ident">jit_compile</span>(<span class="self">self</span>, <span class="ident">checked</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">Program</span> {
+        <span class="ident">compile</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">into_peephole</span>(), <span class="ident">checked</span>)
+    }
+}
 
 <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">asm</span>
     ; .<span class="ident">alias</span> <span class="ident">pointer</span>, <span class="ident">r12</span>
@@ -475,24 +510,16 @@
 
             <span class="ident">Instr</span>(<span class="ident">In</span>) <span class="op">=&gt;</span> {
                 <span class="macro">dynasm</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">asm</span>
-                    ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">QWORD</span> <span class="ident">rts</span>::<span class="ident">RtsState</span>::<span class="ident">read</span> <span class="kw">as</span> _
-                    ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rts</span>
-                    ; <span class="ident">sub</span> <span class="ident">rsp</span>, <span class="ident">BYTE</span> <span class="number">0x28</span>
-                    ; <span class="ident">call</span> <span class="ident">rax</span>
-                    ; <span class="ident">add</span> <span class="ident">rsp</span>, <span class="ident">BYTE</span> <span class="number">0x28</span>
+                    ;; <span class="self">self</span>.<span class="ident">rts_call</span>(<span class="ident">rts</span>::<span class="ident">RtsState</span>::<span class="ident">read</span> <span class="kw">as</span> _)
                     ; <span class="ident">mov</span> [<span class="ident">pointer</span>], <span class="ident">al</span>
                 );
             }
 
             <span class="ident">Instr</span>(<span class="ident">Out</span>) <span class="op">=&gt;</span> {
                 <span class="macro">dynasm</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">asm</span>
-                    ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">QWORD</span> <span class="ident">rts</span>::<span class="ident">RtsState</span>::<span class="ident">write</span> <span class="kw">as</span> _
-                    ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rts</span>
                     ; <span class="ident">xor</span> <span class="ident">rdx</span>, <span class="ident">rdx</span>
                     ; <span class="ident">mov</span> <span class="ident">dl</span>, [<span class="ident">pointer</span>]
-                    ; <span class="ident">sub</span> <span class="ident">rsp</span>, <span class="ident">BYTE</span> <span class="number">0x28</span>
-                    ; <span class="ident">call</span> <span class="ident">rax</span>
-                    ; <span class="ident">add</span> <span class="ident">rsp</span>, <span class="ident">BYTE</span> <span class="number">0x28</span>
+                    ;; <span class="self">self</span>.<span class="ident">rts_call</span>(<span class="ident">rts</span>::<span class="ident">RtsState</span>::<span class="ident">write</span> <span class="kw">as</span> _)
                 );
             }
 
@@ -584,6 +611,16 @@
         }
     }
 
+    <span class="kw">fn</span> <span class="ident">rts_call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fun</span>: <span class="ident">i64</span>) {
+        <span class="macro">dynasm</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">asm</span>
+            ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">QWORD</span> <span class="ident">fun</span>
+            ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rts</span>
+            ; <span class="ident">sub</span> <span class="ident">rsp</span>, <span class="ident">BYTE</span> <span class="number">0x28</span>
+            ; <span class="ident">call</span> <span class="ident">rax</span>
+            ; <span class="ident">add</span> <span class="ident">rsp</span>, <span class="ident">BYTE</span> <span class="number">0x28</span>
+        );
+    }
+
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">load_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">Count</span>) {
         <span class="kw">if</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="kw">as</span> <span class="ident">Count</span> <span class="op">==</span> <span class="ident">offset</span> {
@@ -626,6 +663,17 @@
     }
 }
 
+<span class="kw">impl</span> <span class="ident">JitCompilable</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">peephole</span>::<span class="ident">Program</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_peephole</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">peephole</span>::<span class="ident">Program</span><span class="op">&gt;</span> {
+        <span class="self">self</span>
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">peephole</span>::<span class="ident">PeepholeCompilable</span><span class="op">&gt;</span> <span class="ident">JitCompilable</span> <span class="kw">for</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">into_peephole</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">peephole</span>::<span class="ident">Program</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">peephole_compile</span>()
+    }
+}
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

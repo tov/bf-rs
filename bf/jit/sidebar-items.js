@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["compile","Compiles peephole-optimized AST to x64 machine code."]],"struct":[["Program","The representation of a JIT-compiled program."]]});
+initSidebarItems({"fn":[["compile","Compiles peephole-optimized AST to x64 machine code."]],"struct":[["Program","The representation of a JIT-compiled program."]],"trait":[["JitCompilable","Program forms that can be JIT compiled."]]});
