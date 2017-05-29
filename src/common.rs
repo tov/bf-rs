@@ -63,7 +63,8 @@ pub enum Command {
 /// The number of times to repeat a command when run-length encoded.
 ///
 /// This can be changed to `u16` or `u32` by enabling the `u16count` or `u32count` features,
-/// respectively.
+/// respectively. Making `Count` smaller may make bytecode instructions to be smaller, which
+/// may enable more bytecode to fit in cache.
 pub type Count = usize;
 
 #[cfg(feature = "u16count")]
