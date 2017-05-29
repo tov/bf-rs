@@ -2,7 +2,7 @@
 name = "bf"
 version = "0.4.0"
 authors = ["Jesse A. Tov <jesse.tov@gmail.com>"]
-description = "An optimizing Brainfuck implementation framework"
+description = "An optimizing Brainfuck interpeter and JIT compiler"
 repository = "https://github.com/tov/bf-rs"
 homepage = "https://github.com/tov/bf-rs"
 documentation = "http://tov.github.io/bf-rs/"
