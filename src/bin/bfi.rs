@@ -128,7 +128,7 @@ fn get_options() -> Options {
     if matches.is_present("jit") {
         #[cfg(feature = "jit")]
         let _ = result.compiler_pass = Pass::Jit;
-    } else if matches.is_present("bytecode") {
+    } else if matches.is_present("byte") {
         result.compiler_pass = Pass::Bytecode;
     } else if matches.is_present("peep") {
         result.compiler_pass = Pass::Peephole;
@@ -187,18 +187,18 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("ast")
             .long("ast")
             .help("Interpret the unoptimized AST")
-            .conflicts_with_all(&["rle", "peep", "bytecode", "jit"]))
+            .conflicts_with_all(&["rle", "peep", "byte", "jit"]))
         .arg(Arg::with_name("rle")
             .long("rle")
             .help("Interpret the run-length encoded the AST")
-            .conflicts_with_all(&["ast", "peep", "bytecode", "jit"]))
+            .conflicts_with_all(&["ast", "peep", "byte", "jit"]))
         .arg(Arg::with_name("peep")
             .long("peep")
             .help(if cfg!(feature = "jit") {"Interpret the peephole-optimized AST"}
                   else {"Interpret the peephole-optimized AST (default)"})
-            .conflicts_with_all(&["ast", "rle", "bytecode", "jit"]))
-        .arg(Arg::with_name("bytecode")
-            .long("bytecode")
+            .conflicts_with_all(&["ast", "rle", "byte", "jit"]))
+        .arg(Arg::with_name("byte")
+            .long("byte")
             .help("Compile AST to bytecode")
             .conflicts_with_all(&["ast", "rle", "peep", "jit"]));
 
@@ -207,12 +207,12 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("jit")
             .long("jit")
             .help("JIT to native x64 (default)")
-            .conflicts_with_all(&["ast", "rle", "peep", "bytecode"]))
+            .conflicts_with_all(&["ast", "rle", "peep", "byte"]))
         .arg(Arg::with_name("unchecked")
             .short("u")
             .long("unchecked")
             .help("Omit memory bounds checks in JIT")
-            .conflicts_with_all(&["ast", "rle", "peep", "bytecode"]));
+            .conflicts_with_all(&["ast", "rle", "peep", "byte"]));
 
     app
 }
