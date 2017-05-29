@@ -3,19 +3,19 @@ use peephole;
 
 use common::{Count, Instruction};
 
-/// Program forms that can be compiled to bytecode bytecode.
+/// Program forms that can be compiled to bytecode.
 pub trait BytecodeCompilable {
-    /// Compile the given program into the peephole AST to prepare for bytecode bytecode compilation.
+    /// Compile the given program into the peephole AST to prepare for bytecode compilation.
     fn with_peephole<F, R>(&self, k: F) -> R
         where F: FnOnce(&peephole::Program) -> R;
 
-    /// Compile the given program to bytecode bytecode.
+    /// Compile the given program to bytecode.
     fn bytecode_compile(&self) -> Box<Program> {
         self.with_peephole(compile)
     }
 }
 
-/// Compiles peephole-optimized AST to a bytecode bytecode program.
+/// Compiles peephole-optimized AST to a bytecode program.
 pub fn compile(src: &[peephole::Statement]) -> Box<Program> {
     let mut compiler = Compiler::new();
     compiler.compile(src);
