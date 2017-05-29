@@ -15,7 +15,7 @@ use common;
 mod interpreter;
 mod compiler;
 
-pub use self::compiler::compile;
+pub use self::compiler::{compile, PeepholeCompilable};
 
 /// At this level, a program is a rose tree of statements.
 ///

@@ -15,7 +15,7 @@ mod analysis;
 mod compiler;
 mod rts;
 
-pub use self::compiler::compile;
+pub use self::compiler::{compile, JitCompilable};
 
 use dynasmrt;
 

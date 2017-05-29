@@ -6,6 +6,17 @@ use super::analysis::{BoundsAnalysis, AbstractInterpreter, NoAnalysis};
 use common::Count;
 use peephole;
 
+/// Program forms that can be JIT compiled.
+pub trait JitCompilable: Sized {
+    /// Compile the given program into the peephole AST to prepare for JIT compilation.
+    fn into_peephole(self) -> Box<peephole::Program>;
+
+    /// JIT compile the given program.
+    fn jit_compile(self, checked: bool) -> Program {
+        compile(&*self.into_peephole(), checked)
+    }
+}
+
 dynasm!(asm
     ; .alias pointer, r12
     ; .alias mem_start, r13
@@ -291,3 +302,14 @@ impl<B: BoundsAnalysis> Compiler<B> {
     }
 }
 
+impl JitCompilable for Box<peephole::Program> {
+    fn into_peephole(self) -> Box<peephole::Program> {
+        self
+    }
+}
+
+impl<T: peephole::PeepholeCompilable> JitCompilable for T {
+    fn into_peephole(self) -> Box<peephole::Program> {
+        self.peephole_compile()
+    }
+}

@@ -10,7 +10,7 @@
 mod compiler;
 mod interpreter;
 
-pub use self::compiler::compile;
+pub use self::compiler::{compile, RleCompilable};
 
 use common::{Command, Count};
 

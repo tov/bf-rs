@@ -20,7 +20,7 @@ use common;
 mod compiler;
 mod interpreter;
 
-pub use self::compiler::compile;
+pub use self::compiler::{compile, FlatCompilable};
 
 /// A program is a flat sequence of instructions.
 pub type Program = [common::Instruction];

@@ -177,3 +177,4 @@ mod tests {
         Statement::Loop(instructions.into_boxed_slice())
     }
 }
+

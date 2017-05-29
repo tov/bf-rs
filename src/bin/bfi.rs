@@ -34,12 +34,12 @@ use std::process::exit;
 use clap::{Arg, App};
 
 use bf::ast;
-use bf::rle;
-use bf::flat;
-use bf::peephole;
+use bf::rle::RleCompilable;
+use bf::flat::FlatCompilable;
+use bf::peephole::PeepholeCompilable;
 
 #[cfg(feature = "jit")]
-use bf::jit;
+use bf::jit::JitCompilable;
 
 use bf::traits::Interpretable;
 
@@ -76,28 +76,23 @@ fn main() {
         }
 
         Pass::Rle => {
-            let program = rle::compile(&program);
+            let program = program.rle_compile();
             interpret(&*program, &options);
         }
 
         Pass::Peep => {
-            let program = rle::compile(&program);
-            let program = peephole::compile(&program);
+            let program = program.peephole_compile();
             interpret(&*program, &options);
         }
 
         Pass::Flat => {
-            let program = rle::compile(&program);
-            let program = peephole::compile(&program);
-            let program = flat::compile(&program);
+            let program = program.flat_compile();
             interpret(&*program, &options);
         }
 
         #[cfg(feature = "jit")]
         Pass::Jit => {
-            let program = rle::compile(&program);
-            let program = peephole::compile(&program);
-            let program = jit::compile(&program, !options.unchecked);
+            let program = program.jit_compile(!options.unchecked);
             interpret(&program, &options);
         }
     }
