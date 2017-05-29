@@ -7,13 +7,14 @@ use common::Count;
 use peephole;
 
 /// Program forms that can be JIT compiled.
-pub trait JitCompilable: Sized {
+pub trait JitCompilable {
     /// Compile the given program into the peephole AST to prepare for JIT compilation.
-    fn into_peephole(self) -> Box<peephole::Program>;
+    fn with_peephole<F, R>(&self, k: F) -> R
+        where F: FnOnce(&peephole::Program) -> R;
 
     /// JIT compile the given program.
-    fn jit_compile(self, checked: bool) -> Program {
-        compile(&*self.into_peephole(), checked)
+    fn jit_compile(&self, checked: bool) -> Program {
+        self.with_peephole(|ast| compile(ast, checked))
     }
 }
 
@@ -303,13 +304,17 @@ impl<B: BoundsAnalysis> Compiler<B> {
 }
 
 impl JitCompilable for Box<peephole::Program> {
-    fn into_peephole(self) -> Box<peephole::Program> {
-        self
+    fn with_peephole<F, R>(&self, k: F) -> R
+        where F: FnOnce(&peephole::Program) -> R
+    {
+        k(self)
     }
 }
 
-impl<T: peephole::PeepholeCompilable> JitCompilable for T {
-    fn into_peephole(self) -> Box<peephole::Program> {
-        self.peephole_compile()
+impl<T: peephole::PeepholeCompilable + ?Sized> JitCompilable for T {
+    fn with_peephole<F, R>(&self, k: F) -> R
+        where F: FnOnce(&peephole::Program) -> R
+    {
+        k(&self.peephole_compile())
     }
 }

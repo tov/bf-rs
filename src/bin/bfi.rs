@@ -57,10 +57,8 @@ enum Pass {
 }
 
 fn main() {
-    // Process command-line options:
     let options = get_options();
 
-    // Parse the program to AST:
     let program = parse(&options);
 
     match options.compiler_pass {

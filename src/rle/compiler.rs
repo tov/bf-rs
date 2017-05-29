@@ -2,13 +2,14 @@ use super::*;
 use ast;
 
 /// Program forms that can be compiled to the RLE AST.
-pub trait RleCompilable: Sized {
+pub trait RleCompilable {
     /// Convert the given program to unoptimized AST to prepare for run-length encoding.
-    fn into_ast(self) -> Box<ast::Program>;
+    fn with_ast<F, R>(&self, k: F) -> R
+        where F: FnOnce(&ast::Program) -> R;
 
     /// Run-length encode the given program.
-    fn rle_compile(self) -> Box<Program> {
-        compile(&*self.into_ast())
+    fn rle_compile(&self) -> Box<Program> {
+        self.with_ast(compile)
     }
 }
 
@@ -127,9 +128,11 @@ mod tests {
     }
 }
 
-impl RleCompilable for Box<ast::Program> {
-    fn into_ast(self) -> Box<ast::Program> {
-        self
+impl RleCompilable for ast::Program {
+    fn with_ast<F, R>(&self, k: F) -> R
+        where F: FnOnce(&ast::Program) -> R
+    {
+        k(self)
     }
 }
 

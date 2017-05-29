@@ -2,13 +2,14 @@ use super::*;
 use rle;
 
 /// Program forms that can be compiled to the peephole AST.
-pub trait PeepholeCompilable: Sized {
+pub trait PeepholeCompilable {
     /// Compile the given program into RLE AST to prepare for peephole optimization.
-    fn into_rle(self) -> Box<rle::Program>;
+    fn with_rle<F, R>(&self, k: F) -> R
+        where F: FnOnce(&rle::Program) -> R;
 
     /// Peephole optimize the given program.
-    fn peephole_compile(self) -> Box<Program> {
-        compile(&*self.into_rle())
+    fn peephole_compile(&self) -> Box<Program> {
+        self.with_rle(compile)
     }
 }
 
@@ -149,14 +150,18 @@ pub fn offset_add_peephole(body: &[Statement]) -> Option<common::Instruction> {
     }
 }
 
-impl PeepholeCompilable for Box<rle::Program> {
-    fn into_rle(self) -> Box<rle::Program> {
-        self
+impl PeepholeCompilable for rle::Program {
+    fn with_rle<F, R>(&self, k: F) -> R
+        where F: FnOnce(&rle::Program) -> R
+    {
+        k(self)
     }
 }
 
-impl<T: rle::RleCompilable> PeepholeCompilable for T {
-    fn into_rle(self) -> Box<rle::Program> {
-        self.rle_compile()
+impl<T: rle::RleCompilable + ?Sized> PeepholeCompilable for T {
+    fn with_rle<F, R>(&self, k: F) -> R
+        where F: FnOnce(&rle::Program) -> R
+    {
+        k(&self.rle_compile())
     }
 }

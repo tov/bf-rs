@@ -4,13 +4,14 @@ use peephole;
 use common::{Count, Instruction};
 
 /// Program forms that can be compiled to flat bytecode.
-pub trait FlatCompilable: Sized {
+pub trait FlatCompilable {
     /// Compile the given program into the peephole AST to prepare for flat bytecode compilation.
-    fn into_peephole(self) -> Box<peephole::Program>;
+    fn with_peephole<F, R>(&self, k: F) -> R
+        where F: FnOnce(&peephole::Program) -> R;
 
     /// Compile the given program to flat bytecode.
-    fn flat_compile(self) -> Box<Program> {
-        compile(&*self.into_peephole())
+    fn flat_compile(&self) -> Box<Program> {
+        self.with_peephole(compile)
     }
 }
 
@@ -67,14 +68,18 @@ pub fn usize_to_count(count: usize) -> Count {
     result
 }
 
-impl FlatCompilable for Box<peephole::Program> {
-    fn into_peephole(self) -> Box<peephole::Program> {
-        self
+impl FlatCompilable for peephole::Program {
+    fn with_peephole<F, R>(&self, k: F) -> R
+        where F: FnOnce(&peephole::Program) -> R
+    {
+        k(self)
     }
 }
 
-impl<T: peephole::PeepholeCompilable> FlatCompilable for T {
-    fn into_peephole(self) -> Box<peephole::Program> {
-        self.peephole_compile()
+impl<T: peephole::PeepholeCompilable + ?Sized> FlatCompilable for T {
+    fn with_peephole<F, R>(&self, k: F) -> R
+        where F: FnOnce(&peephole::Program) -> R
+    {
+        k(&self.peephole_compile())
     }
 }
