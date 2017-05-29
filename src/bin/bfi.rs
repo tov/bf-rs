@@ -6,7 +6,7 @@
 //!
 //! FLAGS:
 //!         --ast          Interpret the unoptimized AST
-//!         --flat         Flatten AST to bytecode
+//!         --byte         Compile AST to bytecode
 //!     -h, --help         Prints help information
 //!         --jit          JIT to native x64 (default)
 //!         --peep         Interpret the peephole-optimized AST
@@ -50,8 +50,8 @@ struct Options {
 enum Pass {
     Ast,
     Rle,
-    Flat,
-    Peep,
+    Bytecode,
+    Peephole,
     #[cfg(feature = "jit")]
     Jit,
 }
@@ -71,13 +71,13 @@ fn main() {
             interpret(&*program, &options);
         }
 
-        Pass::Peep => {
+        Pass::Peephole => {
             let program = program.peephole_compile();
             interpret(&*program, &options);
         }
 
-        Pass::Flat => {
-            let program = program.flat_compile();
+        Pass::Bytecode => {
+            let program = program.bytecode_compile();
             interpret(&*program, &options);
         }
 
@@ -103,7 +103,7 @@ fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
 const DEFAULT_PASS: Pass = Pass::Jit;
 
 #[cfg(not(feature = "jit"))]
-const DEFAULT_PASS: Pass = Pass::Peep;
+const DEFAULT_PASS: Pass = Pass::Peephole;
 
 fn get_options() -> Options {
     let mut result = Options {
@@ -128,10 +128,10 @@ fn get_options() -> Options {
     if matches.is_present("jit") {
         #[cfg(feature = "jit")]
         let _ = result.compiler_pass = Pass::Jit;
-    } else if matches.is_present("flat") {
-        result.compiler_pass = Pass::Flat;
+    } else if matches.is_present("bytecode") {
+        result.compiler_pass = Pass::Bytecode;
     } else if matches.is_present("peep") {
-        result.compiler_pass = Pass::Peep;
+        result.compiler_pass = Pass::Peephole;
     } else if matches.is_present("rle") {
         result.compiler_pass = Pass::Rle;
     } else if matches.is_present("ast") {
@@ -187,19 +187,19 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("ast")
             .long("ast")
             .help("Interpret the unoptimized AST")
-            .conflicts_with_all(&["rle", "peep", "flat", "jit"]))
+            .conflicts_with_all(&["rle", "peep", "bytecode", "jit"]))
         .arg(Arg::with_name("rle")
             .long("rle")
             .help("Interpret the run-length encoded the AST")
-            .conflicts_with_all(&["ast", "peep", "flat", "jit"]))
+            .conflicts_with_all(&["ast", "peep", "bytecode", "jit"]))
         .arg(Arg::with_name("peep")
             .long("peep")
             .help(if cfg!(feature = "jit") {"Interpret the peephole-optimized AST"}
                   else {"Interpret the peephole-optimized AST (default)"})
-            .conflicts_with_all(&["ast", "rle", "flat", "jit"]))
-        .arg(Arg::with_name("flat")
-            .long("flat")
-            .help("Flatten AST to bytecode")
+            .conflicts_with_all(&["ast", "rle", "bytecode", "jit"]))
+        .arg(Arg::with_name("bytecode")
+            .long("bytecode")
+            .help("Compile AST to bytecode")
             .conflicts_with_all(&["ast", "rle", "peep", "jit"]));
 
     #[cfg(feature = "jit")]
@@ -207,12 +207,12 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("jit")
             .long("jit")
             .help("JIT to native x64 (default)")
-            .conflicts_with_all(&["ast", "rle", "peep", "flat"]))
+            .conflicts_with_all(&["ast", "rle", "peep", "bytecode"]))
         .arg(Arg::with_name("unchecked")
             .short("u")
             .long("unchecked")
             .help("Omit memory bounds checks in JIT")
-            .conflicts_with_all(&["ast", "rle", "peep", "flat"]));
+            .conflicts_with_all(&["ast", "rle", "peep", "bytecode"]));
 
     app
 }

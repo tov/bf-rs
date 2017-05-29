@@ -51,7 +51,7 @@ pub mod traits;
 
 pub mod ast;
 pub mod rle;
-pub mod flat;
+pub mod bytecode;
 pub mod peephole;
 
 #[cfg(feature = "jit")]

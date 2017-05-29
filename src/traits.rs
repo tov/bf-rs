@@ -8,7 +8,7 @@ use state::State;
 
 pub use rle::RleCompilable;
 pub use peephole::PeepholeCompilable;
-pub use flat::FlatCompilable;
+pub use bytecode::BytecodeCompilable;
 #[cfg(feature = "jit")]
 pub use jit::JitCompilable;
 

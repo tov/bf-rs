@@ -100,7 +100,7 @@ mod tests {
         let program = ::ast::parse_program(program).unwrap();
         let program = ::rle::compile(&program);
         let program = ::peephole::compile(&program);
-        let program = ::flat::compile(&program);
+        let program = ::bytecode::compile(&program);
         assert_interpret(&*program, input.as_bytes(), output.as_bytes());
     }
 }

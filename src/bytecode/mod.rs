@@ -1,4 +1,4 @@
-//! Brainfuck bytecode, flat instead of an abstract syntax tree.
+//! Brainfuck bytecode instead of an abstract syntax tree.
 //!
 //! This is closer to
 //!
@@ -20,8 +20,8 @@ use common;
 mod compiler;
 mod interpreter;
 
-pub use self::compiler::{compile, FlatCompilable};
+pub use self::compiler::{compile, BytecodeCompilable};
 
-/// A program is a flat sequence of instructions.
+/// A program is a bytecode sequence of instructions.
 pub type Program = [common::Instruction];
 
