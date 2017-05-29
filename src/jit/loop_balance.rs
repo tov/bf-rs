@@ -57,8 +57,8 @@ impl LoopBalance {
 
         match self {
             Exact(disp) => disp <= 0,
-            RightOnly   => false,
             LeftOnly    => true,
+            RightOnly   => false,
             Unknown     => false,
         }
     }

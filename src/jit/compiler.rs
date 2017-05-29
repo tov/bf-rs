@@ -138,24 +138,16 @@ impl<B: BoundsAnalysis> Compiler<B> {
 
             Instr(In) => {
                 dynasm!(self.asm
-                    ; mov rax, QWORD rts::RtsState::read as _
-                    ; mov rcx, rts
-                    ; sub rsp, BYTE 0x28
-                    ; call rax
-                    ; add rsp, BYTE 0x28
+                    ;; self.rts_call(rts::RtsState::read as _)
                     ; mov [pointer], al
                 );
             }
 
             Instr(Out) => {
                 dynasm!(self.asm
-                    ; mov rax, QWORD rts::RtsState::write as _
-                    ; mov rcx, rts
                     ; xor rdx, rdx
                     ; mov dl, [pointer]
-                    ; sub rsp, BYTE 0x28
-                    ; call rax
-                    ; add rsp, BYTE 0x28
+                    ;; self.rts_call(rts::RtsState::write as _)
                 );
             }
 
@@ -245,6 +237,16 @@ impl<B: BoundsAnalysis> Compiler<B> {
                 self.interpreter.leave_loop();
             }
         }
+    }
+
+    fn rts_call(&mut self, fun: i64) {
+        dynasm!(self.asm
+            ; mov rax, QWORD fun
+            ; mov rcx, rts
+            ; sub rsp, BYTE 0x28
+            ; call rax
+            ; add rsp, BYTE 0x28
+        );
     }
 
     #[inline]
