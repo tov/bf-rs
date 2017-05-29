@@ -6,11 +6,8 @@ extern crate bf;
 #[cfg(feature = "jit")]
 mod jit_only {
     use bf::ast;
-    use bf::rle;
-    use bf::peephole;
-    use bf::jit;
 
-    use bf::traits::Interpretable;
+    use bf::traits::{Interpretable, JitCompilable};
     use bf::test_helpers;
 
     use test::Bencher;
@@ -20,9 +17,7 @@ mod jit_only {
         let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
 
         b.iter(|| {
-            let program = rle::compile(&program);
-            let program = peephole::compile(&program);
-            jit::compile(&program, true)
+            program.jit_compile(true)
         });
     }
 
@@ -31,18 +26,14 @@ mod jit_only {
         let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
 
         b.iter(|| {
-            let program = rle::compile(&program);
-            let program = peephole::compile(&program);
-            jit::compile(&program, false)
+            program.jit_compile(false)
         });
     }
 
     #[bench]
     fn run_factor_million(b: &mut Bencher) {
         let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
-        let program = rle::compile(&program);
-        let program = peephole::compile(&program);
-        let program = jit::compile(&program, true);
+        let program = program.jit_compile(true);
 
         b.iter(|| {
             program.interpret_memory(None, b"1000000\n").unwrap()
@@ -52,9 +43,7 @@ mod jit_only {
     #[bench]
     fn run_factor_million_unchecked(b: &mut Bencher) {
         let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
-        let program = rle::compile(&program);
-        let program = peephole::compile(&program);
-        let program = jit::compile(&program, false);
+        let program = program.jit_compile(false);
 
         b.iter(|| {
             program.interpret_memory(None, b"1000000\n").unwrap()

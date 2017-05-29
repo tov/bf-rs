@@ -4,9 +4,7 @@ extern crate test;
 extern crate bf;
 
 use bf::ast;
-use bf::rle;
-use bf::peephole::PeepholeCompilable;
-use bf::traits::Interpretable;
+use bf::traits::{Interpretable, PeepholeCompilable};
 use bf::test_helpers;
 
 use test::Bencher;
@@ -16,7 +14,6 @@ fn compile_factor(b: &mut Bencher) {
     let program = ast::parse_program(test_helpers::FACTOR_SRC).unwrap();
 
     b.iter(|| {
-        let program = rle::compile(&program);
         program.peephole_compile()
     });
 }
