@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `FlatCompilable` trait in crate `bf`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, FlatCompilable">
+    <meta name="description" content="API documentation for the Rust `JitCompilable` trait in crate `bf`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, JitCompilable">
 
-    <title>bf::flat::FlatCompilable - Rust</title>
+    <title>bf::traits::JitCompilable - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'>Trait FlatCompilable</p><div class="block items"><ul><li><a href="#required-methods">Required Methods</a></li><li><a href="#provided-methods">Provided Methods</a></li><li><a href="#implementors">Implementors</a></li></ul></div><p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>flat</a></p><script>window.sidebarCurrent = {name: 'FlatCompilable', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Trait JitCompilable</p><div class="block items"><ul><li><a href="#required-methods">Required Methods</a></li><li><a href="#provided-methods">Provided Methods</a></li><li><a href="#implementors">Implementors</a></li></ul></div><p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>traits</a></p><script>window.sidebarCurrent = {name: 'JitCompilable', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,31 +44,31 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>bf</a>::<wbr><a href='index.html'>flat</a>::<wbr><a class="trait" href=''>FlatCompilable</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>bf</a>::<wbr><a href='index.html'>traits</a>::<wbr><a class="trait" href=''>JitCompilable</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/flat/compiler.rs.html#7-15' title='goto source code'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait FlatCompilable: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a> {
+               </span><a class='srclink' href='../../src/bf/jit/compiler.rs.html#10-18' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait JitCompilable: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a> {
     fn <a href='#tymethod.into_peephole' class='fnname'>into_peephole</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt;;
 
-    fn <a href='#method.flat_compile' class='fnname'>flat_compile</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/flat/type.Program.html" title="type bf::flat::Program">Program</a>&gt; { ... }
-}</pre><div class='docblock'><p>Program forms that can be compiled to flat bytecode.</p>
+    fn <a href='#method.jit_compile' class='fnname'>jit_compile</a>(self, checked: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; <a class="struct" href="../../bf/jit/struct.Program.html" title="struct bf::jit::Program">Program</a> { ... }
+}</pre><div class='docblock'><p>Program forms that can be JIT compiled.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.into_peephole' class='method'><span id='into_peephole.v' class='invisible'><code>fn <a href='#tymethod.into_peephole' class='fnname'>into_peephole</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt;</code></span></h3><div class='docblock'><p>Compile the given program into the peephole AST to prepare for flat bytecode compilation.</p>
+        <h3 id='tymethod.into_peephole' class='method'><span id='into_peephole.v' class='invisible'><code>fn <a href='#tymethod.into_peephole' class='fnname'>into_peephole</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt;</code></span></h3><div class='docblock'><p>Compile the given program into the peephole AST to prepare for JIT compilation.</p>
 </div></div>
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
-        <h3 id='method.flat_compile' class='method'><span id='flat_compile.v' class='invisible'><code>fn <a href='#method.flat_compile' class='fnname'>flat_compile</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/flat/type.Program.html" title="type bf::flat::Program">Program</a>&gt;</code></span></h3><div class='docblock'><p>Compile the given program to flat bytecode.</p>
+        <h3 id='method.jit_compile' class='method'><span id='jit_compile.v' class='invisible'><code>fn <a href='#method.jit_compile' class='fnname'>jit_compile</a>(self, checked: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; <a class="struct" href="../../bf/jit/struct.Program.html" title="struct bf::jit::Program">Program</a></code></span></h3><div class='docblock'><p>JIT compile the given program.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl FlatCompilable for <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt;</code></li>
-<li><code>impl&lt;T:&nbsp;<a class="trait" href="../../bf/traits/trait.PeepholeCompilable.html" title="trait bf::traits::PeepholeCompilable">PeepholeCompilable</a>&gt; FlatCompilable for T</code></li>
+    <li><code>impl JitCompilable for <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt;</code></li>
+<li><code>impl&lt;T:&nbsp;<a class="trait" href="../../bf/traits/trait.PeepholeCompilable.html" title="trait bf::traits::PeepholeCompilable">PeepholeCompilable</a>&gt; JitCompilable for T</code></li>
 </ul><script type="text/javascript" async
-                         src="../../implementors/bf/flat/trait.FlatCompilable.js">
+                         src="../../implementors/bf/traits/trait.JitCompilable.js">
                  </script></section>
     <section id='search' class="content hidden"></section>
 

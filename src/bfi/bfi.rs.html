@@ -269,13 +269,6 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! The Brainfuck interpreter executable.</span>
 <span class="doccomment">//!</span>
@@ -313,16 +306,9 @@
 <span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">Arg</span>, <span class="ident">App</span>};
 
 <span class="kw">use</span> <span class="ident">bf</span>::<span class="ident">ast</span>;
-<span class="kw">use</span> <span class="ident">bf</span>::<span class="ident">rle</span>::<span class="ident">RleCompilable</span>;
-<span class="kw">use</span> <span class="ident">bf</span>::<span class="ident">flat</span>::<span class="ident">FlatCompilable</span>;
-<span class="kw">use</span> <span class="ident">bf</span>::<span class="ident">peephole</span>::<span class="ident">PeepholeCompilable</span>;
+<span class="kw">use</span> <span class="ident">bf</span>::<span class="ident">traits</span>::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;jit&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">bf</span>::<span class="ident">jit</span>::<span class="ident">JitCompilable</span>;
-
-<span class="kw">use</span> <span class="ident">bf</span>::<span class="ident">traits</span>::<span class="ident">Interpretable</span>;
-
-<span class="kw">const</span> <span class="ident">VERSION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;0.3.3&quot;</span>;
+<span class="kw">const</span> <span class="ident">VERSION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;0.3.4&quot;</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Options</span> {
