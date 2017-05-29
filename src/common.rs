@@ -61,14 +61,23 @@ pub enum Command {
 
 #[cfg(not(any(feature = "u16count", feature = "u32count")))]
 /// The number of times to repeat a command when run-length encoded.
+///
+/// This can be changed to `u16` or `u32` by enabling the `u16count` or `u32count` features,
+/// respectively.
 pub type Count = usize;
 
 #[cfg(feature = "u16count")]
 /// The number of times to repeat a command when run-length encoded.
+///
+/// This type is `usize` by default, but was set to `u16` by enabling the `u16count` feature. It
+/// can also be set to `u32` via the `u32count` feature.
 pub type Count = u16;
 
 #[cfg(feature = "u32count")]
 /// The number of times to repeat a command when run-length encoded.
+///
+/// This type is `usize` by default, but was set to `u32` by enabling the `u32count` feature. It
+/// can also be set to `u16` via the `u16count` feature.
 pub type Count = u32;
 
 /// Instructions as output by the bytecode flattener.
