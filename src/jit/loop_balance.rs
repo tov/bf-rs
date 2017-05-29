@@ -44,10 +44,9 @@ impl LoopBalance {
         use self::LoopBalance::*;
 
         match self {
-            Exact(disp) => disp >= 0,
-            RightOnly   => true,
-            LeftOnly    => false,
-            Unknown     => false,
+            Exact(disp)         => disp >= 0,
+            RightOnly           => true,
+            LeftOnly | Unknown  => false,
         }
     }
 
@@ -56,10 +55,9 @@ impl LoopBalance {
         use self::LoopBalance::*;
 
         match self {
-            Exact(disp) => disp <= 0,
-            LeftOnly    => true,
-            RightOnly   => false,
-            Unknown     => false,
+            Exact(disp)         => disp <= 0,
+            LeftOnly            => true,
+            RightOnly | Unknown => false,
         }
     }
 }
@@ -117,12 +115,11 @@ impl LoopBalanceMap {
                     _           => Unknown,
                 },
 
-                Instr(Add(_)) | Instr(In) | Instr(Out) => (),
+                Instr(Add(_)) | Instr(In) | Instr(Out) |
+                Instr(SetZero) | Instr(OffsetAddRight(_)) | Instr(OffsetAddLeft(_)) => (),
 
                 Instr(JumpZero(_)) | Instr(JumpNotZero(_)) =>
                     panic!("unexpected jump instruction"),
-
-                Instr(SetZero) | Instr(OffsetAddRight(_)) | Instr(OffsetAddLeft(_)) => (),
 
                 Instr(FindZeroRight(_)) =>
                     net = if net.is_right_only() { RightOnly } else { Unknown },
