@@ -48,24 +48,24 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/rle/compiler.rs.html#5-13' title='goto source code'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait RleCompilable: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a> {
-    fn <a href='#tymethod.into_ast' class='fnname'>into_ast</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/ast/type.Program.html" title="type bf::ast::Program">Program</a>&gt;;
+               </span><a class='srclink' href='../../src/bf/rle/compiler.rs.html#5-14' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait RleCompilable {
+    fn <a href='#tymethod.with_ast' class='fnname'>with_ast</a>&lt;F, R&gt;(&amp;self, k: F) -&gt; R<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(&amp;<a class="type" href="../../bf/ast/type.Program.html" title="type bf::ast::Program">Program</a>) -&gt; R</span>;
 
-    fn <a href='#method.rle_compile' class='fnname'>rle_compile</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/rle/type.Program.html" title="type bf::rle::Program">Program</a>&gt; { ... }
+    fn <a href='#method.rle_compile' class='fnname'>rle_compile</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/rle/type.Program.html" title="type bf::rle::Program">Program</a>&gt; { ... }
 }</pre><div class='docblock'><p>Program forms that can be compiled to the RLE AST.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.into_ast' class='method'><span id='into_ast.v' class='invisible'><code>fn <a href='#tymethod.into_ast' class='fnname'>into_ast</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/ast/type.Program.html" title="type bf::ast::Program">Program</a>&gt;</code></span></h3><div class='docblock'><p>Convert the given program to unoptimized AST to prepare for run-length encoding.</p>
+        <h3 id='tymethod.with_ast' class='method'><span id='with_ast.v' class='invisible'><code>fn <a href='#tymethod.with_ast' class='fnname'>with_ast</a>&lt;F, R&gt;(&amp;self, k: F) -&gt; R <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(&amp;<a class="type" href="../../bf/ast/type.Program.html" title="type bf::ast::Program">Program</a>) -&gt; R,&nbsp;</span></code></span></h3><div class='docblock'><p>Convert the given program to unoptimized AST to prepare for run-length encoding.</p>
 </div></div>
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
-        <h3 id='method.rle_compile' class='method'><span id='rle_compile.v' class='invisible'><code>fn <a href='#method.rle_compile' class='fnname'>rle_compile</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/rle/type.Program.html" title="type bf::rle::Program">Program</a>&gt;</code></span></h3><div class='docblock'><p>Run-length encode the given program.</p>
+        <h3 id='method.rle_compile' class='method'><span id='rle_compile.v' class='invisible'><code>fn <a href='#method.rle_compile' class='fnname'>rle_compile</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/rle/type.Program.html" title="type bf::rle::Program">Program</a>&gt;</code></span></h3><div class='docblock'><p>Run-length encode the given program.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl RleCompilable for <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/ast/type.Program.html" title="type bf::ast::Program">Program</a>&gt;</code></li>
+    <li><code>impl RleCompilable for <a class="type" href="../../bf/ast/type.Program.html" title="type bf::ast::Program">Program</a></code></li>
 </ul><script type="text/javascript" async
                          src="../../implementors/bf/traits/trait.RleCompilable.js">
                  </script></section>

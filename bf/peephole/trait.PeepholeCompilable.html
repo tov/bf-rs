@@ -48,25 +48,25 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/peephole/compiler.rs.html#5-13' title='goto source code'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait PeepholeCompilable: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a> {
-    fn <a href='#tymethod.into_rle' class='fnname'>into_rle</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/rle/type.Program.html" title="type bf::rle::Program">Program</a>&gt;;
+               </span><a class='srclink' href='../../src/bf/peephole/compiler.rs.html#5-14' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait PeepholeCompilable {
+    fn <a href='#tymethod.with_rle' class='fnname'>with_rle</a>&lt;F, R&gt;(&amp;self, k: F) -&gt; R<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(&amp;<a class="type" href="../../bf/rle/type.Program.html" title="type bf::rle::Program">Program</a>) -&gt; R</span>;
 
-    fn <a href='#method.peephole_compile' class='fnname'>peephole_compile</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt; { ... }
+    fn <a href='#method.peephole_compile' class='fnname'>peephole_compile</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt; { ... }
 }</pre><div class='docblock'><p>Program forms that can be compiled to the peephole AST.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.into_rle' class='method'><span id='into_rle.v' class='invisible'><code>fn <a href='#tymethod.into_rle' class='fnname'>into_rle</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/rle/type.Program.html" title="type bf::rle::Program">Program</a>&gt;</code></span></h3><div class='docblock'><p>Compile the given program into RLE AST to prepare for peephole optimization.</p>
+        <h3 id='tymethod.with_rle' class='method'><span id='with_rle.v' class='invisible'><code>fn <a href='#tymethod.with_rle' class='fnname'>with_rle</a>&lt;F, R&gt;(&amp;self, k: F) -&gt; R <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(&amp;<a class="type" href="../../bf/rle/type.Program.html" title="type bf::rle::Program">Program</a>) -&gt; R,&nbsp;</span></code></span></h3><div class='docblock'><p>Compile the given program into RLE AST to prepare for peephole optimization.</p>
 </div></div>
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
-        <h3 id='method.peephole_compile' class='method'><span id='peephole_compile.v' class='invisible'><code>fn <a href='#method.peephole_compile' class='fnname'>peephole_compile</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt;</code></span></h3><div class='docblock'><p>Peephole optimize the given program.</p>
+        <h3 id='method.peephole_compile' class='method'><span id='peephole_compile.v' class='invisible'><code>fn <a href='#method.peephole_compile' class='fnname'>peephole_compile</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt;</code></span></h3><div class='docblock'><p>Peephole optimize the given program.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl PeepholeCompilable for <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/rle/type.Program.html" title="type bf::rle::Program">Program</a>&gt;</code></li>
-<li><code>impl&lt;T:&nbsp;<a class="trait" href="../../bf/traits/trait.RleCompilable.html" title="trait bf::traits::RleCompilable">RleCompilable</a>&gt; PeepholeCompilable for T</code></li>
+    <li><code>impl PeepholeCompilable for <a class="type" href="../../bf/rle/type.Program.html" title="type bf::rle::Program">Program</a></code></li>
+<li><code>impl&lt;T:&nbsp;<a class="trait" href="../../bf/traits/trait.RleCompilable.html" title="trait bf::traits::RleCompilable">RleCompilable</a> + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>&gt; PeepholeCompilable for T</code></li>
 </ul><script type="text/javascript" async
                          src="../../implementors/bf/peephole/trait.PeepholeCompilable.js">
                  </script></section>

@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `compile` fn in crate `bf`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, compile">
+    <meta name="description" content="API documentation for the Rust `Program` type in crate `bf`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Program">
 
-    <title>bf::peephole::compile - Rust</title>
+    <title>bf::bytecode::Program - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc fn">
+<body class="rustdoc type">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>peephole</a></p><script>window.sidebarCurrent = {name: 'compile', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>bytecode</a></p><script>window.sidebarCurrent = {name: 'Program', ty: 'type', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,14 +44,12 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Function <a href='../index.html'>bf</a>::<wbr><a href='index.html'>peephole</a>::<wbr><a class="fn" href=''>compile</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Type Definition <a href='../index.html'>bf</a>::<wbr><a href='index.html'>bytecode</a>::<wbr><a class="type" href=''>Program</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/peephole/compiler.rs.html#19-23' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn compile(src: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="enum" href="../../bf/rle/enum.Statement.html" title="enum bf::rle::Statement">Statement</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt;</pre><div class='docblock'><p>Peephole-optimizes run-length encoded AST.</p>
-
-<p>See <a href="struct.Instruction.html"><code>Instruction</code></a> for descriptions of the peepholes.</p>
+               </span><a class='srclink' href='../../src/bf/bytecode/mod.rs.html#26' title='goto source code'>[src]</a></span></h1>
+<pre class='rust typedef'>type Program = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">[</a><a class="enum" href="../../bf/common/enum.Instruction.html" title="enum bf::common::Instruction">Instruction</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>;</pre><div class='docblock'><p>A program is a bytecode sequence of instructions.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
 

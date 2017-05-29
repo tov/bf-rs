@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `JitCompilable` trait in crate `bf`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, JitCompilable">
+    <meta name="description" content="API documentation for the Rust `BytecodeCompilable` trait in crate `bf`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, BytecodeCompilable">
 
-    <title>bf::jit::JitCompilable - Rust</title>
+    <title>bf::bytecode::BytecodeCompilable - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'>Trait JitCompilable</p><div class="block items"><ul><li><a href="#required-methods">Required Methods</a></li><li><a href="#provided-methods">Provided Methods</a></li><li><a href="#implementors">Implementors</a></li></ul></div><p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>jit</a></p><script>window.sidebarCurrent = {name: 'JitCompilable', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Trait BytecodeCompilable</p><div class="block items"><ul><li><a href="#required-methods">Required Methods</a></li><li><a href="#provided-methods">Provided Methods</a></li><li><a href="#implementors">Implementors</a></li></ul></div><p class='location'><a href='../index.html'>bf</a>::<wbr><a href='index.html'>bytecode</a></p><script>window.sidebarCurrent = {name: 'BytecodeCompilable', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,31 +44,31 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>bf</a>::<wbr><a href='index.html'>jit</a>::<wbr><a class="trait" href=''>JitCompilable</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>bf</a>::<wbr><a href='index.html'>bytecode</a>::<wbr><a class="trait" href=''>BytecodeCompilable</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/jit/compiler.rs.html#10-19' title='goto source code'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait JitCompilable {
+               </span><a class='srclink' href='../../src/bf/bytecode/compiler.rs.html#7-16' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait BytecodeCompilable {
     fn <a href='#tymethod.with_peephole' class='fnname'>with_peephole</a>&lt;F, R&gt;(&amp;self, k: F) -&gt; R<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(&amp;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>) -&gt; R</span>;
 
-    fn <a href='#method.jit_compile' class='fnname'>jit_compile</a>(&amp;self, checked: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; <a class="struct" href="../../bf/jit/struct.Program.html" title="struct bf::jit::Program">Program</a> { ... }
-}</pre><div class='docblock'><p>Program forms that can be JIT compiled.</p>
+    fn <a href='#method.bytecode_compile' class='fnname'>bytecode_compile</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/bytecode/type.Program.html" title="type bf::bytecode::Program">Program</a>&gt; { ... }
+}</pre><div class='docblock'><p>Program forms that can be compiled to bytecode bytecode.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.with_peephole' class='method'><span id='with_peephole.v' class='invisible'><code>fn <a href='#tymethod.with_peephole' class='fnname'>with_peephole</a>&lt;F, R&gt;(&amp;self, k: F) -&gt; R <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(&amp;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>) -&gt; R,&nbsp;</span></code></span></h3><div class='docblock'><p>Compile the given program into the peephole AST to prepare for JIT compilation.</p>
+        <h3 id='tymethod.with_peephole' class='method'><span id='with_peephole.v' class='invisible'><code>fn <a href='#tymethod.with_peephole' class='fnname'>with_peephole</a>&lt;F, R&gt;(&amp;self, k: F) -&gt; R <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(&amp;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>) -&gt; R,&nbsp;</span></code></span></h3><div class='docblock'><p>Compile the given program into the peephole AST to prepare for bytecode bytecode compilation.</p>
 </div></div>
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
-        <h3 id='method.jit_compile' class='method'><span id='jit_compile.v' class='invisible'><code>fn <a href='#method.jit_compile' class='fnname'>jit_compile</a>(&amp;self, checked: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; <a class="struct" href="../../bf/jit/struct.Program.html" title="struct bf::jit::Program">Program</a></code></span></h3><div class='docblock'><p>JIT compile the given program.</p>
+        <h3 id='method.bytecode_compile' class='method'><span id='bytecode_compile.v' class='invisible'><code>fn <a href='#method.bytecode_compile' class='fnname'>bytecode_compile</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/bytecode/type.Program.html" title="type bf::bytecode::Program">Program</a>&gt;</code></span></h3><div class='docblock'><p>Compile the given program to bytecode bytecode.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl JitCompilable for <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a>&gt;</code></li>
-<li><code>impl&lt;T:&nbsp;<a class="trait" href="../../bf/traits/trait.PeepholeCompilable.html" title="trait bf::traits::PeepholeCompilable">PeepholeCompilable</a> + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>&gt; JitCompilable for T</code></li>
+    <li><code>impl BytecodeCompilable for <a class="type" href="../../bf/peephole/type.Program.html" title="type bf::peephole::Program">Program</a></code></li>
+<li><code>impl&lt;T:&nbsp;<a class="trait" href="../../bf/traits/trait.PeepholeCompilable.html" title="trait bf::traits::PeepholeCompilable">PeepholeCompilable</a> + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>&gt; BytecodeCompilable for T</code></li>
 </ul><script type="text/javascript" async
-                         src="../../implementors/bf/jit/trait.JitCompilable.js">
+                         src="../../implementors/bf/bytecode/trait.BytecodeCompilable.js">
                  </script></section>
     <section id='search' class="content hidden"></section>
 
