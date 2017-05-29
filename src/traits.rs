@@ -6,6 +6,12 @@ use std::io::{Cursor, Read, Write, stdin, stdout};
 use common::BfResult;
 use state::State;
 
+pub use rle::RleCompilable;
+pub use peephole::PeepholeCompilable;
+pub use flat::FlatCompilable;
+#[cfg(feature = "jit")]
+pub use jit::JitCompilable;
+
 /// Program forms that can be interpreted.
 pub trait Interpretable {
     /// Interprets a program against the given state.

@@ -34,14 +34,7 @@ use std::process::exit;
 use clap::{Arg, App};
 
 use bf::ast;
-use bf::rle::RleCompilable;
-use bf::flat::FlatCompilable;
-use bf::peephole::PeepholeCompilable;
-
-#[cfg(feature = "jit")]
-use bf::jit::JitCompilable;
-
-use bf::traits::Interpretable;
+use bf::traits::*;
 
 const VERSION: &'static str = "0.3.3";
 
