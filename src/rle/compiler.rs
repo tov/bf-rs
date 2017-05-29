@@ -2,7 +2,7 @@ use super::*;
 use ast;
 
 /// Compiles an unoptimized [`ast`](../ast/index.html) program to a run-length encoded program.
-pub fn compile(program: &[ast::Statement]) -> Box<Program> {
+pub fn compile(program: &ast::Program) -> Box<Program> {
     let mut compiler = Compiler::new();
     compiler.compile(program);
     compiler.into_program()
