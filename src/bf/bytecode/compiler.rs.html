@@ -134,19 +134,19 @@
 
 <span class="kw">use</span> <span class="ident">common</span>::{<span class="ident">Count</span>, <span class="ident">Instruction</span>};
 
-<span class="doccomment">/// Program forms that can be compiled to bytecode bytecode.</span>
+<span class="doccomment">/// Program forms that can be compiled to bytecode.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BytecodeCompilable</span> {
-    <span class="doccomment">/// Compile the given program into the peephole AST to prepare for bytecode bytecode compilation.</span>
+    <span class="doccomment">/// Compile the given program into the peephole AST to prepare for bytecode compilation.</span>
     <span class="kw">fn</span> <span class="ident">with_peephole</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">k</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="ident">R</span>
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">peephole</span>::<span class="ident">Program</span>) <span class="op">-&gt;</span> <span class="ident">R</span>;
 
-    <span class="doccomment">/// Compile the given program to bytecode bytecode.</span>
+    <span class="doccomment">/// Compile the given program to bytecode.</span>
     <span class="kw">fn</span> <span class="ident">bytecode_compile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Program</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">with_peephole</span>(<span class="ident">compile</span>)
     }
 }
 
-<span class="doccomment">/// Compiles peephole-optimized AST to a bytecode bytecode program.</span>
+<span class="doccomment">/// Compiles peephole-optimized AST to a bytecode program.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">peephole</span>::<span class="ident">Statement</span>]) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Program</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">compiler</span> <span class="op">=</span> <span class="ident">Compiler</span>::<span class="ident">new</span>();
     <span class="ident">compiler</span>.<span class="ident">compile</span>(<span class="ident">src</span>);
