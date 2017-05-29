@@ -26,7 +26,7 @@
 //!  - Then, common loop forms are converted to new (non-Brainfuck)
 //! instructions by the [peephole optimizer](peephole/index.html).
 //!
-//!  - The peephole output can be [flattened to bytecode](flat/index.html),
+//!  - The peephole output can be [flattened to bytecode](bytecode/index.html),
 //! which is then interpreted.
 //!
 //!  - Or, if the `jit` feature is enabled (nightly only), the peephole output

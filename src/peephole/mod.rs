@@ -7,7 +7,7 @@
 //!
 //! For example, we detect the pattern `[-]`, which decrements the current byte until it reaches
 //! zero, and replaces it with the [`SetZero`](../../src/bf/peephole/mod.rs.html#21-22)
-//! instruction. See the [`flat::Instruction`](../flat/enum.Instruction.html) enum for a list of
+//! instruction. See the [`bytecode::Instruction`](../bytecode/enum.Instruction.html) enum for a list of
 //! the instructions produced by the [peephole compiler](fn.compile.html).
 
 use common;
