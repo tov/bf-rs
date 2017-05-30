@@ -361,8 +361,6 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::<span class="ident">x64</span>::<span class="ident">Assembler</span>;
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::{<span class="ident">DynasmApi</span>, <span class="ident">DynasmLabelApi</span>};
@@ -564,8 +562,7 @@
             }
 
             <span class="ident">Instr</span>(<span class="ident">OffsetAddRight</span>(<span class="ident">offset</span>)) <span class="op">=&gt;</span> {
-                <span class="kw">let</span> <span class="ident">proved</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interpreter</span>.<span class="ident">move_right</span>(<span class="ident">offset</span>);
-                <span class="self">self</span>.<span class="ident">interpreter</span>.<span class="ident">move_left</span>(<span class="ident">offset</span>);
+                <span class="kw">let</span> <span class="ident">proved</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interpreter</span>.<span class="ident">check_right</span>(<span class="ident">offset</span>);
 
                 <span class="macro">dynasm</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">asm</span>
                     ; <span class="ident">cmp</span> <span class="ident">BYTE</span> [<span class="ident">pointer</span>], <span class="number">0</span>
@@ -579,8 +576,7 @@
             }
 
             <span class="ident">Instr</span>(<span class="ident">OffsetAddLeft</span>(<span class="ident">offset</span>)) <span class="op">=&gt;</span> {
-                <span class="kw">let</span> <span class="ident">proved</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interpreter</span>.<span class="ident">move_left</span>(<span class="ident">offset</span>);
-                <span class="self">self</span>.<span class="ident">interpreter</span>.<span class="ident">move_right</span>(<span class="ident">offset</span>);
+                <span class="kw">let</span> <span class="ident">proved</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interpreter</span>.<span class="ident">check_left</span>(<span class="ident">offset</span>);
 
                 <span class="macro">dynasm</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">asm</span>
                     ; <span class="ident">cmp</span> <span class="ident">BYTE</span> [<span class="ident">pointer</span>], <span class="number">0</span>
@@ -628,21 +624,21 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">load_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">Count</span>) {
-        <span class="kw">if</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="kw">as</span> <span class="ident">Count</span> <span class="op">==</span> <span class="ident">offset</span> {
+    <span class="kw">fn</span> <span class="ident">load_constant</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">Count</span>) {
+        <span class="kw">if</span> <span class="ident">count</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="kw">as</span> <span class="ident">Count</span> <span class="op">==</span> <span class="ident">count</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">asm</span>
-                ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">DWORD</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">i32</span>
+                ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">DWORD</span> <span class="ident">count</span> <span class="kw">as</span> <span class="ident">i32</span>
             );
         } <span class="kw">else</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">asm</span>
-                ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">QWORD</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">i64</span>
+                ; <span class="ident">mov</span> <span class="ident">rax</span>, <span class="ident">QWORD</span> <span class="ident">count</span> <span class="kw">as</span> <span class="ident">i64</span>
             );
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">load_pos_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">Count</span>, <span class="ident">proved</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">load_offset</span>(<span class="ident">offset</span>);
+        <span class="self">self</span>.<span class="ident">load_constant</span>(<span class="ident">offset</span>);
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">checked</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">proved</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">asm</span>
@@ -656,7 +652,7 @@
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">load_neg_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">Count</span>, <span class="ident">proved</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">load_offset</span>(<span class="ident">offset</span>);
+        <span class="self">self</span>.<span class="ident">load_constant</span>(<span class="ident">offset</span>);
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">checked</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">proved</span> {
             <span class="macro">dynasm</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">asm</span>
