@@ -262,21 +262,21 @@ impl<B: BoundsAnalysis> Compiler<B> {
     }
 
     #[inline]
-    fn load_offset(&mut self, offset: Count) {
-        if offset as i32 as Count == offset {
+    fn load_constant(&mut self, count: Count) {
+        if count as i32 as Count == count {
             dynasm!(self.asm
-                ; mov rax, DWORD offset as i32
+                ; mov rax, DWORD count as i32
             );
         } else {
             dynasm!(self.asm
-                ; mov rax, QWORD offset as i64
+                ; mov rax, QWORD count as i64
             );
         }
     }
 
     #[inline]
     fn load_pos_offset(&mut self, offset: Count, proved: bool) {
-        self.load_offset(offset);
+        self.load_constant(offset);
 
         if self.checked && !proved {
             dynasm!(self.asm
@@ -290,7 +290,7 @@ impl<B: BoundsAnalysis> Compiler<B> {
 
     #[inline]
     fn load_neg_offset(&mut self, offset: Count, proved: bool) {
-        self.load_offset(offset);
+        self.load_constant(offset);
 
         if self.checked && !proved {
             dynasm!(self.asm
