@@ -301,7 +301,7 @@ impl<B: BoundsAnalysis> Compiler<B> {
     }
 }
 
-impl JitCompilable for Box<peephole::Program> {
+impl JitCompilable for peephole::Program {
     fn with_peephole<F, R>(&self, k: F) -> R
         where F: FnOnce(&peephole::Program) -> R
     {
