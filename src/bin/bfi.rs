@@ -36,7 +36,7 @@ use clap::{Arg, App};
 use bf::ast;
 use bf::traits::*;
 
-const VERSION: &'static str = "0.4.1";
+const VERSION: &'static str = "0.4.2";
 
 #[derive(Debug, Clone)]
 struct Options {
