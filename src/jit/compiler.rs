@@ -198,8 +198,7 @@ impl<B: BoundsAnalysis> Compiler<B> {
             }
 
             Instr(OffsetAddRight(offset)) => {
-                let proved = self.interpreter.move_right(offset);
-                self.interpreter.move_left(offset);
+                let proved = self.interpreter.check_right(offset);
 
                 dynasm!(self.asm
                     ; cmp BYTE [pointer], 0
@@ -213,8 +212,7 @@ impl<B: BoundsAnalysis> Compiler<B> {
             }
 
             Instr(OffsetAddLeft(offset)) => {
-                let proved = self.interpreter.move_left(offset);
-                self.interpreter.move_right(offset);
+                let proved = self.interpreter.check_left(offset);
 
                 dynasm!(self.asm
                     ; cmp BYTE [pointer], 0

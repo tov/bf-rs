@@ -21,6 +21,12 @@ pub trait BoundsAnalysis {
     /// Returns whether we can prove that this move will not overflow.
     fn move_right(&mut self, count: Count) -> bool;
 
+    /// Checks whether the pointer can safely move the given distance to the left.
+    fn check_left(&self, count: Count) -> bool;
+
+    /// Checks whether the pointer can safely move the given distance to the right.
+    fn check_right(&self, count: Count) -> bool;
+
     /// Resets the left mark.
     ///
     /// This is used when we may move an arbitrary distance to the left.
@@ -101,6 +107,14 @@ impl BoundsAnalysis for AbstractInterpreter {
         }
     }
 
+    fn check_left(&self, count: Count) -> bool {
+        count <= self.left_mark
+    }
+
+    fn check_right(&self, count: Count) -> bool {
+        count <= self.right_mark
+    }
+
     /// Resets the left mark.
     ///
     /// This is used when we may move an arbitrary distance to the left.
@@ -151,6 +165,8 @@ impl BoundsAnalysis for NoAnalysis {
     fn new(_program: &Program) -> Self { NoAnalysis }
     fn move_left(&mut self, _count: Count) -> bool { false }
     fn move_right(&mut self, _count: Count) -> bool { false }
+    fn check_left(&self, _count: Count) -> bool { false }
+    fn check_right(&self, _count: Count) -> bool { false }
     fn reset_left(&mut self) { }
     fn reset_right(&mut self) { }
     fn enter_loop(&mut self, _body: &Box<[Statement]>) { }
