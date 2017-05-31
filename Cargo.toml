@@ -18,6 +18,9 @@ travis-ci = { repository = "tov/bf-rs" }
 # Enables native x64 JIT; requires nightly Rust
 jit = ["dynasmrt", "dynasm"]
 
+# Enables LLVM-based JIT; requires LLVM 3.8
+llvm = ["llvm-sys"]
+
 # Use `u32` for counts instead of usize.
 u32count = []
 
@@ -29,5 +32,7 @@ clap = "2.24"
 
 dynasmrt = { version = "0.1", optional = true }
 dynasm = { version = "0.1", optional = true }
+
+llvm-sys = { version = "38", optional = true }
 
 clippy = { version = "0", optional = true }

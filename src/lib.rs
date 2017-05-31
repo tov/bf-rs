@@ -45,6 +45,9 @@
 #[cfg(feature = "jit")]
 extern crate dynasmrt;
 
+#[cfg(feature = "llvm")]
+extern crate llvm_sys;
+
 pub mod common;
 pub mod state;
 pub mod traits;
@@ -56,5 +59,8 @@ pub mod peephole;
 
 #[cfg(feature = "jit")]
 pub mod jit;
+
+#[cfg(feature = "llvm")]
+pub mod llvm;
 
 pub mod test_helpers;
