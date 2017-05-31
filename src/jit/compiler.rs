@@ -5,6 +5,7 @@ use super::*;
 use super::analysis::{BoundsAnalysis, AbstractInterpreter, NoAnalysis};
 use common::Count;
 use peephole;
+use rts;
 
 /// Program forms that can be JIT compiled.
 pub trait JitCompilable {

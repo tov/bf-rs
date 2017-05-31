@@ -51,6 +51,7 @@ extern crate llvm_sys;
 pub mod common;
 pub mod state;
 pub mod traits;
+pub mod rts;
 
 pub mod ast;
 pub mod rle;

@@ -13,11 +13,18 @@
 mod loop_balance;
 mod analysis;
 mod compiler;
-mod rts;
 
 pub use self::compiler::{compile, JitCompilable};
 
+use std::io::{Read, Write};
+use std::mem;
+
 use dynasmrt;
+
+use common::{BfResult, Error};
+use rts::{self, RtsState};
+use state::State;
+use traits::Interpretable;
 
 /// The representation of a JIT-compiled program.
 ///
@@ -29,6 +36,41 @@ use dynasmrt;
 pub struct Program {
     code: dynasmrt::ExecutableBuffer,
     start: dynasmrt::AssemblyOffset,
+}
+
+/// The type of function that we will assemble and then call.
+///
+/// # Parameters
+///
+/// `<'a>` – the lifetime of the channel references in the run-time system state.
+///
+/// `memory` – the address of the beginning of memory (also where the pointer starts).
+///
+/// `memory_size` – the amount of memory allocated, defaults to 30,000 bytes.
+///
+/// `rts_state` – the state that the run-time system needs to do I/O.
+type EntryFunction<'a> = extern "win64" fn(memory: *mut u8,
+                                           memory_size: u64,
+                                           rts_state: *mut RtsState<'a>) -> u64;
+
+impl Interpretable for Program {
+    fn interpret_state<R: Read, W: Write>(&self, mut state: State,
+                                          mut input: R, mut output: W)
+                                          -> BfResult<()>
+    {
+        let mut rts = RtsState::new(&mut input, &mut output);
+
+        let f: EntryFunction = unsafe { mem::transmute(self.code.ptr(self.start)) };
+
+        let result = f(state.as_mut_ptr(), state.capacity() as u64, &mut rts);;
+
+        match result {
+            rts::OKAY      => Ok(()),
+            rts::UNDERFLOW => Err(Error::PointerUnderflow),
+            rts::OVERFLOW  => Err(Error::PointerOverflow),
+            _ => panic!(format!("Unknown result code: {}", result)),
+        }
+    }
 }
 
 #[cfg(test)]

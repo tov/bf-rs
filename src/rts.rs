@@ -10,12 +10,6 @@
 //! [the `dynlib-rs` tutorial]:(https://censoredusername.github.io/dynasm-rs/language/tutorial.html#advanced-usage)
 
 use std::io::{Read, Write};
-use std::mem;
-
-use super::*;
-use common::{BfResult, Error};
-use state::State;
-use traits::Interpretable;
 
 /// The object code terminated successfully.
 pub const OKAY: u64      = 0;
@@ -36,43 +30,8 @@ pub struct RtsState<'a> {
     output: &'a mut Write,
 }
 
-/// The type of function that we will assemble and then call.
-///
-/// # Parameters
-///
-/// `<'a>` – the lifetime of the channel references in the run-time system state.
-///
-/// `memory` – the address of the beginning of memory (also where the pointer starts).
-///
-/// `memory_size` – the amount of memory allocated, defaults to 30,000 bytes.
-///
-/// `rts_state` – the state that the run-time system needs to do I/O.
-type EntryFunction<'a> = extern "win64" fn(memory: *mut u8,
-                                           memory_size: u64,
-                                           rts_state: *mut RtsState<'a>) -> u64;
-
-impl Interpretable for Program {
-    fn interpret_state<R: Read, W: Write>(&self, mut state: State,
-                                          mut input: R, mut output: W)
-                                          -> BfResult<()>
-    {
-        let mut rts = RtsState::new(&mut input, &mut output);
-
-        let f: EntryFunction = unsafe { mem::transmute(self.code.ptr(self.start)) };
-
-        let result = f(state.as_mut_ptr(), state.capacity() as u64, &mut rts);;
-
-        match result {
-            OKAY      => Ok(()),
-            UNDERFLOW => Err(Error::PointerUnderflow),
-            OVERFLOW  => Err(Error::PointerOverflow),
-            _ => panic!(format!("Unknown result code: {}", result)),
-        }
-    }
-}
-
 impl<'a> RtsState<'a> {
-    fn new<R: Read, W: Write>(input: &'a mut R, output: &'a mut W) -> Self {
+    pub fn new<R: Read, W: Write>(input: &'a mut R, output: &'a mut W) -> Self {
         RtsState {
             input: input,
             output: output,
