@@ -46,7 +46,7 @@
 extern crate dynasmrt;
 
 #[cfg(feature = "llvm")]
-extern crate llvm_sys;
+extern crate llvm as llvm_alt;
 
 pub mod common;
 pub mod state;

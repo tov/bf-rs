@@ -73,7 +73,8 @@ fn main() {
 
         Pass::Peephole => {
             let program = program.peephole_compile();
-            interpret(&*program, &options);
+            bf::llvm::compile(&*program);
+//            interpret(&*program, &options);
         }
 
         Pass::Bytecode => {
