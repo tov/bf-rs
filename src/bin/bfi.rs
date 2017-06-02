@@ -54,6 +54,8 @@ enum Pass {
     Peephole,
     #[cfg(feature = "jit")]
     Jit,
+    #[cfg(feature = "llvm")]
+    Llvm,
 }
 
 fn main() {
@@ -73,8 +75,7 @@ fn main() {
 
         Pass::Peephole => {
             let program = program.peephole_compile();
-            bf::llvm::compile(&*program);
-//            interpret(&*program, &options);
+            interpret(&*program, &options);
         }
 
         Pass::Bytecode => {
@@ -86,6 +87,12 @@ fn main() {
         Pass::Jit => {
             let program = program.jit_compile(!options.unchecked);
             interpret(&program, &options);
+        }
+
+        #[cfg(feature = "llvm")]
+        Pass::Llvm => {
+            let program = program.peephole_compile();
+            bf::llvm::compile(&*program);
         }
     }
 }
@@ -103,7 +110,10 @@ fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
 #[cfg(feature = "jit")]
 const DEFAULT_PASS: Pass = Pass::Jit;
 
-#[cfg(not(feature = "jit"))]
+#[cfg(all(feature = "llvm", not(feature = "jit")))]
+const DEFAULT_PASS: Pass = Pass::Llvm;
+
+#[cfg(not(any(feature = "jit", feature = "llvm")))]
 const DEFAULT_PASS: Pass = Pass::Peephole;
 
 fn get_options() -> Options {
@@ -129,6 +139,9 @@ fn get_options() -> Options {
     if matches.is_present("jit") {
         #[cfg(feature = "jit")]
         let _ = result.compiler_pass = Pass::Jit;
+    } else if matches.is_present("llvm") {
+        #[cfg(feature = "llvm")]
+        let _ = result.compiler_pass = Pass::Llvm;
     } else if matches.is_present("byte") {
         result.compiler_pass = Pass::Bytecode;
     } else if matches.is_present("peep") {
@@ -188,27 +201,46 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("ast")
             .long("ast")
             .help("Interpret the unoptimized AST")
-            .conflicts_with_all(&["rle", "peep", "byte", "jit"]))
+            .conflicts_with_all(&["rle", "peep", "byte", "jit", "llvm"]))
         .arg(Arg::with_name("rle")
             .long("rle")
             .help("Interpret the run-length encoded the AST")
-            .conflicts_with_all(&["ast", "peep", "byte", "jit"]))
+            .conflicts_with_all(&["ast", "peep", "byte", "jit", "llvm"]))
         .arg(Arg::with_name("peep")
             .long("peep")
-            .help(if cfg!(feature = "jit") {"Interpret the peephole-optimized AST"}
-                  else {"Interpret the peephole-optimized AST (default)"})
-            .conflicts_with_all(&["ast", "rle", "byte", "jit"]))
+            .help(
+                if cfg!(feature = "jit") || cfg!(feature = "llvm") {
+                    "Interpret the peephole-optimized AST"
+                } else {
+                    "Interpret the peephole-optimized AST (default)"
+                })
+            .conflicts_with_all(&["ast", "rle", "byte", "jit", "llvm"]))
         .arg(Arg::with_name("byte")
             .long("byte")
             .help("Compile AST to bytecode")
-            .conflicts_with_all(&["ast", "rle", "peep", "jit"]));
+            .conflicts_with_all(&["ast", "rle", "peep", "jit", "llvm"]));
+
+    #[cfg(feature = "llvm")]
+    let app = app
+        .arg(Arg::with_name("llvm")
+            .long("llvm")
+            .help(
+                if cfg!(feature = "jit") {
+                    "JIT using LLVM (default)"
+                } else {
+                    "JIT using LLVM"
+                })
+            .conflicts_with_all(&["ast", "rle", "peep", "byte", "jit"]));
 
     #[cfg(feature = "jit")]
     let app = app
         .arg(Arg::with_name("jit")
             .long("jit")
             .help("JIT to native x64 (default)")
-            .conflicts_with_all(&["ast", "rle", "peep", "byte"]))
+            .conflicts_with_all(&["ast", "rle", "peep", "byte", "llvm"]));
+
+    #[cfg(any(feature = "jit", feature = "llvm"))]
+    let app = app
         .arg(Arg::with_name("unchecked")
             .short("u")
             .long("unchecked")
