@@ -12,6 +12,8 @@ use llvm_sys::transforms::pass_manager_builder as builder;
 use llvm_sys::execution_engine as engine;
 pub use llvm_sys::LLVMIntPredicate;
 
+use rts::RtsState;
+
 pub struct Context {
     context_ref: LLVMContextRef,
     strings:     RefCell<Vec<CString>>,
@@ -115,46 +117,48 @@ impl<'a> Module<'a> {
         }
     }
 
-    pub fn run_function(&self, name: &str) -> Result<u64, String> {
+    pub unsafe fn with_function<'b, F>(&self, name: &str, with: F) -> Result<u64, String>
+        where F: FnOnce(extern fn (&mut RtsState<'b>,
+                                   extern fn(&mut RtsState<'b>) -> u8,
+                                   extern fn(&mut RtsState<'b>, u8) -> ()) -> u64) -> u64
+    {
         let mut out_message: *mut c_char = ptr::null_mut();
         let mut exec: engine::LLVMExecutionEngineRef = ptr::null_mut();
 
-        unsafe {
-            engine::LLVMLinkInMCJIT();
+        engine::LLVMLinkInMCJIT();
 
-            if target::LLVM_InitializeNativeAsmPrinter() == 1 {
-                return Err("Could not initialize native asm printer for LLVM.".to_owned());
-            }
-
-            if target::LLVM_InitializeNativeTarget() == 1 {
-                return Err("Could not initialize native target for LLVM.".to_owned());
-            }
-
-            let mut options = engine::LLVMMCJITCompilerOptions {
-                OptLevel: 3,
-                CodeModel: llvm_sys::target_machine::LLVMCodeModel::LLVMCodeModelDefault,
-                NoFramePointerElim: 0,
-                EnableFastISel: 0,
-                MCJMM: ptr::null_mut(),
-            };
-
-            if engine::LLVMCreateMCJITCompilerForModule(
-                &mut exec, self.module_ref,
-                &mut options,
-                mem::size_of::<c_uint>() as _,
-                &mut out_message
-            ) != 0 {
-                let result = CStr::from_ptr(out_message).to_string_lossy().into_owned();
-                LLVMDisposeMessage(out_message);
-                return Err(result);
-            }
-
-            let cname    = CString::new(name).unwrap();
-            let fun_addr = engine::LLVMGetFunctionAddress(exec, cname.as_ptr());
-            let fun: extern fn() -> u64 = mem::transmute(fun_addr);
-
-            Ok(fun())
+        if target::LLVM_InitializeNativeAsmPrinter() == 1 {
+            return Err("Could not initialize native asm printer for LLVM.".to_owned());
         }
+
+        if target::LLVM_InitializeNativeTarget() == 1 {
+            return Err("Could not initialize native target for LLVM.".to_owned());
+        }
+
+        let mut options = engine::LLVMMCJITCompilerOptions {
+            OptLevel: 3,
+            CodeModel: llvm_sys::target_machine::LLVMCodeModel::LLVMCodeModelDefault,
+            NoFramePointerElim: 0,
+            EnableFastISel: 0,
+            MCJMM: ptr::null_mut(),
+        };
+
+        if engine::LLVMCreateMCJITCompilerForModule(
+            &mut exec, self.module_ref,
+            &mut options,
+            mem::size_of::<c_uint>() as _,
+            &mut out_message
+        ) != 0 {
+            let result = CStr::from_ptr(out_message).to_string_lossy().into_owned();
+            LLVMDisposeMessage(out_message);
+            return Err(result);
+        }
+
+        let cname    = CString::new(name).unwrap();
+        let fun_addr = engine::LLVMGetFunctionAddress(exec, cname.as_ptr());
+        let fun = mem::transmute(fun_addr);
+
+        Ok(with(fun))
     }
 }
 
@@ -219,11 +223,11 @@ pub struct Value<'a> {
 }
 
 impl<'a> Value<'a> {
-//    pub fn get_fun_param(&self, index: usize) -> Self {
-//        self.context.wrap_value(unsafe {
-//            LLVMGetParam(self.value_ref, index as _)
-//        })
-//    }
+    pub fn get_fun_param(&self, index: usize) -> Self {
+        self.context.wrap_value(unsafe {
+            LLVMGetParam(self.value_ref, index as _)
+        })
+    }
 
     pub fn append(&self, name: &str) -> BasicBlock<'a> {
         let name = self.context.new_name(name);
@@ -393,17 +397,17 @@ impl<'a> Builder<'a> {
         })
     }
 
-    pub fn trunc(&self, value: Value<'a>, ty: Type<'a>, name: &str) -> Value<'a> {
-        let name = self.context.new_name(name);
-        self.context.wrap_value(unsafe {
-            LLVMBuildTrunc(self.builder_ref, value.value_ref, ty.type_ref, name)
-        })
-    }
-
-    pub fn zext(&self, value: Value<'a>, ty: Type<'a>, name: &str) -> Value<'a> {
-        let name = self.context.new_name(name);
-        self.context.wrap_value(unsafe {
-            LLVMBuildZExt(self.builder_ref, value.value_ref, ty.type_ref, name)
-        })
-    }
+//    pub fn trunc(&self, value: Value<'a>, ty: Type<'a>, name: &str) -> Value<'a> {
+//        let name = self.context.new_name(name);
+//        self.context.wrap_value(unsafe {
+//            LLVMBuildTrunc(self.builder_ref, value.value_ref, ty.type_ref, name)
+//        })
+//    }
+//
+//    pub fn zext(&self, value: Value<'a>, ty: Type<'a>, name: &str) -> Value<'a> {
+//        let name = self.context.new_name(name);
+//        self.context.wrap_value(unsafe {
+//            LLVMBuildZExt(self.builder_ref, value.value_ref, ty.type_ref, name)
+//        })
+//    }
 }

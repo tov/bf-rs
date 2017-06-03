@@ -47,5 +47,15 @@ impl<'a> RtsState<'a> {
     pub extern "win64" fn write(&mut self, byte: u8) {
         let _ = self.output.write_all(&[byte]);
     }
+
+    pub extern "C" fn read_c(&mut self) -> u8 {
+        let mut buf = [0];
+        let _ = self.input.read_exact(&mut buf);
+        buf[0]
+    }
+
+    pub extern "C" fn write_c(&mut self, byte: u8) {
+        let _ = self.output.write_all(&[byte]);
+    }
 }
 

@@ -1,8 +1,7 @@
-use std::os::raw::c_int;
-use std::mem;
+use std::io;
 
 use common::{BfResult, Error, Count};
-use rts;
+use rts::{self, RtsState};
 use state::DEFAULT_CAPACITY;
 use peephole;
 
@@ -16,7 +15,10 @@ pub trait LlvmCompilable {
 
     /// JIT compile and run the given program via LLVM.
     fn llvm_run(&self, memory_size: Option<usize>) -> BfResult<()> {
-        self.with_peephole(|ast| compile_and_run(ast, memory_size, false))
+        let mut stdin = io::stdin();
+        let mut stdout = io::stdout();
+        let rts_state = RtsState::new(&mut stdin, &mut stdout);
+        self.with_peephole(|ast| compile_and_run(ast, memory_size, false, rts_state))
     }
 }
 
@@ -32,15 +34,15 @@ struct Compiler<'a> {
     underflow:      BasicBlock<'a>,
     /// Label to jump to for pointer overflow
     overflow:       BasicBlock<'a>,
-    /// The native C `int` type, for `putchar` and `getchar`
-    int_type:       Type<'a>,
     /// The size of memory, for bounds checks
     memory_size:    Value<'a>,
     /// The main function
     main_function:  Value<'a>,
-    /// `getchar`
+    /// &RtsState<'a>
+    rts_state:      Value<'a>,
+    /// RtsState::read_c
     read_function:  Value<'a>,
-    /// `putchar`
+    /// RtsSate::write_c
     write_function: Value<'a>,
     /// The program’s memory (“tape”)
     memory:         Value<'a>,
@@ -49,8 +51,8 @@ struct Compiler<'a> {
 }
 
 /// JIT compile and run the given program via LLVM.
-pub fn compile_and_run(program: &peephole::Program, memory_size: Option<usize>, debug: bool)
-                       -> BfResult<()> {
+pub fn compile_and_run<'a>(program: &peephole::Program, memory_size: Option<usize>, debug: bool,
+                           mut rts_state: RtsState<'a>) -> BfResult<()> {
     let context = Context::new();
 
     let compiler = Compiler::prologue(&context, memory_size.unwrap_or(DEFAULT_CAPACITY) as u64);
@@ -65,7 +67,15 @@ pub fn compile_and_run(program: &peephole::Program, memory_size: Option<usize>, 
     }
 
     // This panics if LLVM fails.
-    let result = compiler.module.run_function("bfi_main").unwrap();
+    let result = unsafe {
+        compiler.module.with_function("bfi_main",
+                                      |f: extern fn(rts_state: &mut RtsState<'a>,
+                                                    read: extern fn(&mut RtsState<'a>) -> u8,
+                                                    write: extern fn(&mut RtsState<'a>, u8) -> ())
+                                                        -> u64| {
+                                          f(&mut rts_state, RtsState::read_c, RtsState::write_c)
+                                      }).unwrap()
+    };
 
     match result {
         rts::OKAY       => Ok(()),
@@ -102,15 +112,13 @@ impl<'a> Compiler<'a> {
                 }
 
                 Instr(In) => {
-                    let result = builder.call(self.read_function, &[], "");
-                    let result = builder.trunc(result, Type::get_i8(self.context), "");
+                    let result = builder.call(self.read_function, &[self.rts_state], "");
                     self.store_data(result);
                 }
 
                 Instr(Out) => {
                     let argument = self.load_data("data");
-                    let argument = builder.zext(argument, self.int_type, "");
-                    builder.call(self.write_function, &[argument], "");
+                    builder.call(self.write_function, &[self.rts_state, argument], "");
                 }
 
                 Instr(SetZero) => {
@@ -198,14 +206,18 @@ impl<'a> Compiler<'a> {
         let void_type       = Type::get_void(context);
         let char_ptr_type   = Type::get_pointer(i8_type);
 
-        // getchar and putchar use C's int type, which varies in size.
-        let int_type = if mem::size_of::<c_int>() == 4 {i32_type} else {i64_type};
-
         // The size of memory as an LLVM Value
         let memory_size = Value::get_u64(context, memory_size);
 
+        let rts_state_type = Type::get_pointer(Type::get_void(context));
+        let write_function_type = Type::get_function(&[rts_state_type, i8_type], void_type);
+        let read_function_type = Type::get_function(&[rts_state_type], i8_type);
+
         // Create the main function, create an entry basic block, and position a builder at entry.
-        let main_function_type = Type::get_function(&[], i64_type);
+        let main_function_type = Type::get_function(&[
+            rts_state_type,
+            Type::get_pointer(read_function_type),
+            Type::get_pointer(write_function_type)], i64_type);
         let main_function  = module.add_function("bfi_main", main_function_type);
         let entry_bb = main_function.append("entry");
         let builder = Builder::new(context);
@@ -218,19 +230,13 @@ impl<'a> Compiler<'a> {
             builder:        builder,
             underflow:      main_function.append("underflow"),
             overflow:       main_function.append("overflow"),
-            int_type:       int_type,
             memory_size:    memory_size,
             main_function:  main_function,
             pointer:        builder.alloca(i64_type, "pointer"),
             memory:         builder.array_alloca(i8_type, memory_size, "memory"),
-            read_function: {
-                let read_function_type = Type::get_function(&[], int_type);
-                module.add_function("getchar", read_function_type)
-            },
-            write_function: {
-                let write_function_type = Type::get_function(&[int_type], int_type);
-                module.add_function("putchar", write_function_type)
-            }
+            rts_state:      main_function.get_fun_param(0),
+            read_function:  main_function.get_fun_param(1),
+            write_function: main_function.get_fun_param(2),
         };
 
         // Zero-initialize the memory
@@ -334,3 +340,5 @@ impl<T: peephole::PeepholeCompilable + ?Sized> LlvmCompilable for T {
         k(&self.peephole_compile())
     }
 }
+
+
