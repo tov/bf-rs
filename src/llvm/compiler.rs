@@ -148,11 +148,13 @@ impl<'a> Compiler<'a> {
                 }
 
                 Instr(FindZeroRight(count)) => {
-                    self.compile_block(&[Instr(Right(count))]);
+                    let instr = Loop(vec![Instr(Right(count))].into_boxed_slice());
+                    self.compile_block(&[instr]);
                 }
 
                 Instr(FindZeroLeft(count)) => {
-                    self.compile_block(&[Instr(Left(count))]);
+                    let instr = Loop(vec![Instr(Left(count))].into_boxed_slice());
+                    self.compile_block(&[instr]);
                 }
 
                 Instr(OffsetAddRight(count)) => {
