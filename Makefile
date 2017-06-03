@@ -8,7 +8,7 @@ clippy:
 	rustup run nightly cargo build --features=clippy\ jit
 
 doc:
-	rustup run nightly cargo doc --no-deps -p $(CRATE) --features=jit
+	rustup run nightly cargo doc --no-deps -p $(CRATE) --features="jit llvm"
 	echo "<meta http-equiv='refresh' content='0;url=$(CRATE)/'>" > target/doc/index.html
 
 upload-doc:
