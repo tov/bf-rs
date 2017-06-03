@@ -102,8 +102,7 @@ pub fn set_zero_peephole(body: &[Statement]) -> Option<common::Instruction> {
     use self::Statement::*;
     use common::Instruction::*;
 
-    if body.len() == 1 &&
-        body[0] == Instr(Add(1)) {
+    if body.len() == 1 && (body[0] == Instr(Add(1)) || body[0] == Instr(Add(255))) {
         Some(SetZero)
     } else {
         None
