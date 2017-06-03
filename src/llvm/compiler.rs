@@ -65,7 +65,7 @@ pub fn compile_and_run(program: &peephole::Program, memory_size: Option<usize>, 
     }
 
     // This panics if LLVM fails.
-    let result = compiler.module.run_function(compiler.main_function).unwrap();
+    let result = compiler.module.run_function("bfi_main").unwrap();
 
     match result {
         rts::OKAY       => Ok(()),

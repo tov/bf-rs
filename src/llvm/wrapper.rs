@@ -1,11 +1,12 @@
 use std::ffi::{CString, CStr};
-use std::os::raw::c_char;
-use std::ptr;
+use std::os::raw::{c_char, c_uint};
+use std::{mem, ptr};
 use std::cell::RefCell;
 
+use llvm_sys;
 use llvm_sys::prelude::*;
 use llvm_sys::core::*;
-use llvm_sys::target::LLVM_InitializeNativeTarget;
+use llvm_sys::target;
 use llvm_sys::analysis::{LLVMVerifyModule, LLVMVerifierFailureAction};
 use llvm_sys::transforms::pass_manager_builder as builder;
 use llvm_sys::execution_engine as engine;
@@ -118,36 +119,45 @@ impl<'a> Module<'a> {
         }
     }
 
-    pub fn run_function(&self, fun: Value<'a>) -> Result<u64, String> {
+    pub fn run_function(&self, name: &str) -> Result<u64, String> {
         let mut out_message: *mut c_char = ptr::null_mut();
         let mut exec: engine::LLVMExecutionEngineRef = ptr::null_mut();
 
         unsafe {
             engine::LLVMLinkInMCJIT();
 
-            if LLVM_InitializeNativeTarget() == 1 {
-                panic!("Could not initialize native target for LLVM.");
+            if target::LLVM_InitializeNativeAsmPrinter() == 1 {
+                return Err("Could not initialize native asm printer for LLVM.".to_owned());
             }
 
-            if engine::LLVMCreateMCJITCompilerForModule(&mut exec,
-                                                        self.module_ref,
-                                                        ptr::null_mut(),
-                                                        0,
-                                                        &mut out_message) != 0 {
+            if target::LLVM_InitializeNativeTarget() == 1 {
+                return Err("Could not initialize native target for LLVM.".to_owned());
+            }
+
+            let mut options = engine::LLVMMCJITCompilerOptions {
+                OptLevel: 3,
+                CodeModel: llvm_sys::target_machine::LLVMCodeModel::LLVMCodeModelDefault,
+                NoFramePointerElim: 0,
+                EnableFastISel: 0,
+                MCJMM: ptr::null_mut(),
+            };
+
+            if engine::LLVMCreateMCJITCompilerForModule(
+                &mut exec, self.module_ref,
+                &mut options,
+                mem::size_of::<c_uint>() as _,
+                &mut out_message
+            ) != 0 {
                 let result = CStr::from_ptr(out_message).to_string_lossy().into_owned();
                 LLVMDisposeMessage(out_message);
                 return Err(result);
             }
 
-            let size = engine::LLVMCreateGenericValueOfInt(Type::get_i64(self.context).type_ref,
-                                                           30_000 as _,
-                                                           0 as i32);
-            let mut args = vec![size];
-            let result = engine::LLVMRunFunction(exec,
-                                                 fun.value_ref,
-                                                 args.len() as u32,
-                                                 args.as_mut_ptr());
-            Ok(engine::LLVMGenericValueToInt(result, 0 as i32) as _)
+            let cname    = CString::new(name).unwrap();
+            let fun_addr = engine::LLVMGetFunctionAddress(exec, cname.as_ptr());
+            let fun: extern fn() -> u64 = mem::transmute(fun_addr);
+
+            Ok(fun())
         }
     }
 }
