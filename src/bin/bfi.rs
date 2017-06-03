@@ -92,8 +92,7 @@ fn main() {
 
         #[cfg(feature = "llvm")]
         Pass::Llvm => {
-            let program = program.peephole_compile();
-            bf::llvm::compile_and_run(&*program, options.memory_size)
+            program.llvm_run(options.memory_size)
                 .unwrap_or_else(|e| error_exit(3, format!("runtime error: {}.", e)));
         }
     }

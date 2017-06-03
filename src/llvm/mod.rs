@@ -3,4 +3,4 @@
 mod wrapper;
 mod compiler;
 
-pub use self::compiler::compile_and_run;
+pub use self::compiler::{LlvmCompilable, compile_and_run};

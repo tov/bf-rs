@@ -8,38 +8,69 @@ use peephole;
 
 use super::wrapper::*;
 
-struct Compiler<'a> {
-    context:        &'a Context,
-    module:         Module<'a>,
-    builder:        Builder<'a>,
-    underflow:      BasicBlock<'a>,
-    overflow:       BasicBlock<'a>,
-    int_type:       Type<'a>,
-    memory_size:    Value<'a>,
-    main_function:  Value<'a>,
-    pointer:        Value<'a>,
-    memory:         Value<'a>,
-    read_function:  Value<'a>,
-    write_function: Value<'a>,
+/// Program forms that can be compiled and run via LLVM.
+pub trait LlvmCompilable {
+    /// Compile the given program into the peephole AST to prepare for LLVM compilation.
+    fn with_peephole<F, R>(&self, k: F) -> R
+        where F: FnOnce(&peephole::Program) -> R;
+
+    /// JIT compile and run the given program via LLVM.
+    fn llvm_run(&self, memory_size: Option<usize>) -> BfResult<()> {
+        self.with_peephole(|ast| compile_and_run(ast, memory_size, false))
+    }
 }
 
-pub fn compile_and_run(program: &peephole::Program, memory_size: Option<usize>) -> BfResult<()> {
+/// State required for the LLVM compiler.
+struct Compiler<'a> {
+    /// The LLVM context
+    context:        &'a Context,
+    /// The main module
+    module:         Module<'a>,
+    /// A builder positioned at the current end of the program
+    builder:        Builder<'a>,
+    /// Label to jump to for pointer underflow
+    underflow:      BasicBlock<'a>,
+    /// Label to jump to for pointer overflow
+    overflow:       BasicBlock<'a>,
+    /// The native C `int` type, for `putchar` and `getchar`
+    int_type:       Type<'a>,
+    /// The size of memory, for bounds checks
+    memory_size:    Value<'a>,
+    /// The main function
+    main_function:  Value<'a>,
+    /// `getchar`
+    read_function:  Value<'a>,
+    /// `putchar`
+    write_function: Value<'a>,
+    /// The program’s memory (“tape”)
+    memory:         Value<'a>,
+    /// The current offset into memory
+    pointer:        Value<'a>,
+}
+
+/// JIT compile and run the given program via LLVM.
+pub fn compile_and_run(program: &peephole::Program, memory_size: Option<usize>, debug: bool)
+                       -> BfResult<()> {
     let context = Context::new();
 
-    let compiler = Compiler::prologue(&context, memory_size);
+    let compiler = Compiler::prologue(&context, memory_size.unwrap_or(DEFAULT_CAPACITY) as u64);
     compiler.compile_block(program);
     compiler.epilogue();
 
     compiler.module.optimize(3, 0);
-    compiler.module.dump();
-    compiler.module.verify().unwrap();
 
+    if debug {
+        compiler.module.dump();
+        compiler.module.verify().unwrap();
+    }
+
+    // This panics if LLVM fails.
     let result = compiler.module.run_function(compiler.main_function).unwrap();
 
     match result {
-        rts::OKAY => Ok(()),
-        rts::UNDERFLOW => Err(Error::PointerUnderflow),
-        rts::OVERFLOW => Err(Error::PointerOverflow),
+        rts::OKAY       => Ok(()),
+        rts::UNDERFLOW  => Err(Error::PointerUnderflow),
+        rts::OVERFLOW   => Err(Error::PointerOverflow),
         _ => panic!("unrecognized error code"),
     }
 }
@@ -155,7 +186,8 @@ impl<'a> Compiler<'a> {
         }
     }
 
-    fn prologue(context: &'a Context, memory_size: Option<usize>) -> Self {
+    /// Set up compilation.
+    fn prologue(context: &'a Context, memory_size: u64) -> Self {
         let module = Module::new(&context, "bfi_module");
 
         // Some useful types
@@ -170,8 +202,7 @@ impl<'a> Compiler<'a> {
         let int_type = if mem::size_of::<c_int>() == 4 {i32_type} else {i64_type};
 
         // The size of memory as an LLVM Value
-        let memory_size = memory_size.unwrap_or(DEFAULT_CAPACITY);
-        let memory_size = Value::get_u64(&context, memory_size as u64);
+        let memory_size = Value::get_u64(&context, memory_size);
 
         // Create the main function, create an entry basic block, and position a builder at entry.
         let main_function_type = Type::get_function(&[], i64_type);
@@ -182,7 +213,7 @@ impl<'a> Compiler<'a> {
 
         // All state for the compiler.
         let compiler = Compiler {
-            context:        &context,
+            context:        context,
             module:         module,
             builder:        builder,
             underflow:      main_function.append("underflow"),
@@ -220,6 +251,7 @@ impl<'a> Compiler<'a> {
         compiler
     }
 
+    /// Emit the returns for the successful path and both error paths.
     fn epilogue(&self) {
         self.builder.ret(Value::get_u64(&self.context, rts::OKAY));
 
@@ -230,6 +262,7 @@ impl<'a> Compiler<'a> {
         self.builder.ret(Value::get_u64(&self.context, rts::OVERFLOW));
     }
 
+    /// Branch based on whether the byte at the data pointer is 0.
     fn if_not0(&self, true_: BasicBlock<'a>, false_: BasicBlock<'a>) {
         let byte = self.load_data("data");
         let zero = Value::get_u8(self.context, 0);
@@ -237,26 +270,31 @@ impl<'a> Compiler<'a> {
         self.builder.cond_br(comparison, true_, false_);
     }
 
+    /// Load the byte from the given index into memory.
     fn load_data_at(&self, index: Value<'a>, name: &str) -> Value<'a> {
         let address = self.builder.gep(self.memory, &[index], "data_ptr");
         self.builder.load(address, name)
     }
 
+    /// Store the given value at the given index into memory.
     fn store_data_at(&self, index: Value<'a>, value: Value<'a>) {
         let address = self.builder.gep(self.memory, &[index], "data_ptr");
         self.builder.store(value, address);
     }
 
+    /// Load the byte from the data pointer.
     fn load_data(&self, name: &str) -> Value<'a> {
         let pointer = self.builder.load(self.pointer, "");
         self.load_data_at(pointer, name)
     }
 
+    /// Store the given value at the data pointer.
     fn store_data(&self, value: Value<'a>) {
         let pointer = self.builder.load(self.pointer, "");
         self.store_data_at(pointer, value);
     }
 
+    /// Add the given offset to the data pointer, checking for overflow.
     fn load_pos_offset(&self, offset: Count, name: &str) -> Value<'a> {
         let success = self.main_function.append("right_success");
         let old_pointer = self.builder.load(self.pointer, "old_pointer");
@@ -268,6 +306,7 @@ impl<'a> Compiler<'a> {
         self.builder.add(old_pointer, offset, name)
     }
 
+    /// Subtract the given offset from the data pointer, checking for underflow.
     fn load_neg_offset(&self, offset: Count, name: &str) -> Value<'a> {
         let success = self.main_function.append("left_success");
         let old_pointer = self.builder.load(self.pointer, "old_pointer");
@@ -277,5 +316,21 @@ impl<'a> Compiler<'a> {
         self.builder.cond_br(comparison, success, self.underflow);
         self.builder.position_at_end(success);
         self.builder.sub(old_pointer, offset, name)
+    }
+}
+
+impl LlvmCompilable for peephole::Program {
+    fn with_peephole<F, R>(&self, k: F) -> R
+        where F: FnOnce(&peephole::Program) -> R
+    {
+        k(self)
+    }
+}
+
+impl<T: peephole::PeepholeCompilable + ?Sized> LlvmCompilable for T {
+    fn with_peephole<F, R>(&self, k: F) -> R
+        where F: FnOnce(&peephole::Program) -> R
+    {
+        k(&self.peephole_compile())
     }
 }

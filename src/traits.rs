@@ -11,6 +11,8 @@ pub use peephole::PeepholeCompilable;
 pub use bytecode::BytecodeCompilable;
 #[cfg(feature = "jit")]
 pub use jit::JitCompilable;
+#[cfg(feature = "llvm")]
+pub use llvm::LlvmCompilable;
 
 /// Program forms that can be interpreted.
 pub trait Interpretable {
