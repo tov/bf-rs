@@ -103,20 +103,3 @@ pub fn compile(program: &peephole::Program) {
     println!("{:?}", module.run_function(main_function));
 }
 
-//pub struct Compiler<'a> {
-//    function: &'a mut Function,
-//    entry:    &'a BasicBlock,
-//    builder:  CSemiBox<'a, Builder>,
-//}
-
-//impl<'a> Compiler<'a> {
-//    fn new(context: &'a Context, module: &'a Module) -> Self {
-//        Compiler {
-
-//            entry: entry,
-//            builder:  builder,
-//        }
-//    }
-//}
-
-
