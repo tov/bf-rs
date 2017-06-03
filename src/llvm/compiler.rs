@@ -91,7 +91,7 @@ pub fn compile_and_run(program: &peephole::Program, memory_size: Option<usize>) 
 
     builder.ret(Value::get_u64(&context, rts::OKAY));
 
-//    module.optimize(3, 0);
+    module.optimize(3, 0);
     module.dump();
     module.verify().unwrap();
 
@@ -147,10 +147,52 @@ impl<'a> Compiler<'a> {
                     self.store_data(Value::get_u8(self.context, 0));
                 }
 
+                Instr(FindZeroRight(count)) => {
+                    self.compile_block(&[Instr(Right(count))]);
+                }
+
+                Instr(FindZeroLeft(count)) => {
+                    self.compile_block(&[Instr(Left(count))]);
+                }
+
+                Instr(OffsetAddRight(count)) => {
+                    let do_it = self.main_function.append("do_it");
+                    let after = self.main_function.append("after");
+
+                    self.if_not0(do_it, after);
+
+                    builder.position_at_end(do_it);
+                    let pointer = self.load_pos_offset(count, "offset_ptr");
+                    let to_add = self.load_data("to_add");
+                    self.store_data(Value::get_u8(&self.context, 0));
+                    let add_to = self.load_data_at(pointer, "add_to");
+                    let sum = builder.add(to_add, add_to, "sum");
+                    self.store_data_at(pointer, sum);
+                    builder.br(after);
+
+                    builder.position_at_end(after);
+                }
+
+                Instr(OffsetAddLeft(count)) => {
+                    let do_it = self.main_function.append("do_it");
+                    let after = self.main_function.append("after");
+
+                    self.if_not0(do_it, after);
+
+                    builder.position_at_end(do_it);
+                    let pointer = self.load_neg_offset(count, "offset_ptr");
+                    let to_add = self.load_data("to_add");
+                    self.store_data(Value::get_u8(&self.context, 0));
+                    let add_to = self.load_data_at(pointer, "add_to");
+                    let sum = builder.add(to_add, add_to, "sum");
+                    self.store_data_at(pointer, sum);
+                    builder.br(after);
+
+                    builder.position_at_end(after);
+                }
+
                 Instr(JumpZero(_)) | Instr(JumpNotZero(_)) =>
                     panic!("unexpected instruction"),
-
-                Instr(_) => {}
 
                 Loop(ref body) => {
                     let header = self.main_function.append("loop_header");
@@ -160,11 +202,7 @@ impl<'a> Compiler<'a> {
                     builder.br(header);
 
                     builder.position_at_end(header);
-                    let byte = self.load_data("data");
-                    let zero = Value::get_u8(self.context, 0);
-                    let comparison = builder.cmp(LLVMIntPredicate::LLVMIntNE, byte, zero,
-                                                 "comparison");
-                    builder.cond_br(comparison, true_, false_);
+                    self.if_not0(true_, false_);
 
                     builder.position_at_end(true_);
                     self.compile_block(body);
@@ -176,16 +214,31 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn if_not0(&self, true_: BasicBlock<'a>, false_: BasicBlock<'a>) {
+        let byte = self.load_data("data");
+        let zero = Value::get_u8(self.context, 0);
+        let comparison = self.builder.cmp(LLVMIntPredicate::LLVMIntNE, byte, zero, "comparison");
+        self.builder.cond_br(comparison, true_, false_);
+    }
+
+    fn load_data_at(&self, index: Value<'a>, name: &str) -> Value<'a> {
+        let address = self.builder.gep(self.memory, &[index], "data_ptr");
+        self.builder.load(address, name)
+    }
+
+    fn store_data_at(&self, index: Value<'a>, value: Value<'a>) {
+        let address = self.builder.gep(self.memory, &[index], "data_ptr");
+        self.builder.store(value, address);
+    }
+
     fn load_data(&self, name: &str) -> Value<'a> {
         let pointer = self.builder.load(self.pointer, "");
-        let address = self.builder.gep(self.memory, &[pointer], "data_ptr");
-        self.builder.load(address, name)
+        self.load_data_at(pointer, name)
     }
 
     fn store_data(&self, value: Value<'a>) {
         let pointer = self.builder.load(self.pointer, "");
-        let address = self.builder.gep(self.memory, &[pointer], "data_ptr");
-        self.builder.store(value, address);
+        self.store_data_at(pointer, value);
     }
 
     fn load_pos_offset(&self, offset: Count, name: &str) -> Value<'a> {
