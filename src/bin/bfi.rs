@@ -111,10 +111,7 @@ fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
 #[cfg(feature = "jit")]
 const DEFAULT_PASS: Pass = Pass::Jit;
 
-#[cfg(all(feature = "llvm", not(feature = "jit")))]
-const DEFAULT_PASS: Pass = Pass::Llvm;
-
-#[cfg(not(any(feature = "jit", feature = "llvm")))]
+#[cfg(not(feature = "jit"))]
 const DEFAULT_PASS: Pass = Pass::Peephole;
 
 fn get_options() -> Options {
@@ -210,7 +207,7 @@ fn build_clap_app() -> App<'static, 'static> {
         .arg(Arg::with_name("peep")
             .long("peep")
             .help(
-                if cfg!(feature = "jit") || cfg!(feature = "llvm") {
+                if cfg!(feature = "jit") {
                     "Interpret the peephole-optimized AST"
                 } else {
                     "Interpret the peephole-optimized AST (default)"
@@ -225,12 +222,7 @@ fn build_clap_app() -> App<'static, 'static> {
     let app = app
         .arg(Arg::with_name("llvm")
             .long("llvm")
-            .help(
-                if cfg!(feature = "jit") {
-                    "JIT using LLVM (default)"
-                } else {
-                    "JIT using LLVM"
-                })
+            .help("JIT using LLVM")
             .conflicts_with_all(&["ast", "rle", "peep", "byte", "jit"]));
 
     #[cfg(feature = "jit")]
@@ -240,13 +232,13 @@ fn build_clap_app() -> App<'static, 'static> {
             .help("JIT to native x64 (default)")
             .conflicts_with_all(&["ast", "rle", "peep", "byte", "llvm"]));
 
-    #[cfg(any(feature = "jit", feature = "llvm"))]
+    #[cfg(any(feature = "jit"))]
     let app = app
         .arg(Arg::with_name("unchecked")
             .short("u")
             .long("unchecked")
             .help("Omit memory bounds checks in JIT")
-            .conflicts_with_all(&["ast", "rle", "peep", "byte"]));
+            .conflicts_with_all(&["ast", "rle", "peep", "byte", "llvm"]));
 
     app
 }
