@@ -6,8 +6,8 @@
 //! Brainfuck programs.
 //!
 //! By default, installing `bf` does not enable the JIT compiler because
-//! that requires nightly Rust. To build and install from crates.io with the JIT
-//! enabled:
+//! that requires nightly Rust. To build and install from crates.io with the native x86-64
+//! JIT enabled:
 //!
 //! ```shell
 //! $ rustup run nightly cargo install --features=jit bf
