@@ -9,6 +9,7 @@
 //!         --byte         Compile AST to bytecode
 //!     -h, --help         Prints help information
 //!         --jit          JIT to native x64 (default)
+//!         --llvm         JIT using LLVM
 //!         --peep         Interpret the peephole-optimized AST
 //!         --rle          Interpret the run-length encoded the AST
 //!     -u, --unchecked    Omit memory bounds checks in JIT
@@ -92,7 +93,8 @@ fn main() {
         #[cfg(feature = "llvm")]
         Pass::Llvm => {
             let program = program.peephole_compile();
-            bf::llvm::compile(&*program);
+            bf::llvm::compile_and_run(&*program, options.memory_size)
+                .unwrap_or_else(|e| error_exit(3, format!("runtime error: {}.", e)));
         }
     }
 }

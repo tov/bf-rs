@@ -8,6 +8,7 @@ use llvm_sys::core::*;
 use llvm_sys::analysis::{LLVMVerifyModule, LLVMVerifierFailureAction};
 use llvm_sys::transforms::pass_manager_builder as builder;
 use llvm_sys::execution_engine as engine;
+pub use llvm_sys::LLVMIntPredicate;
 
 // FIXME: Force to link against libffi
 #[link(name = "ffi")]
@@ -115,7 +116,7 @@ impl<'a> Module<'a> {
         }
     }
 
-    pub fn run_function(&self, fun: Value<'a>) -> Result<usize, String> {
+    pub fn run_function(&self, fun: Value<'a>) -> Result<u64, String> {
         let mut out_message: *mut c_char = ptr::null_mut();
         let mut exec: engine::LLVMExecutionEngineRef = ptr::null_mut();
 
@@ -132,8 +133,6 @@ impl<'a> Module<'a> {
             let size = engine::LLVMCreateGenericValueOfInt(Type::get_i64(self.context).type_ref,
                                                            30_000 as _,
                                                            0 as i32);
-//            let read = engine::LLVMCreateGenericValueOfPointer(rts_read as _);
-//            let write = engine::LLVMCreateGenericValueOfPointer(rts_write as _);
             let mut args = vec![size];
             let result = engine::LLVMRunFunction(exec,
                                                  fun.value_ref,
@@ -205,11 +204,11 @@ pub struct Value<'a> {
 }
 
 impl<'a> Value<'a> {
-    pub fn get_fun_param(&self, index: usize) -> Self {
-        self.context.wrap_value(unsafe {
-            LLVMGetParam(self.value_ref, index as _)
-        })
-    }
+//    pub fn get_fun_param(&self, index: usize) -> Self {
+//        self.context.wrap_value(unsafe {
+//            LLVMGetParam(self.value_ref, index as _)
+//        })
+//    }
 
     pub fn append(&self, name: &str) -> BasicBlock<'a> {
         let name = self.context.new_name(name);
@@ -264,6 +263,7 @@ pub struct BasicBlock<'a> {
     _context: &'a Context,
 }
 
+#[derive(Copy, Clone)]
 pub struct Builder<'a> {
     builder_ref: LLVMBuilderRef,
     context:     &'a Context,
@@ -307,6 +307,12 @@ impl<'a> Builder<'a> {
         })
     }
 
+    pub fn br(&self, dst: BasicBlock<'a>) {
+        unsafe {
+            LLVMBuildBr(self.builder_ref, dst.bb_ref);
+        }
+    }
+
     pub fn call(&self, fun: Value<'a>, args: &[Value<'a>], name: &str) -> Value<'a> {
         let name = self.context.new_name(name);
         let mut args = args.into_iter().map(|arg| arg.value_ref).collect::<Vec<_>>();
@@ -317,6 +323,21 @@ impl<'a> Builder<'a> {
                           args.len() as u32,
                           name)
         })
+    }
+
+    pub fn cmp(&self, pred: LLVMIntPredicate, lhs: Value<'a>, rhs: Value<'a>,
+               name: &str) -> Value<'a> {
+        let name = self.context.new_name(name);
+        self.context.wrap_value(unsafe {
+            LLVMBuildICmp(self.builder_ref, pred, lhs.value_ref, rhs.value_ref, name)
+
+        })
+    }
+
+    pub fn cond_br(&self, test: Value<'a>, then: BasicBlock<'a>, else_: BasicBlock<'a>) {
+        unsafe {
+            LLVMBuildCondBr(self.builder_ref, test.value_ref, then.bb_ref, else_.bb_ref);
+        }
     }
 
     pub fn gep(&self, ptr: Value<'a>, indices: &[Value<'a>], name: &str) -> Value<'a> {
