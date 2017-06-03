@@ -438,22 +438,34 @@
 <span id="393">393</span>
 <span id="394">394</span>
 <span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">CString</span>, <span class="ident">CStr</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_char</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::{<span class="ident">c_char</span>, <span class="ident">c_uint</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">mem</span>, <span class="ident">ptr</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">RefCell</span>;
 
+<span class="kw">use</span> <span class="ident">llvm_sys</span>;
 <span class="kw">use</span> <span class="ident">llvm_sys</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">llvm_sys</span>::<span class="ident">core</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">llvm_sys</span>::<span class="ident">target</span>;
 <span class="kw">use</span> <span class="ident">llvm_sys</span>::<span class="ident">analysis</span>::{<span class="ident">LLVMVerifyModule</span>, <span class="ident">LLVMVerifierFailureAction</span>};
 <span class="kw">use</span> <span class="ident">llvm_sys</span>::<span class="ident">transforms</span>::<span class="ident">pass_manager_builder</span> <span class="kw">as</span> <span class="ident">builder</span>;
 <span class="kw">use</span> <span class="ident">llvm_sys</span>::<span class="ident">execution_engine</span> <span class="kw">as</span> <span class="ident">engine</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">llvm_sys</span>::<span class="ident">LLVMIntPredicate</span>;
-
-<span class="comment">// FIXME: Force to link against libffi</span>
-<span class="attribute">#[<span class="ident">link</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-<span class="kw">extern</span> {}
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
     <span class="ident">context_ref</span>: <span class="ident">LLVMContextRef</span>,
@@ -558,29 +570,45 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_function</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fun</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_function</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out_message</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exec</span>: <span class="ident">engine</span>::<span class="ident">LLVMExecutionEngineRef</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
 
         <span class="kw">unsafe</span> {
-            <span class="ident">engine</span>::<span class="ident">LLVMLinkInInterpreter</span>();
             <span class="ident">engine</span>::<span class="ident">LLVMLinkInMCJIT</span>();
 
-            <span class="kw">if</span> <span class="ident">engine</span>::<span class="ident">LLVMCreateExecutionEngineForModule</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exec</span>, <span class="self">self</span>.<span class="ident">module_ref</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out_message</span>) <span class="op">!=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">target</span>::<span class="ident">LLVM_InitializeNativeAsmPrinter</span>() <span class="op">==</span> <span class="number">1</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Could not initialize native asm printer for LLVM.&quot;</span>.<span class="ident">to_owned</span>());
+            }
+
+            <span class="kw">if</span> <span class="ident">target</span>::<span class="ident">LLVM_InitializeNativeTarget</span>() <span class="op">==</span> <span class="number">1</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Could not initialize native target for LLVM.&quot;</span>.<span class="ident">to_owned</span>());
+            }
+
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">engine</span>::<span class="ident">LLVMMCJITCompilerOptions</span> {
+                <span class="ident">OptLevel</span>: <span class="number">3</span>,
+                <span class="ident">CodeModel</span>: <span class="ident">llvm_sys</span>::<span class="ident">target_machine</span>::<span class="ident">LLVMCodeModel</span>::<span class="ident">LLVMCodeModelDefault</span>,
+                <span class="ident">NoFramePointerElim</span>: <span class="number">0</span>,
+                <span class="ident">EnableFastISel</span>: <span class="number">0</span>,
+                <span class="ident">MCJMM</span>: <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+            };
+
+            <span class="kw">if</span> <span class="ident">engine</span>::<span class="ident">LLVMCreateMCJITCompilerForModule</span>(
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exec</span>, <span class="self">self</span>.<span class="ident">module_ref</span>,
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">options</span>,
+                <span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>() <span class="kw">as</span> _,
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out_message</span>
+            ) <span class="op">!=</span> <span class="number">0</span> {
                 <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">CStr</span>::<span class="ident">from_ptr</span>(<span class="ident">out_message</span>).<span class="ident">to_string_lossy</span>().<span class="ident">into_owned</span>();
                 <span class="ident">LLVMDisposeMessage</span>(<span class="ident">out_message</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">result</span>);
             }
 
-            <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">engine</span>::<span class="ident">LLVMCreateGenericValueOfInt</span>(<span class="ident">Type</span>::<span class="ident">get_i64</span>(<span class="self">self</span>.<span class="ident">context</span>).<span class="ident">type_ref</span>,
-                                                           <span class="number">30_000</span> <span class="kw">as</span> _,
-                                                           <span class="number">0</span> <span class="kw">as</span> <span class="ident">i32</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">size</span>];
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">engine</span>::<span class="ident">LLVMRunFunction</span>(<span class="ident">exec</span>,
-                                                 <span class="ident">fun</span>.<span class="ident">value_ref</span>,
-                                                 <span class="ident">args</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                                                 <span class="ident">args</span>.<span class="ident">as_mut_ptr</span>());
-            <span class="prelude-val">Ok</span>(<span class="ident">engine</span>::<span class="ident">LLVMGenericValueToInt</span>(<span class="ident">result</span>, <span class="number">0</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> _)
+            <span class="kw">let</span> <span class="ident">cname</span>    <span class="op">=</span> <span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">fun_addr</span> <span class="op">=</span> <span class="ident">engine</span>::<span class="ident">LLVMGetFunctionAddress</span>(<span class="ident">exec</span>, <span class="ident">cname</span>.<span class="ident">as_ptr</span>());
+            <span class="kw">let</span> <span class="ident">fun</span>: <span class="kw">extern</span> <span class="kw">fn</span>() <span class="op">-&gt;</span> <span class="ident">u64</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">fun_addr</span>);
+
+            <span class="prelude-val">Ok</span>(<span class="ident">fun</span>())
         }
     }
 }

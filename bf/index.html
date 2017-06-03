@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/bf/lib.rs.html#1-67' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/bf/lib.rs.html#1-71' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p><code>bf-rs</code> is a optimizing Brainfuck interpreter and JIT compiler
 inspired by Eli Bendersky’s <a href="http://eli.thegreenplace.net/2017/adventures-in-jit-compilation-part-1-an-interpreter/">series on JIT compilation</a>.
 It includes a library crate <code>bf</code> that exports most of the functionality,
@@ -56,10 +56,10 @@ and an executable <code>bfi</code> that provides a command-line interface for ex
 Brainfuck programs.</p>
 
 <p>By default, installing <code>bf</code> does not enable the JIT compiler because
-that requires nightly Rust. To build and install from crates.io with the JIT
-enabled:</p>
+that requires nightly Rust. To build and install from crates.io with the native x86-64
+JIT enabled:</p>
 
-<pre><code class="language-shell">$ rustup run nightly cargo install --features=jit bf
+<pre><code class="language-shell">$ rustup run nightly cargo install bf --features=jit
 </code></pre>
 
 <p>This library implements a number of compilation passes:</p>
@@ -75,6 +75,9 @@ instructions by the <a href="peephole/index.html">peephole optimizer</a>.</p></l
 which is then interpreted.</p></li>
 <li><p>Or, if the <code>jit</code> feature is enabled (nightly only), the peephole output
 can be <a href="jit/index.html">just-in-time compiled to x64 machine code</a>.</p></li>
+<li><p>Or, if the <code>llvm</code> feature is enabled (LLVM ≥ 3.8 must be in the PATH to build),
+the peephole output can be <a href="llvm/index.html">JIT compiled useing LLVM</a>.
+(This is quite slow right now.)</p></li>
 </ul>
 
 <p>Interpreters are provided for the intermediate forms as well. In particular,

@@ -110,6 +110,10 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
 </pre><pre class="rust ">
 <span class="doccomment">//!</span>
 <span class="doccomment">//! `bf-rs` is a optimizing Brainfuck interpreter and JIT compiler</span>
@@ -119,11 +123,11 @@
 <span class="doccomment">//! Brainfuck programs.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! By default, installing `bf` does not enable the JIT compiler because</span>
-<span class="doccomment">//! that requires nightly Rust. To build and install from crates.io with the JIT</span>
-<span class="doccomment">//! enabled:</span>
+<span class="doccomment">//! that requires nightly Rust. To build and install from crates.io with the native x86-64</span>
+<span class="doccomment">//! JIT enabled:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```shell</span>
-<span class="doccomment">//! $ rustup run nightly cargo install --features=jit bf</span>
+<span class="doccomment">//! $ rustup run nightly cargo install bf --features=jit</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [series on JIT compilation]: http://eli.thegreenplace.net/2017/adventures-in-jit-compilation-part-1-an-interpreter/</span>
@@ -144,6 +148,10 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//!  - Or, if the `jit` feature is enabled (nightly only), the peephole output</span>
 <span class="doccomment">//! can be [just-in-time compiled to x64 machine code](jit/index.html).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!  - Or, if the `llvm` feature is enabled (LLVM ≥ 3.8 must be in the PATH to build),</span>
+<span class="doccomment">//! the peephole output can be [JIT compiled useing LLVM](llvm/index.html).</span>
+<span class="doccomment">//! (This is quite slow right now.)</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Interpreters are provided for the intermediate forms as well. In particular,</span>
 <span class="doccomment">//! all representations of Brainfuck programs implement the</span>

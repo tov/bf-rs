@@ -43,22 +43,20 @@
         </form>
     </nav>
 
-    <section id='main' class="content"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
-<span id="10">10</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! JIT compiler for Brainfuck based on LLVM.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Enabled with `--features=llvm`. This currently doesn&#39;t link on some platforms due to trouble</span>
-<span class="doccomment">//! with libffi. And when it does link, it appears to use the LLVM bitcode interpreter rather</span>
-<span class="doccomment">//! than MCJIT, and consequently is very slow.</span>
+<span class="doccomment">//! Enabled with `--features=llvm`. This is actually quite slow, because LLVM takes a long time</span>
+<span class="doccomment">//! optimizing. However, the actual running of the optimized code appears to be quite fast.</span>
 
 <span class="kw">mod</span> <span class="ident">wrapper</span>;
 <span class="kw">mod</span> <span class="ident">compiler</span>;

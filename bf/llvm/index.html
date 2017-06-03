@@ -48,12 +48,11 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/bf/llvm/mod.rs.html#1-10' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/bf/llvm/mod.rs.html#1-9' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>JIT compiler for Brainfuck based on LLVM.</p>
 
-<p>Enabled with <code>--features=llvm</code>. This currently doesn&#39;t link on some platforms due to trouble
-with libffi. And when it does link, it appears to use the LLVM bitcode interpreter rather
-than MCJIT, and consequently is very slow.</p>
+<p>Enabled with <code>--features=llvm</code>. This is actually quite slow, because LLVM takes a long time
+optimizing. However, the actual running of the optimized code appears to be quite fast.</p>
 </div><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
                        <tr class=' module-item'>
