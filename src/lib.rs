@@ -32,6 +32,9 @@
 //!  - Or, if the `jit` feature is enabled (nightly only), the peephole output
 //! can be [just-in-time compiled to x64 machine code](jit/index.html).
 //!
+//!  - Or, if the `llvm` feature is enabled, the peephole output can be
+//! [JIT compiled useing LLVM](llvm/index.html). (This is quite slow right now.)
+//!
 //! Interpreters are provided for the intermediate forms as well. In particular,
 //! all representations of Brainfuck programs implement the
 //! [`Interpretable`](traits/trait.Interpretable.html) trait.
