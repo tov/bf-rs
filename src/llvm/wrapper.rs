@@ -57,6 +57,7 @@ impl Drop for Context {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct Module<'a> {
     module_ref: LLVMModuleRef,
     context:    &'a Context,

@@ -10,9 +10,10 @@ use super::wrapper::*;
 
 struct Compiler<'a> {
     context:        &'a Context,
+    module:         Module<'a>,
     builder:        Builder<'a>,
-    overflow:       BasicBlock<'a>,
     underflow:      BasicBlock<'a>,
+    overflow:       BasicBlock<'a>,
     int_type:       Type<'a>,
     memory_size:    Value<'a>,
     main_function:  Value<'a>,
@@ -23,79 +24,17 @@ struct Compiler<'a> {
 }
 
 pub fn compile_and_run(program: &peephole::Program, memory_size: Option<usize>) -> BfResult<()> {
-    let memory_size = memory_size.unwrap_or(DEFAULT_CAPACITY);
-
     let context = Context::new();
-    let module = Module::new(&context, "bfi_module");
 
-    let i64_type        = Type::get_i64(&context);
-    let i32_type        = Type::get_i32(&context);
-    let i8_type         = Type::get_i8(&context);
-    let bool_type       = Type::get_bool(&context);
-    let void_type       = Type::get_void(&context);
-    let char_ptr_type   = Type::get_pointer(i8_type);
-    let int_type        = if mem::size_of::<c_int>() == 4 {i32_type} else {i64_type};
-
-    let false_i1        = Value::get_bool(&context, false);
-    let zero_u8         = Value::get_u8(&context, 0);
-    let zero_u32        = Value::get_u32(&context, 0);
-    let zero_u64        = Value::get_u64(&context, 0);
-    let memory_size_u64 = Value::get_u64(&context, memory_size as u64);
-
-    let read_function_type = Type::get_function(&[], int_type);
-    let read_function = module.add_function("getchar", read_function_type);
-
-    let write_function_type = Type::get_function(&[int_type], int_type);
-    let write_function = module.add_function("putchar", write_function_type);
-
-    let main_function_type = Type::get_function(&[], i64_type);
-    let main_function  = module.add_function("bfi_main", main_function_type);
-
-    let memset_type = Type::get_function(&[char_ptr_type, i8_type, i64_type, i32_type, bool_type],
-                                         void_type);
-    let memset = module.add_function("llvm.memset.p0i8.i64", memset_type);
-
-    let entry_bb = main_function.append("entry");
-    let underflow_bb = main_function.append("underflow");
-    let overflow_bb = main_function.append("overflow");
-
-    let builder = Builder::new(&context);
-
-    builder.position_at_end(underflow_bb);
-    builder.ret(Value::get_u64(&context, rts::UNDERFLOW));
-
-    builder.position_at_end(overflow_bb);
-    builder.ret(Value::get_u64(&context, rts::OVERFLOW));
-
-    builder.position_at_end(entry_bb);
-    let memory = builder.array_alloca(i8_type, memory_size_u64, "memory");
-    builder.call(memset, &[memory, zero_u8, memory_size_u64, zero_u32, false_i1], "");
-    let pointer = builder.alloca(i64_type, "pointer");
-    builder.store(zero_u64, pointer);
-
-    let compiler = Compiler {
-        context: &context,
-        builder: builder,
-        overflow: overflow_bb,
-        underflow: underflow_bb,
-        int_type: int_type,
-        memory_size: memory_size_u64,
-        main_function: main_function,
-        pointer: pointer,
-        memory: memory,
-        read_function: read_function,
-        write_function: write_function,
-    };
-
+    let compiler = Compiler::prologue(&context, memory_size);
     compiler.compile_block(program);
+    compiler.epilogue();
 
-    builder.ret(Value::get_u64(&context, rts::OKAY));
+    compiler.module.optimize(3, 0);
+    compiler.module.dump();
+    compiler.module.verify().unwrap();
 
-    module.optimize(3, 0);
-    module.dump();
-    module.verify().unwrap();
-
-    let result = module.run_function(main_function).unwrap();
+    let result = compiler.module.run_function(compiler.main_function).unwrap();
 
     match result {
         rts::OKAY => Ok(()),
@@ -214,6 +153,81 @@ impl<'a> Compiler<'a> {
                 }
             }
         }
+    }
+
+    fn prologue(context: &'a Context, memory_size: Option<usize>) -> Self {
+        let module = Module::new(&context, "bfi_module");
+
+        // Some useful types
+        let i64_type        = Type::get_i64(&context);
+        let i32_type        = Type::get_i32(&context);
+        let i8_type         = Type::get_i8(&context);
+        let bool_type       = Type::get_bool(&context);
+        let void_type       = Type::get_void(&context);
+        let char_ptr_type   = Type::get_pointer(i8_type);
+
+        // getchar and putchar use C's int type, which varies in size.
+        let int_type = if mem::size_of::<c_int>() == 4 {i32_type} else {i64_type};
+
+        // The size of memory as an LLVM Value
+        let memory_size = memory_size.unwrap_or(DEFAULT_CAPACITY);
+        let memory_size = Value::get_u64(&context, memory_size as u64);
+
+        // Create the main function, create an entry basic block, and position a builder at entry.
+        let main_function_type = Type::get_function(&[], i64_type);
+        let main_function  = module.add_function("bfi_main", main_function_type);
+        let entry_bb = main_function.append("entry");
+        let builder = Builder::new(&context);
+        builder.position_at_end(entry_bb);
+
+        // All state for the compiler.
+        let compiler = Compiler {
+            context:        &context,
+            module:         module,
+            builder:        builder,
+            underflow:      main_function.append("underflow"),
+            overflow:       main_function.append("overflow"),
+            int_type:       int_type,
+            memory_size:    memory_size,
+            main_function:  main_function,
+            pointer:        builder.alloca(i64_type, "pointer"),
+            memory:         builder.array_alloca(i8_type, memory_size, "memory"),
+            read_function: {
+                let read_function_type = Type::get_function(&[], int_type);
+                module.add_function("getchar", read_function_type)
+            },
+            write_function: {
+                let write_function_type = Type::get_function(&[int_type], int_type);
+                module.add_function("putchar", write_function_type)
+            }
+        };
+
+        // Zero-initialize the memory
+        let memset_type = Type::get_function(&[char_ptr_type, i8_type, i64_type, i32_type, bool_type],
+                                             void_type);
+        let memset = compiler.module.add_function("llvm.memset.p0i8.i64", memset_type);
+        builder.call(memset,
+                     &[compiler.memory,
+                         Value::get_u8(&context, 0),
+                         compiler.memory_size,
+                         Value::get_u32(&context, 0),
+                         Value::get_bool(&context, false)],
+                     "");
+
+        // Start the data pointer at 0.
+        builder.store(Value::get_u64(&context, 0), compiler.pointer);
+
+        compiler
+    }
+
+    fn epilogue(&self) {
+        self.builder.ret(Value::get_u64(&self.context, rts::OKAY));
+
+        self.builder.position_at_end(self.underflow);
+        self.builder.ret(Value::get_u64(&self.context, rts::UNDERFLOW));
+
+        self.builder.position_at_end(self.overflow);
+        self.builder.ret(Value::get_u64(&self.context, rts::OVERFLOW));
     }
 
     fn if_not0(&self, true_: BasicBlock<'a>, false_: BasicBlock<'a>) {
