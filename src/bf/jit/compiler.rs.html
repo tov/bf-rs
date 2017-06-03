@@ -665,7 +665,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">JitCompilable</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">peephole</span>::<span class="ident">Program</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">JitCompilable</span> <span class="kw">for</span> <span class="ident">peephole</span>::<span class="ident">Program</span> {
     <span class="kw">fn</span> <span class="ident">with_peephole</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">k</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="ident">R</span>
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">peephole</span>::<span class="ident">Program</span>) <span class="op">-&gt;</span> <span class="ident">R</span>
     {
