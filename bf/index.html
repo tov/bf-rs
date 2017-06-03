@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/bf/lib.rs.html#1-60' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/bf/lib.rs.html#1-67' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p><code>bf-rs</code> is a optimizing Brainfuck interpreter and JIT compiler
 inspired by Eli Bendersky’s <a href="http://eli.thegreenplace.net/2017/adventures-in-jit-compilation-part-1-an-interpreter/">series on JIT compilation</a>.
 It includes a library crate <code>bf</code> that exports most of the functionality,
@@ -111,6 +111,13 @@ all representations of Brainfuck programs implement the
                            </td>
                        </tr>
                        <tr class=' module-item'>
+                           <td><a class="mod" href="llvm/index.html"
+                                  title='mod bf::llvm'>llvm</a></td>
+                           <td class='docblock-short'>
+                                <p>JIT compiler for Brainfuck based on LLVM.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class="mod" href="peephole/index.html"
                                   title='mod bf::peephole'>peephole</a></td>
                            <td class='docblock-short'>
@@ -123,6 +130,13 @@ instructions.</p>
                                   title='mod bf::rle'>rle</a></td>
                            <td class='docblock-short'>
                                 <p>Run-length encodes Brainfuck commands.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="mod" href="rts/index.html"
+                                  title='mod bf::rts'>rts</a></td>
+                           <td class='docblock-short'>
+                                <p>Minimal run-time system, which does I/O.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>

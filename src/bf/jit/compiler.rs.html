@@ -361,6 +361,7 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
+<span id="319">319</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::<span class="ident">x64</span>::<span class="ident">Assembler</span>;
 <span class="kw">use</span> <span class="ident">dynasmrt</span>::{<span class="ident">DynasmApi</span>, <span class="ident">DynasmLabelApi</span>};
@@ -369,6 +370,7 @@
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">analysis</span>::{<span class="ident">BoundsAnalysis</span>, <span class="ident">AbstractInterpreter</span>, <span class="ident">NoAnalysis</span>};
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Count</span>;
 <span class="kw">use</span> <span class="ident">peephole</span>;
+<span class="kw">use</span> <span class="ident">rts</span>;
 
 <span class="doccomment">/// Program forms that can be JIT compiled.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">JitCompilable</span> {

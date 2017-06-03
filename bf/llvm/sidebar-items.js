@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["compile_and_run","JIT compile and run the given program via LLVM."]],"trait":[["LlvmCompilable","Program forms that can be compiled and run via LLVM."]]});

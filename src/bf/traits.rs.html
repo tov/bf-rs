@@ -111,6 +111,8 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Contains the Interpretable trait, which provides a common interface for running a Brainfuck</span>
 <span class="doccomment">//! program.</span>
@@ -125,6 +127,8 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bytecode</span>::<span class="ident">BytecodeCompilable</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;jit&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">jit</span>::<span class="ident">JitCompilable</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;llvm&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">llvm</span>::<span class="ident">LlvmCompilable</span>;
 
 <span class="doccomment">/// Program forms that can be interpreted.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Interpretable</span> {
