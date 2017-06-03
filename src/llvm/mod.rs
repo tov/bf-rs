@@ -1,8 +1,7 @@
 //! JIT compiler for Brainfuck based on LLVM.
 //!
-//! Enabled with `--features=llvm`. This currently doesn't link on some platforms due to trouble
-//! with libffi. And when it does link, it appears to use the LLVM bitcode interpreter rather
-//! than MCJIT, and consequently is very slow.
+//! Enabled with `--features=llvm`. This is actually quite slow, because LLVM takes a long time
+//! optimizing. However, the actual running of the optimized code appears to be quite fast.
 
 mod wrapper;
 mod compiler;
