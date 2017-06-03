@@ -9,8 +9,6 @@ use llvm_sys::analysis::{LLVMVerifyModule, LLVMVerifierFailureAction};
 use llvm_sys::transforms::pass_manager_builder as builder;
 use llvm_sys::execution_engine as engine;
 
-use super::compiler::{rts_read, rts_write};
-
 // FIXME: Force to link against libffi
 #[link(name = "ffi")]
 extern {}
@@ -134,9 +132,9 @@ impl<'a> Module<'a> {
             let size = engine::LLVMCreateGenericValueOfInt(Type::get_i64(self.context).type_ref,
                                                            30_000 as _,
                                                            0 as i32);
-            let read = engine::LLVMCreateGenericValueOfPointer(rts_read as _);
-            let write = engine::LLVMCreateGenericValueOfPointer(rts_write as _);
-            let mut args = vec![size, read, write];
+//            let read = engine::LLVMCreateGenericValueOfPointer(rts_read as _);
+//            let write = engine::LLVMCreateGenericValueOfPointer(rts_write as _);
+            let mut args = vec![size];
             let result = engine::LLVMRunFunction(exec,
                                                  fun.value_ref,
                                                  args.len() as u32,

@@ -1,18 +1,9 @@
-use std::io::Read;
+use std::os::raw::c_int;
+use std::mem;
 
 use peephole;
 
 use super::wrapper::*;
-
-pub extern fn rts_write(c: u8) {
-    print!("{}", c as char);
-}
-
-pub extern fn rts_read() -> u8 {
-    let mut buf = [0u8];
-    let _ = ::std::io::stdin().read_exact(&mut buf);
-    buf[0]
-}
 
 pub fn compile(program: &peephole::Program) {
     use peephole::Statement::*;
@@ -27,23 +18,22 @@ pub fn compile(program: &peephole::Program) {
     let bool_type     = Type::get_bool(&context);
     let void_type     = Type::get_void(&context);
     let char_ptr_type = Type::get_pointer(i8_type);
+    let int_type      = if mem::size_of::<c_int>() == 4 {i32_type} else {i64_type};
 
     let false_i1 = Value::get_bool(&context, false);
     let zero_u8  = Value::get_u8(&context, 0);
     let zero_u32 = Value::get_u32(&context, 0);
     let zero_u64 = Value::get_u64(&context, 0);
 
-    let read_function_type = Type::get_pointer(Type::get_function(&[], i8_type));
-    let write_function_type = Type::get_pointer(Type::get_function(&[i8_type], void_type));
+    let read_function_type = Type::get_function(&[], int_type);
+    let read_function = module.add_function("getchar", read_function_type);
 
-    let main_function_type = Type::get_function(&[i64_type,
-                                                  read_function_type,
-                                                  write_function_type],
-                                                i64_type);
+    let write_function_type = Type::get_function(&[int_type], int_type);
+    let write_function = module.add_function("putchar", write_function_type);
+
+    let main_function_type = Type::get_function(&[i64_type], i64_type);
     let main_function  = module.add_function("bfi_main", main_function_type);
     let memory_size    = main_function.get_fun_param(0);
-    let read_function  = main_function.get_fun_param(1);
-    let write_function = main_function.get_fun_param(2);
 
     let memset_type = Type::get_function(&[char_ptr_type, i8_type, i64_type, i32_type, bool_type],
                                          void_type);
@@ -86,6 +76,7 @@ pub fn compile(program: &peephole::Program) {
 
             Instr(In) => {
                 let result  = builder.call(read_function, &[], "");
+                let result  = builder.trunc(result, i8_type, "");
                 let address = builder.gep(memory, &[builder.load(pointer, "")], "data_ptr");
                 builder.store(result, address);
             }
@@ -93,6 +84,7 @@ pub fn compile(program: &peephole::Program) {
             Instr(Out) => {
                 let address  = builder.gep(memory, &[builder.load(pointer, "")], "data_ptr");
                 let argument = builder.load(address, "");
+                let argument = builder.zext(argument, int_type, "");
                 builder.call(write_function, &[argument], "");
             }
 
