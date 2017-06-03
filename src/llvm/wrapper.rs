@@ -12,10 +12,6 @@ use llvm_sys::transforms::pass_manager_builder as builder;
 use llvm_sys::execution_engine as engine;
 pub use llvm_sys::LLVMIntPredicate;
 
-// FIXME: Force to link against libffi
-#[link(name = "ffi")]
-extern {}
-
 pub struct Context {
     context_ref: LLVMContextRef,
     strings:     RefCell<Vec<CString>>,
