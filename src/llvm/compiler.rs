@@ -95,7 +95,7 @@ impl<'a> Compiler<'a> {
                 }
 
                 Instr(Add(count)) => {
-                    let count = Value::get_u8(&self.context, count);
+                    let count = Value::get_u8(self.context, count);
                     let old_value = self.load_data("old_val");
                     let new_value = builder.add(old_value, count, "new_val");
                     self.store_data(new_value);
@@ -136,7 +136,7 @@ impl<'a> Compiler<'a> {
                     builder.position_at_end(do_it);
                     let pointer = self.load_pos_offset(count, "offset_ptr");
                     let to_add = self.load_data("to_add");
-                    self.store_data(Value::get_u8(&self.context, 0));
+                    self.store_data(Value::get_u8(self.context, 0));
                     let add_to = self.load_data_at(pointer, "add_to");
                     let sum = builder.add(to_add, add_to, "sum");
                     self.store_data_at(pointer, sum);
@@ -154,7 +154,7 @@ impl<'a> Compiler<'a> {
                     builder.position_at_end(do_it);
                     let pointer = self.load_neg_offset(count, "offset_ptr");
                     let to_add = self.load_data("to_add");
-                    self.store_data(Value::get_u8(&self.context, 0));
+                    self.store_data(Value::get_u8(self.context, 0));
                     let add_to = self.load_data_at(pointer, "add_to");
                     let sum = builder.add(to_add, add_to, "sum");
                     self.store_data_at(pointer, sum);
@@ -188,27 +188,27 @@ impl<'a> Compiler<'a> {
 
     /// Set up compilation.
     fn prologue(context: &'a Context, memory_size: u64) -> Self {
-        let module = Module::new(&context, "bfi_module");
+        let module = Module::new(context, "bfi_module");
 
         // Some useful types
-        let i64_type        = Type::get_i64(&context);
-        let i32_type        = Type::get_i32(&context);
-        let i8_type         = Type::get_i8(&context);
-        let bool_type       = Type::get_bool(&context);
-        let void_type       = Type::get_void(&context);
+        let i64_type        = Type::get_i64(context);
+        let i32_type        = Type::get_i32(context);
+        let i8_type         = Type::get_i8(context);
+        let bool_type       = Type::get_bool(context);
+        let void_type       = Type::get_void(context);
         let char_ptr_type   = Type::get_pointer(i8_type);
 
         // getchar and putchar use C's int type, which varies in size.
         let int_type = if mem::size_of::<c_int>() == 4 {i32_type} else {i64_type};
 
         // The size of memory as an LLVM Value
-        let memory_size = Value::get_u64(&context, memory_size);
+        let memory_size = Value::get_u64(context, memory_size);
 
         // Create the main function, create an entry basic block, and position a builder at entry.
         let main_function_type = Type::get_function(&[], i64_type);
         let main_function  = module.add_function("bfi_main", main_function_type);
         let entry_bb = main_function.append("entry");
-        let builder = Builder::new(&context);
+        let builder = Builder::new(context);
         builder.position_at_end(entry_bb);
 
         // All state for the compiler.
@@ -239,27 +239,27 @@ impl<'a> Compiler<'a> {
         let memset = compiler.module.add_function("llvm.memset.p0i8.i64", memset_type);
         builder.call(memset,
                      &[compiler.memory,
-                         Value::get_u8(&context, 0),
+                         Value::get_u8(context, 0),
                          compiler.memory_size,
-                         Value::get_u32(&context, 0),
-                         Value::get_bool(&context, false)],
+                         Value::get_u32(context, 0),
+                         Value::get_bool(context, false)],
                      "");
 
         // Start the data pointer at 0.
-        builder.store(Value::get_u64(&context, 0), compiler.pointer);
+        builder.store(Value::get_u64(context, 0), compiler.pointer);
 
         compiler
     }
 
     /// Emit the returns for the successful path and both error paths.
     fn epilogue(&self) {
-        self.builder.ret(Value::get_u64(&self.context, rts::OKAY));
+        self.builder.ret(Value::get_u64(self.context, rts::OKAY));
 
         self.builder.position_at_end(self.underflow);
-        self.builder.ret(Value::get_u64(&self.context, rts::UNDERFLOW));
+        self.builder.ret(Value::get_u64(self.context, rts::UNDERFLOW));
 
         self.builder.position_at_end(self.overflow);
-        self.builder.ret(Value::get_u64(&self.context, rts::OVERFLOW));
+        self.builder.ret(Value::get_u64(self.context, rts::OVERFLOW));
     }
 
     /// Branch based on whether the byte at the data pointer is 0.
@@ -299,7 +299,7 @@ impl<'a> Compiler<'a> {
         let success = self.main_function.append("right_success");
         let old_pointer = self.builder.load(self.pointer, "old_pointer");
         let allowed = self.builder.sub(self.memory_size, old_pointer, "room");
-        let offset = Value::get_u64(&self.context, offset as u64);
+        let offset = Value::get_u64(self.context, offset as u64);
         let comparison = self.builder.cmp(LLVMIntPredicate::LLVMIntULT, offset, allowed, "allowed");
         self.builder.cond_br(comparison, success, self.overflow);
         self.builder.position_at_end(success);
@@ -310,7 +310,7 @@ impl<'a> Compiler<'a> {
     fn load_neg_offset(&self, offset: Count, name: &str) -> Value<'a> {
         let success = self.main_function.append("left_success");
         let old_pointer = self.builder.load(self.pointer, "old_pointer");
-        let offset = Value::get_u64(&self.context, offset as u64);
+        let offset = Value::get_u64(self.context, offset as u64);
         let comparison = self.builder.cmp(LLVMIntPredicate::LLVMIntULE, offset, old_pointer,
                                      "allowed");
         self.builder.cond_br(comparison, success, self.underflow);
