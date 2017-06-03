@@ -10,7 +10,7 @@
 //! JIT enabled:
 //!
 //! ```shell
-//! $ rustup run nightly cargo install --features=jit bf
+//! $ rustup run nightly cargo install bf --features=jit
 //! ```
 //!
 //! [series on JIT compilation]: http://eli.thegreenplace.net/2017/adventures-in-jit-compilation-part-1-an-interpreter/
@@ -32,8 +32,9 @@
 //!  - Or, if the `jit` feature is enabled (nightly only), the peephole output
 //! can be [just-in-time compiled to x64 machine code](jit/index.html).
 //!
-//!  - Or, if the `llvm` feature is enabled, the peephole output can be
-//! [JIT compiled useing LLVM](llvm/index.html). (This is quite slow right now.)
+//!  - Or, if the `llvm` feature is enabled (LLVM ≥ 3.8 must be in the PATH to build),
+//! the peephole output can be [JIT compiled useing LLVM](llvm/index.html).
+//! (This is quite slow right now.)
 //!
 //! Interpreters are provided for the intermediate forms as well. In particular,
 //! all representations of Brainfuck programs implement the
