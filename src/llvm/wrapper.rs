@@ -5,6 +5,7 @@ use std::cell::RefCell;
 
 use llvm_sys::prelude::*;
 use llvm_sys::core::*;
+use llvm_sys::target::LLVM_InitializeNativeTarget;
 use llvm_sys::analysis::{LLVMVerifyModule, LLVMVerifierFailureAction};
 use llvm_sys::transforms::pass_manager_builder as builder;
 use llvm_sys::execution_engine as engine;
@@ -122,10 +123,17 @@ impl<'a> Module<'a> {
         let mut exec: engine::LLVMExecutionEngineRef = ptr::null_mut();
 
         unsafe {
-            engine::LLVMLinkInInterpreter();
             engine::LLVMLinkInMCJIT();
 
-            if engine::LLVMCreateExecutionEngineForModule(&mut exec, self.module_ref, &mut out_message) != 0 {
+            if LLVM_InitializeNativeTarget() == 1 {
+                panic!("Could not initialize native target for LLVM.");
+            }
+
+            if engine::LLVMCreateMCJITCompilerForModule(&mut exec,
+                                                        self.module_ref,
+                                                        ptr::null_mut(),
+                                                        0,
+                                                        &mut out_message) != 0 {
                 let result = CStr::from_ptr(out_message).to_string_lossy().into_owned();
                 LLVMDisposeMessage(out_message);
                 return Err(result);
