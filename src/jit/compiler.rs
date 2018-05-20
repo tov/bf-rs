@@ -55,7 +55,7 @@ struct Compiler<B: BoundsAnalysis> {
 
 impl<B: BoundsAnalysis> Compiler<B> {
     fn new(program: &peephole::Program, checked: bool) -> Self {
-        let asm = Assembler::new();
+        let asm = Assembler::new().expect("Could not create assembler");
         let start = asm.offset();
 
         let mut result = Compiler {
