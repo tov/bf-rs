@@ -15,7 +15,7 @@ that requires nightly Rust. To build and install from crates.io with the JIT
 enabled:
 
 ```
-$ rustup run nightly cargo install --features=jit bf
+$ cargo +nightly install --features=jit bf
 ```
 
 If you’re interested in how it works, see [the documentation].

@@ -10,7 +10,7 @@
 //! JIT enabled:
 //!
 //! ```shell
-//! $ rustup run nightly cargo install bf --features=jit
+//! $ cargo +nightly install bf --features=jit
 //! ```
 //!
 //! [series on JIT compilation]: http://eli.thegreenplace.net/2017/adventures-in-jit-compilation-part-1-an-interpreter/
