@@ -1,49 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `src/llvm/wrapper.rs`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang">
-
-    <title>wrapper.rs.html -- source</title>
-
-    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
-    
-
-    
-    
-</head>
-<body class="rustdoc source">
-    <!--[if lte IE 8]>
-    <div class="warning">
-        This old browser is unsupported and will most likely display funky
-        things.
-    </div>
-    <![endif]-->
-
-    
-
-    <nav class="sidebar">
-        
-        
-    </nav>
-
-    <nav class="sub">
-        <form class="search-form js-only">
-            <div class="search-container">
-                <input class="search-input" name="search"
-                       autocomplete="off"
-                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
-                       type="search">
-            </div>
-        </form>
-    </nav>
-
-    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/llvm/wrapper.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>wrapper.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -452,6 +407,10 @@
 <span id="407">407</span>
 <span id="408">408</span>
 <span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">CString</span>, <span class="ident">CStr</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::{<span class="ident">c_char</span>, <span class="ident">c_uint</span>};
@@ -466,6 +425,8 @@
 <span class="kw">use</span> <span class="ident">llvm_sys</span>::<span class="ident">transforms</span>::<span class="ident">pass_manager_builder</span> <span class="kw">as</span> <span class="ident">builder</span>;
 <span class="kw">use</span> <span class="ident">llvm_sys</span>::<span class="ident">execution_engine</span> <span class="kw">as</span> <span class="ident">engine</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">llvm_sys</span>::<span class="ident">LLVMIntPredicate</span>;
+
+<span class="kw">use</span> <span class="ident">rts</span>::<span class="ident">RtsState</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
     <span class="ident">context_ref</span>: <span class="ident">LLVMContextRef</span>,
@@ -538,8 +499,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">optimize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">opt_level</span>: <span class="ident">usize</span>, <span class="ident">size_level</span>: <span class="ident">usize</span>) {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>::<span class="ident">LLVMPassManagerBuilderCreate</span>();
-            <span class="ident">builder</span>::<span class="ident">LLVMPassManagerBuilderSetOptLevel</span>(<span class="ident">builder</span>, <span class="ident">opt_level</span> <span class="kw">as</span> _);
-            <span class="ident">builder</span>::<span class="ident">LLVMPassManagerBuilderSetSizeLevel</span>(<span class="ident">builder</span>, <span class="ident">size_level</span> <span class="kw">as</span> _);
+            <span class="ident">builder</span>::<span class="ident">LLVMPassManagerBuilderSetOptLevel</span>(<span class="ident">builder</span>, <span class="ident">opt_level</span> <span class="kw">as</span> <span class="kw">_</span>);
+            <span class="ident">builder</span>::<span class="ident">LLVMPassManagerBuilderSetSizeLevel</span>(<span class="ident">builder</span>, <span class="ident">size_level</span> <span class="kw">as</span> <span class="kw">_</span>);
             <span class="kw">let</span> <span class="ident">pass_manager</span> <span class="op">=</span> <span class="ident">LLVMCreatePassManager</span>();
             <span class="ident">builder</span>::<span class="ident">LLVMPassManagerBuilderPopulateModulePassManager</span>(<span class="ident">builder</span>, <span class="ident">pass_manager</span>);
             <span class="ident">builder</span>::<span class="ident">LLVMPassManagerBuilderDispose</span>(<span class="ident">builder</span>);
@@ -570,46 +531,48 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_function</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">with_function</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">with</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">String</span><span class="op">&gt;</span>
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw">extern</span> <span class="kw">fn</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RtsState</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
+                                   <span class="kw">extern</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RtsState</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">u8</span>,
+                                   <span class="kw">extern</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RtsState</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>, <span class="ident">u8</span>) <span class="op">-&gt;</span> ()) <span class="op">-&gt;</span> <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>
+    {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out_message</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exec</span>: <span class="ident">engine</span>::<span class="ident">LLVMExecutionEngineRef</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
 
-        <span class="kw">unsafe</span> {
-            <span class="ident">engine</span>::<span class="ident">LLVMLinkInMCJIT</span>();
+        <span class="ident">engine</span>::<span class="ident">LLVMLinkInMCJIT</span>();
 
-            <span class="kw">if</span> <span class="ident">target</span>::<span class="ident">LLVM_InitializeNativeAsmPrinter</span>() <span class="op">==</span> <span class="number">1</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Could not initialize native asm printer for LLVM.&quot;</span>.<span class="ident">to_owned</span>());
-            }
-
-            <span class="kw">if</span> <span class="ident">target</span>::<span class="ident">LLVM_InitializeNativeTarget</span>() <span class="op">==</span> <span class="number">1</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Could not initialize native target for LLVM.&quot;</span>.<span class="ident">to_owned</span>());
-            }
-
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">engine</span>::<span class="ident">LLVMMCJITCompilerOptions</span> {
-                <span class="ident">OptLevel</span>: <span class="number">3</span>,
-                <span class="ident">CodeModel</span>: <span class="ident">llvm_sys</span>::<span class="ident">target_machine</span>::<span class="ident">LLVMCodeModel</span>::<span class="ident">LLVMCodeModelDefault</span>,
-                <span class="ident">NoFramePointerElim</span>: <span class="number">0</span>,
-                <span class="ident">EnableFastISel</span>: <span class="number">0</span>,
-                <span class="ident">MCJMM</span>: <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
-            };
-
-            <span class="kw">if</span> <span class="ident">engine</span>::<span class="ident">LLVMCreateMCJITCompilerForModule</span>(
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exec</span>, <span class="self">self</span>.<span class="ident">module_ref</span>,
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">options</span>,
-                <span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>() <span class="kw">as</span> _,
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out_message</span>
-            ) <span class="op">!=</span> <span class="number">0</span> {
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">CStr</span>::<span class="ident">from_ptr</span>(<span class="ident">out_message</span>).<span class="ident">to_string_lossy</span>().<span class="ident">into_owned</span>();
-                <span class="ident">LLVMDisposeMessage</span>(<span class="ident">out_message</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">result</span>);
-            }
-
-            <span class="kw">let</span> <span class="ident">cname</span>    <span class="op">=</span> <span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">fun_addr</span> <span class="op">=</span> <span class="ident">engine</span>::<span class="ident">LLVMGetFunctionAddress</span>(<span class="ident">exec</span>, <span class="ident">cname</span>.<span class="ident">as_ptr</span>());
-            <span class="kw">let</span> <span class="ident">fun</span>: <span class="kw">extern</span> <span class="kw">fn</span>() <span class="op">-&gt;</span> <span class="ident">u64</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">fun_addr</span>);
-
-            <span class="prelude-val">Ok</span>(<span class="ident">fun</span>())
+        <span class="kw">if</span> <span class="ident">target</span>::<span class="ident">LLVM_InitializeNativeAsmPrinter</span>() <span class="op">==</span> <span class="number">1</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Could not initialize native asm printer for LLVM.&quot;</span>.<span class="ident">to_owned</span>());
         }
+
+        <span class="kw">if</span> <span class="ident">target</span>::<span class="ident">LLVM_InitializeNativeTarget</span>() <span class="op">==</span> <span class="number">1</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Could not initialize native target for LLVM.&quot;</span>.<span class="ident">to_owned</span>());
+        }
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">engine</span>::<span class="ident">LLVMMCJITCompilerOptions</span> {
+            <span class="ident">OptLevel</span>: <span class="number">3</span>,
+            <span class="ident">CodeModel</span>: <span class="ident">llvm_sys</span>::<span class="ident">target_machine</span>::<span class="ident">LLVMCodeModel</span>::<span class="ident">LLVMCodeModelDefault</span>,
+            <span class="ident">NoFramePointerElim</span>: <span class="number">0</span>,
+            <span class="ident">EnableFastISel</span>: <span class="number">0</span>,
+            <span class="ident">MCJMM</span>: <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+        };
+
+        <span class="kw">if</span> <span class="ident">engine</span>::<span class="ident">LLVMCreateMCJITCompilerForModule</span>(
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exec</span>, <span class="self">self</span>.<span class="ident">module_ref</span>,
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">options</span>,
+            <span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="kw">_</span>,
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out_message</span>
+        ) <span class="op">!=</span> <span class="number">0</span> {
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">CStr</span>::<span class="ident">from_ptr</span>(<span class="ident">out_message</span>).<span class="ident">to_string_lossy</span>().<span class="ident">into_owned</span>();
+            <span class="ident">LLVMDisposeMessage</span>(<span class="ident">out_message</span>);
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">result</span>);
+        }
+
+        <span class="kw">let</span> <span class="ident">cname</span>    <span class="op">=</span> <span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">fun_addr</span> <span class="op">=</span> <span class="ident">engine</span>::<span class="ident">LLVMGetFunctionAddress</span>(<span class="ident">exec</span>, <span class="ident">cname</span>.<span class="ident">as_ptr</span>());
+        <span class="kw">let</span> <span class="ident">fun</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">fun_addr</span>);
+
+        <span class="prelude-val">Ok</span>(<span class="ident">with</span>(<span class="ident">fun</span>))
     }
 }
 
@@ -657,11 +620,11 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_function</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>], <span class="ident">result</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">type_ref</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">type_ref</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;&gt;</span>();
         <span class="ident">result</span>.<span class="ident">context</span>.<span class="ident">wrap_type</span>(<span class="kw">unsafe</span> {
             <span class="ident">LLVMFunctionType</span>(<span class="ident">result</span>.<span class="ident">type_ref</span>,
                              <span class="ident">args</span>.<span class="ident">as_mut_ptr</span>(),
-                             <span class="ident">args</span>.<span class="ident">len</span>() <span class="kw">as</span> _,
+                             <span class="ident">args</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>,
                              <span class="number">0</span>)
         })
     }
@@ -674,11 +637,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-<span class="comment">//    pub fn get_fun_param(&amp;self, index: usize) -&gt; Self {</span>
-<span class="comment">//        self.context.wrap_value(unsafe {</span>
-<span class="comment">//            LLVMGetParam(self.value_ref, index as _)</span>
-<span class="comment">//        })</span>
-<span class="comment">//    }</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_fun_param</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">wrap_value</span>(<span class="kw">unsafe</span> {
+            <span class="ident">LLVMGetParam</span>(<span class="self">self</span>.<span class="ident">value_ref</span>, <span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>)
+        })
+    }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">new_name</span>(<span class="ident">name</span>);
@@ -696,24 +659,24 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_u64</span>(<span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Context</span>, <span class="ident">value</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">context</span>.<span class="ident">wrap_value</span>(<span class="kw">unsafe</span> {
             <span class="ident">LLVMConstInt</span>(<span class="ident">Type</span>::<span class="ident">get_i64</span>(<span class="ident">context</span>).<span class="ident">type_ref</span>,
-                         <span class="ident">value</span> <span class="kw">as</span> _,
-                         <span class="bool-val">false</span> <span class="kw">as</span> _)
+                         <span class="ident">value</span> <span class="kw">as</span> <span class="kw">_</span>,
+                         <span class="bool-val">false</span> <span class="kw">as</span> <span class="kw">_</span>)
         })
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_u32</span>(<span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Context</span>, <span class="ident">value</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">context</span>.<span class="ident">wrap_value</span>(<span class="kw">unsafe</span> {
             <span class="ident">LLVMConstInt</span>(<span class="ident">Type</span>::<span class="ident">get_i32</span>(<span class="ident">context</span>).<span class="ident">type_ref</span>,
-                         <span class="ident">value</span> <span class="kw">as</span> _,
-                         <span class="bool-val">false</span> <span class="kw">as</span> _)
+                         <span class="ident">value</span> <span class="kw">as</span> <span class="kw">_</span>,
+                         <span class="bool-val">false</span> <span class="kw">as</span> <span class="kw">_</span>)
         })
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_u8</span>(<span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Context</span>, <span class="ident">value</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">context</span>.<span class="ident">wrap_value</span>(<span class="kw">unsafe</span> {
             <span class="ident">LLVMConstInt</span>(<span class="ident">Type</span>::<span class="ident">get_i8</span>(<span class="ident">context</span>).<span class="ident">type_ref</span>,
-                         <span class="ident">value</span> <span class="kw">as</span> _,
-                         <span class="bool-val">false</span> <span class="kw">as</span> _)
+                         <span class="ident">value</span> <span class="kw">as</span> <span class="kw">_</span>,
+                         <span class="bool-val">false</span> <span class="kw">as</span> <span class="kw">_</span>)
         })
     }
 
@@ -721,8 +684,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_bool</span>(<span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Context</span>, <span class="ident">value</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">context</span>.<span class="ident">wrap_value</span>(<span class="kw">unsafe</span> {
             <span class="ident">LLVMConstInt</span>(<span class="ident">Type</span>::<span class="ident">get_bool</span>(<span class="ident">context</span>).<span class="ident">type_ref</span>,
-                         <span class="ident">value</span> <span class="kw">as</span> _,
-                         <span class="bool-val">false</span> <span class="kw">as</span> _)
+                         <span class="ident">value</span> <span class="kw">as</span> <span class="kw">_</span>,
+                         <span class="bool-val">false</span> <span class="kw">as</span> <span class="kw">_</span>)
         })
     }
 }
@@ -785,7 +748,7 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fun</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>], <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">new_name</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">value_ref</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">value_ref</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;&gt;</span>();
         <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">wrap_value</span>(<span class="kw">unsafe</span> {
             <span class="ident">LLVMBuildCall</span>(<span class="self">self</span>.<span class="ident">builder_ref</span>,
                           <span class="ident">fun</span>.<span class="ident">value_ref</span>,
@@ -812,7 +775,7 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gep</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ptr</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">indices</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>], <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">new_name</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indices</span> <span class="op">=</span> <span class="ident">indices</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">value_ref</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indices</span> <span class="op">=</span> <span class="ident">indices</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">value_ref</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;&gt;</span>();
         <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">wrap_value</span>(<span class="kw">unsafe</span> {
             <span class="ident">LLVMBuildGEP</span>(<span class="self">self</span>.<span class="ident">builder_ref</span>,
                          <span class="ident">ptr</span>.<span class="ident">value_ref</span>,
@@ -848,79 +811,19 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trunc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">ty</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">new_name</span>(<span class="ident">name</span>);
-        <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">wrap_value</span>(<span class="kw">unsafe</span> {
-            <span class="ident">LLVMBuildTrunc</span>(<span class="self">self</span>.<span class="ident">builder_ref</span>, <span class="ident">value</span>.<span class="ident">value_ref</span>, <span class="ident">ty</span>.<span class="ident">type_ref</span>, <span class="ident">name</span>)
-        })
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">ty</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">new_name</span>(<span class="ident">name</span>);
-        <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">wrap_value</span>(<span class="kw">unsafe</span> {
-            <span class="ident">LLVMBuildZExt</span>(<span class="self">self</span>.<span class="ident">builder_ref</span>, <span class="ident">value</span>.<span class="ident">value_ref</span>, <span class="ident">ty</span>.<span class="ident">type_ref</span>, <span class="ident">name</span>)
-        })
-    }
+<span class="comment">//    pub fn trunc(&amp;self, value: Value&lt;&#39;a&gt;, ty: Type&lt;&#39;a&gt;, name: &amp;str) -&gt; Value&lt;&#39;a&gt; {</span>
+<span class="comment">//        let name = self.context.new_name(name);</span>
+<span class="comment">//        self.context.wrap_value(unsafe {</span>
+<span class="comment">//            LLVMBuildTrunc(self.builder_ref, value.value_ref, ty.type_ref, name)</span>
+<span class="comment">//        })</span>
+<span class="comment">//    }</span>
+<span class="comment">//</span>
+<span class="comment">//    pub fn zext(&amp;self, value: Value&lt;&#39;a&gt;, ty: Type&lt;&#39;a&gt;, name: &amp;str) -&gt; Value&lt;&#39;a&gt; {</span>
+<span class="comment">//        let name = self.context.new_name(name);</span>
+<span class="comment">//        self.context.wrap_value(unsafe {</span>
+<span class="comment">//            LLVMBuildZExt(self.builder_ref, value.value_ref, ty.type_ref, name)</span>
+<span class="comment">//        })</span>
+<span class="comment">//    }</span>
 }
 </pre>
-</section>
-    <section id='search' class="content hidden"></section>
-
-    <section class="footer"></section>
-
-    <aside id="help" class="hidden">
-        <div>
-            <h1 class="hidden">Help</h1>
-
-            <div class="shortcuts">
-                <h2>Keyboard Shortcuts</h2>
-
-                <dl>
-                    <dt>?</dt>
-                    <dd>Show this help dialog</dd>
-                    <dt>S</dt>
-                    <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
-                    <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
-                    <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
-                    <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
-                </dl>
-            </div>
-
-            <div class="infos">
-                <h2>Search Tricks</h2>
-
-                <p>
-                    Prefix searches with a type followed by a colon (e.g.
-                    <code>fn:</code>) to restrict the search to a given type.
-                </p>
-
-                <p>
-                    Accepted types are: <code>fn</code>, <code>mod</code>,
-                    <code>struct</code>, <code>enum</code>,
-                    <code>trait</code>, <code>type</code>, <code>macro</code>,
-                    and <code>const</code>.
-                </p>
-
-                <p>
-                    Search functions by type signature (e.g.
-                    <code>vec -> usize</code> or <code>* -> vec</code>)
-                </p>
-            </div>
-        </div>
-    </aside>
-
-    
-
-    <script>
-        window.rootPath = "../../../";
-        window.currentCrate = "bf";
-    </script>
-    <script src="../../../main.js"></script>
-    <script defer src="../../../search-index.js"></script>
-</body>
-</html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../";window.currentCrate = "bf";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script defer src="../../../search-index.js"></script></body></html>
