@@ -244,7 +244,7 @@ fn build_clap_app() -> App<'static, 'static> {
 }
 
 fn error_exit(code: i32, msg: String) -> ! {
-    writeln!(io::stderr(), "bfi: {}", msg).unwrap();
+    eprintln!("bfi: {}", msg);
     exit(code)
 }
 
