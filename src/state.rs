@@ -5,7 +5,6 @@
 
 use std::default::Default;
 use std::io::{Read, Write};
-use std::mem;
 use std::num::Wrapping;
 
 use common::{BfResult, Error};
@@ -147,7 +146,7 @@ impl State {
     /// This is used by the JIT RTS to pass the memory pointer to the generated code.
     pub fn as_mut_ptr(&mut self) -> *mut u8 {
         // Assumes that Wrapping<u8> == u8:
-        unsafe { mem::transmute(self.memory.as_mut_ptr()) }
+        self.memory.as_mut_ptr() as *mut u8
     }
 }
 

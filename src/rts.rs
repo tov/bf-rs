@@ -32,9 +32,7 @@ pub struct RtsState<'a> {
 
 impl<'a> RtsState<'a> {
     pub fn new<R: Read, W: Write>(input: &'a mut R, output: &'a mut W) -> Self {
-        RtsState {
-            input: input,
-            output: output,
+        RtsState { input, output,
         }
     }
 
