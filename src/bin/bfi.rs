@@ -28,7 +28,7 @@
 extern crate bf;
 extern crate clap;
 
-use std::io::{self, Read, Write};
+use std::io::Read;
 use std::fs::File;
 use std::process::exit;
 
@@ -93,19 +93,19 @@ fn main() {
         #[cfg(feature = "llvm")]
         Pass::Llvm => {
             program.llvm_run(options.memory_size)
-                .unwrap_or_else(|e| error_exit(3, format!("runtime error: {}.", e)));
+                .unwrap_or_else(|e| error_exit(3, &format!("runtime error: {}.", e)));
         }
     }
 }
 
 fn parse(options: &Options) -> Box<ast::Program> {
     ast::parse_program(&options.program_text)
-        .unwrap_or_else(|e| error_exit(2, format!("syntax error: {}.", e)))
+        .unwrap_or_else(|e| error_exit(2, &format!("syntax error: {}.", e)))
 }
 
 fn interpret<P: Interpretable + ?Sized>(program: &P, options: &Options) {
     program.interpret_stdin(options.memory_size)
-        .unwrap_or_else(|e| error_exit(3, format!("runtime error: {}.", e)))
+        .unwrap_or_else(|e| error_exit(3, &format!("runtime error: {}.", e)))
 }
 
 #[cfg(feature = "jit")]
@@ -127,9 +127,9 @@ fn get_options() -> Options {
     if let Some(size) = matches.value_of("size") {
         let size = size.parse()
             .unwrap_or_else(|e|
-                error_exit(1, format!("error: could not parse memory size: {}.", e)));
+                error_exit(1, &format!("error: could not parse memory size: {}.", e)));
         if size == 0 {
-            error_exit(1, "error: memory size must be at least 1.".to_owned());
+            error_exit(1, "error: memory size must be at least 1.");
         }
         result.memory_size = Some(size);
     }
@@ -161,12 +161,12 @@ fn get_options() -> Options {
     } else if let Some(files) = matches.values_of("FILE") {
         for f in files {
             let mut file = File::open(f)
-                .unwrap_or_else(|e| error_exit(1, format!("{}: ‘{}’.", e, f)));
+                .unwrap_or_else(|e| error_exit(1, &format!("{}: ‘{}’.", e, f)));
             file.read_to_end(&mut result.program_text)
-                .unwrap_or_else(|e| error_exit(1, format!("{}: ‘{}’.", e, f)));
+                .unwrap_or_else(|e| error_exit(1, &format!("{}: ‘{}’.", e, f)));
         }
     } else {
-        error_exit(1, "error: no program given.".to_owned());
+        error_exit(1, "error: no program given.");
     }
 
     result
@@ -243,7 +243,7 @@ fn build_clap_app() -> App<'static, 'static> {
     app
 }
 
-fn error_exit(code: i32, msg: String) -> ! {
+fn error_exit(code: i32, msg: &str) -> ! {
     eprintln!("bfi: {}", msg);
     exit(code)
 }
