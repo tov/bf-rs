@@ -26,6 +26,8 @@
 //! See [the library crate documentation](../bf/index.html) for more.
 
 extern crate bf;
+
+#[macro_use]
 extern crate clap;
 
 use std::io::Read;
@@ -36,8 +38,6 @@ use clap::{Arg, App};
 
 use bf::ast;
 use bf::traits::*;
-
-const VERSION: &str = "0.4.6";
 
 #[derive(Debug, Clone)]
 struct Options {
@@ -174,7 +174,7 @@ fn get_options() -> Options {
 
 fn build_clap_app() -> App<'static, 'static> {
     let app = App::new("bfi")
-        .version(VERSION)
+        .version(crate_version!())
         .author("Jesse A. Tov <jesse.tov@gmail.com>")
         .about("A Brainfuck interpreter")
         .arg(Arg::with_name("expr")
