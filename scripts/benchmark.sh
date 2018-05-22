@@ -33,7 +33,7 @@ bench () {
 }
 
 bench "bfi peephole AST"                target/release/bfi --peep
-bench "bfi bytecode"                    target/release/bfi --flat
+bench "bfi bytecode"                    target/release/bfi --byte
 bench "bfi native JIT"                  target/release/bfi --jit
 bench "bfi native JIT (unchecked)"      target/release/bfi --jit -u
 bench "Bendersky's optinterp3"          cpp/optinterp3
