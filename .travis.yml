@@ -10,6 +10,8 @@ matrix:
       env:
         - BENCH=yes
         - FEATURES=jit
+# Oldest supported version:
+    - rust: 1.20.0
   allow_failures:
     - rust: nightly
 
