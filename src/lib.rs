@@ -5,7 +5,8 @@
 //! and an executable `bfi` that provides a command-line interface for executing
 //! Brainfuck programs.
 //!
-//! By default, installing `bf` does not enable the JIT compiler because
+//! This crate supports Rust version 1.20 and later. However,
+//! by default, installing `bf` does not enable the JIT compiler because
 //! that requires nightly Rust. To build and install from crates.io with the native x86-64
 //! JIT enabled:
 //!
