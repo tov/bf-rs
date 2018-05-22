@@ -33,7 +33,7 @@
 //! can be [just-in-time compiled to x64 machine code](jit/index.html).
 //!
 //!  - Or, if the `llvm` feature is enabled (LLVM ≥ 3.8 must be in the PATH to build),
-//! the peephole output can be [JIT compiled useing LLVM](llvm/index.html).
+//! the peephole output can be [JIT compiled using LLVM](llvm/index.html).
 //! (This is quite slow right now.)
 //!
 //! Interpreters are provided for the intermediate forms as well. In particular,
