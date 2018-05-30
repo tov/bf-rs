@@ -66,7 +66,10 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
 </pre><pre class="rust ">
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;http://tov.github.io/bf-rs&quot;</span>)]</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! `bf-rs` is a optimizing Brainfuck interpreter and JIT compiler</span>
 <span class="doccomment">//! inspired by Eli Bendersky’s [series on JIT compilation].</span>
@@ -74,7 +77,8 @@
 <span class="doccomment">//! and an executable `bfi` that provides a command-line interface for executing</span>
 <span class="doccomment">//! Brainfuck programs.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! By default, installing `bf` does not enable the JIT compiler because</span>
+<span class="doccomment">//! This crate supports Rust version 1.20 and later. However,</span>
+<span class="doccomment">//! by default, installing `bf` does not enable the JIT compiler because</span>
 <span class="doccomment">//! that requires nightly Rust. To build and install from crates.io with the native x86-64</span>
 <span class="doccomment">//! JIT enabled:</span>
 <span class="doccomment">//!</span>
@@ -102,7 +106,7 @@
 <span class="doccomment">//! can be [just-in-time compiled to x64 machine code](jit/index.html).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!  - Or, if the `llvm` feature is enabled (LLVM ≥ 3.8 must be in the PATH to build),</span>
-<span class="doccomment">//! the peephole output can be [JIT compiled useing LLVM](llvm/index.html).</span>
+<span class="doccomment">//! the peephole output can be [JIT compiled using LLVM](llvm/index.html).</span>
 <span class="doccomment">//! (This is quite slow right now.)</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Interpreters are provided for the intermediate forms as well. In particular,</span>
