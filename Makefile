@@ -1,11 +1,7 @@
-default: clippy
-hard: doc
+default: doc
 
 CRATE = bf
 REPO  = bf-rs
-
-clippy:
-	rustup run nightly cargo build --features=clippy\ jit
 
 doc:
 	rustup run nightly cargo doc --no-deps -p $(CRATE) --features="jit llvm"
@@ -15,12 +11,3 @@ upload-doc:
 	make doc
 	ghp-import -n target/doc
 	git push -f https://github.com/tov/$(REPO).git gh-pages
-
-release:
-	scripts/prepare_release.sh $(VERSION)
-	make upload-doc
-	cargo publish
-
-clean:
-	cargo clean
-	$(RM) src/raw.rs

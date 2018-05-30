@@ -1,3 +1,4 @@
+#![doc(html_root_url = "http://tov.github.io/bf-rs")]
 //!
 //! `bf-rs` is a optimizing Brainfuck interpreter and JIT compiler
 //! inspired by Eli Bendersky’s [series on JIT compilation].
