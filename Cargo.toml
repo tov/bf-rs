@@ -13,12 +13,16 @@ keywords = ["brainfuck", "interpreters", "compilers", "jit", "x64"]
 travis-ci = { repository = "tov/bf-rs" }
 
 [features]
+default = ["bfi"]
 
 # Enables native x64 JIT; requires nightly Rust
 jit = ["dynasmrt", "dynasm"]
 
 # Enables LLVM-based JIT; requires LLVM >= 3.8
 llvm = ["llvm-sys"]
+
+# Enables the buitlin cli brainfuck interpreter.
+bfi = ["clap"]
 
 # Use `u32` for counts instead of usize.
 u32count = []
@@ -27,7 +31,7 @@ u32count = []
 u16count = []
 
 [dependencies]
-clap = "2.24"
+clap = { version = "2.24", optional = true }
 
 dynasmrt = { version = "0.2.1", optional = true }
 dynasm = { version = "0.2.1", optional = true }
@@ -37,3 +41,6 @@ llvm-sys = { version = "38", optional = true }
 [package.metadata.docs.rs]
 features = ["jit"]
 
+[[bin]]
+name = "bfi"
+required-features = ["bfi"]
