@@ -106,8 +106,6 @@ mod tests {
     }
 
     fn assert_parse_interpret(program: &[u8], input: &str, output: &str) {
-        use super::super::parser::parse_program;
-
         let program = parse_program(program).unwrap();
         assert_interpret(&*program, input.as_bytes(), output.as_bytes());
     }

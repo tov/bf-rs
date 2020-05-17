@@ -25,9 +25,9 @@ pub const OVERFLOW: u64  = 2;
 /// Trait objects providing channels for standard input and output.
 pub struct RtsState<'a> {
     /// Input channel for the `,` operation.
-    input:  &'a mut Read,
+    input:  &'a mut dyn Read,
     /// Output channel for the `.` operation.
-    output: &'a mut Write,
+    output: &'a mut dyn Write,
 }
 
 impl<'a> RtsState<'a> {
